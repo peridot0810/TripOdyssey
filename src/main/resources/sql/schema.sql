@@ -22,8 +22,6 @@ USE `tripsaga` ;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `tripsaga`.`location` (
   `location_id` INT NOT NULL,
-  `X` FLOAT NOT NULL,
-  `Y` FLOAT NOT NULL,
   `title` VARCHAR(45) NOT NULL,
   `type` VARCHAR(45) NULL DEFAULT NULL,
   `imgUrl` VARCHAR(100) NULL,
@@ -47,7 +45,9 @@ CREATE TABLE IF NOT EXISTS `tripsaga`.`content` (
   INDEX `fk_content_location1_idx` (`location_id` ASC) VISIBLE,
   CONSTRAINT `fk_content_location1`
     FOREIGN KEY (`location_id`)
-    REFERENCES `tripsaga`.`location` (`location_id`))
+    REFERENCES `tripsaga`.`location` (`location_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
 
