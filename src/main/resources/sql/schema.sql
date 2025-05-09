@@ -237,6 +237,17 @@ CREATE TABLE IF NOT EXISTS `tripsaga`.`post_like` (
   FOREIGN KEY (`user_id`) REFERENCES `tripsaga`.`user` (`id`)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb3;
 
+CREATE TABLE IF NOT EXISTS `available_schedule` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `group_id` INT NOT NULL,
+  `user_id` VARCHAR(100) NOT NULL,
+  `start_date` DATE NOT NULL,
+  `end_date` DATE NOT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`group_id`) REFERENCES `travel_group`(`group_id`) ON DELETE CASCADE,
+  FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb3;
+
 -- 마무리 설정 복구
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
