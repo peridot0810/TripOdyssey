@@ -1,361 +1,243 @@
--- MySQL Workbench Forward Engineering
+-- MySQL Workbench Forward Engineering (최종 수정본)
 
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
 
--- -----------------------------------------------------
--- Schema mydb
--- -----------------------------------------------------
--- -----------------------------------------------------
--- Schema tripsaga
--- -----------------------------------------------------
-
--- -----------------------------------------------------
--- Schema tripsaga
--- -----------------------------------------------------
 DROP SCHEMA IF EXISTS `tripsaga`;
-CREATE SCHEMA IF NOT EXISTS `tripsaga` DEFAULT CHARACTER SET utf8mb3 ;
-USE `tripsaga` ;
+CREATE SCHEMA IF NOT EXISTS `tripsaga` DEFAULT CHARACTER SET utf8mb3;
+USE `tripsaga`;
 
--- -----------------------------------------------------
--- Table `tripsaga`.`group`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `tripsaga`.`group` (
+-- travel_group
+CREATE TABLE IF NOT EXISTS `tripsaga`.`travel_group` (
   `group_id` INT NOT NULL AUTO_INCREMENT,
-  `groupcol` VARCHAR(45) NULL DEFAULT NULL,
   `name` VARCHAR(100) NOT NULL,
   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `status` ENUM('planning', 'onGoing', 'finished', 'canceled') NOT NULL,
-  `start_date` DATE NULL DEFAULT NULL,
-  `end_date` DATE NULL DEFAULT NULL,
-  PRIMARY KEY (`group_id`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb3;
+  `start_date` DATE,
+  `end_date` DATE,
+  PRIMARY KEY (`group_id`)
+) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb3;
 
-
--- -----------------------------------------------------
--- Table `tripsaga`.`location`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `tripsaga`.`location` (
-  `location_id` INT NOT NULL,
-  `title` VARCHAR(45) NOT NULL,
-  `type` VARCHAR(45) NULL DEFAULT NULL,
-  `imgUrl` VARCHAR(100) NULL DEFAULT NULL,
-  `tel` VARCHAR(45) NULL DEFAULT NULL,
-  `address` VARCHAR(45) NULL DEFAULT NULL,
-  `overview` VARCHAR(45) NULL DEFAULT NULL,
-  PRIMARY KEY (`location_id`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb3;
-
-
--- -----------------------------------------------------
--- Table `tripsaga`.`accommodation`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `tripsaga`.`accommodation` (
-  `accommodation_id` INT NOT NULL AUTO_INCREMENT,
-  `group_id` INT NOT NULL,
-  `name` VARCHAR(45) NULL DEFAULT NULL,
-  `duration_start` INT NULL DEFAULT NULL,
-  `duration_end` INT NULL DEFAULT NULL,
-  `location_id` INT NOT NULL,
-  PRIMARY KEY (`accommodation_id`),
-  INDEX `fk_accommodation_group1_idx` (`group_id` ASC) VISIBLE,
-  INDEX `fk_accommodation_location1_idx` (`location_id` ASC) VISIBLE,
-  CONSTRAINT `fk_accommodation_group1`
-    FOREIGN KEY (`group_id`)
-    REFERENCES `tripsaga`.`group` (`group_id`),
-  CONSTRAINT `fk_accommodation_location1`
-    FOREIGN KEY (`location_id`)
-    REFERENCES `tripsaga`.`location` (`location_id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb3;
-
-
--- -----------------------------------------------------
--- Table `tripsaga`.`content`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `tripsaga`.`content` (
-  `content_id` INT NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(45) NULL DEFAULT NULL,
-  `description` VARCHAR(45) NULL DEFAULT NULL,
-  `location_id` INT NULL DEFAULT NULL,
-  PRIMARY KEY (`content_id`),
-  INDEX `fk_content_location1_idx` (`location_id` ASC) VISIBLE,
-  CONSTRAINT `fk_content_location1`
-    FOREIGN KEY (`location_id`)
-    REFERENCES `tripsaga`.`location` (`location_id`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb3;
-
-
--- -----------------------------------------------------
--- Table `tripsaga`.`expense_category`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `tripsaga`.`expense_category` (
-  `category_id` INT NOT NULL AUTO_INCREMENT,
-  `category_name` VARCHAR(45) NULL DEFAULT NULL,
-  PRIMARY KEY (`category_id`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb3;
-
-
--- -----------------------------------------------------
--- Table `tripsaga`.`expense_tracker`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `tripsaga`.`expense_tracker` (
-  `expense_id` INT NOT NULL AUTO_INCREMENT,
-  `group_id` INT NOT NULL,
-  `content_id` INT NOT NULL,
-  `category_id` INT NOT NULL,
-  `datetime` DATETIME NULL DEFAULT NULL,
-  `description` VARCHAR(45) NULL DEFAULT NULL,
-  `amount` INT NULL DEFAULT NULL,
-  PRIMARY KEY (`expense_id`),
-  INDEX `fk_expense_tracker_group1_idx` (`group_id` ASC) VISIBLE,
-  INDEX `fk_expense_tracker_expense_category1_idx` (`category_id` ASC) VISIBLE,
-  INDEX `fk_expense_tracker_content1_idx` (`content_id` ASC) VISIBLE,
-  CONSTRAINT `fk_expense_tracker_content1`
-    FOREIGN KEY (`content_id`)
-    REFERENCES `tripsaga`.`content` (`content_id`),
-  CONSTRAINT `fk_expense_tracker_expense_category1`
-    FOREIGN KEY (`category_id`)
-    REFERENCES `tripsaga`.`expense_category` (`category_id`),
-  CONSTRAINT `fk_expense_tracker_group1`
-    FOREIGN KEY (`group_id`)
-    REFERENCES `tripsaga`.`group` (`group_id`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb3;
-
-
--- -----------------------------------------------------
--- Table `tripsaga`.`role`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `tripsaga`.`role` (
-  `role_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(100) NOT NULL,
-  PRIMARY KEY (`role_id`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb3;
-
-
--- -----------------------------------------------------
--- Table `tripsaga`.`user`
--- -----------------------------------------------------
+-- user
 CREATE TABLE IF NOT EXISTS `tripsaga`.`user` (
   `id` VARCHAR(100) NOT NULL,
-  `pw` VARCHAR(300) NOT NULL,
+  `pw` VARCHAR(100) NOT NULL,
   `email` VARCHAR(100) NOT NULL,
   `gender` ENUM('male', 'female') NOT NULL,
   `nickname` VARCHAR(100) NOT NULL,
-  `age` INT NOT NULL,
+  `age` INT UNSIGNED NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb3;
+  UNIQUE INDEX `email_UNIQUE` (`email` ASC)
+) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb3;
 
+-- location
+CREATE TABLE IF NOT EXISTS `tripsaga`.`location` (
+  `location_id` INT NOT NULL,
+  `title` VARCHAR(100) NOT NULL,
+  `type` VARCHAR(50),
+  `imgUrl` VARCHAR(255),
+  `tel` VARCHAR(45),
+  `address` VARCHAR(100),
+  `overview` VARCHAR(500),
+  PRIMARY KEY (`location_id`)
+) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb3;
 
--- -----------------------------------------------------
--- Table `tripsaga`.`group_user_info`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `tripsaga`.`group_user_info` (
-  `user_id` VARCHAR(100) NOT NULL,
+-- content
+CREATE TABLE IF NOT EXISTS `tripsaga`.`content` (
+  `content_id` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(100),
+  `description` VARCHAR(500),
+  `location_id` INT,
+  PRIMARY KEY (`content_id`),
+  FOREIGN KEY (`location_id`) REFERENCES `tripsaga`.`location` (`location_id`)
+) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb3;
+
+-- accommodation
+CREATE TABLE IF NOT EXISTS `tripsaga`.`accommodation` (
+  `accommodation_id` INT NOT NULL AUTO_INCREMENT,
   `group_id` INT NOT NULL,
-  `role_id` INT UNSIGNED NOT NULL,
-  PRIMARY KEY (`user_id`, `group_id`, `role_id`),
-  INDEX `fk_GroupUserInfo_Group1_idx` (`group_id` ASC) VISIBLE,
-  INDEX `fk_GroupUserInfo_Role1_idx` (`role_id` ASC) VISIBLE,
-  CONSTRAINT `fk_GroupUserInfo_Group1`
-    FOREIGN KEY (`group_id`)
-    REFERENCES `tripsaga`.`group` (`group_id`)
-    ON DELETE CASCADE,
-  CONSTRAINT `fk_GroupUserInfo_Role1`
-    FOREIGN KEY (`role_id`)
-    REFERENCES `tripsaga`.`role` (`role_id`),
-  CONSTRAINT `fk_GroupUserInfo_User`
-    FOREIGN KEY (`user_id`)
-    REFERENCES `tripsaga`.`user` (`id`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb3;
+  `name` VARCHAR(100),
+  `check_in_time` DATETIME,
+  `check_out_time` DATETIME,
+  `location_id` INT NOT NULL,
+  PRIMARY KEY (`accommodation_id`),
+  FOREIGN KEY (`group_id`) REFERENCES `tripsaga`.`travel_group` (`group_id`),
+  FOREIGN KEY (`location_id`) REFERENCES `tripsaga`.`location` (`location_id`)
+) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb3;
 
-
--- -----------------------------------------------------
--- Table `tripsaga`.`member_expense_info`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `tripsaga`.`member_expense_info` (
-  `user_id` VARCHAR(100) NOT NULL,
-  `group_id` INT NOT NULL,
-  `expense_to_pay` INT NOT NULL,
-  `paid_amount` INT NOT NULL DEFAULT '0',
-  PRIMARY KEY (`user_id`, `group_id`),
-  INDEX `fk_member_expense_info_group1_idx` (`group_id` ASC) VISIBLE,
-  CONSTRAINT `fk_member_expense_info_group1`
-    FOREIGN KEY (`group_id`)
-    REFERENCES `tripsaga`.`group` (`group_id`),
-  CONSTRAINT `fk_member_expense_info_user1`
-    FOREIGN KEY (`user_id`)
-    REFERENCES `tripsaga`.`user` (`id`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb3;
-
-
--- -----------------------------------------------------
--- Table `tripsaga`.`schedule`
--- -----------------------------------------------------
+-- schedule
 CREATE TABLE IF NOT EXISTS `tripsaga`.`schedule` (
   `order` INT NOT NULL,
   `day` INT NOT NULL,
   `content_id` INT NOT NULL,
   `group_id` INT NOT NULL,
   `is_official` BOOLEAN DEFAULT TRUE,
-  PRIMARY KEY (`content_id`),
-  INDEX `fk_Schedule_Group1_idx` (`group_id` ASC) VISIBLE,
-  CONSTRAINT `fk_Schedule_Content1`
-    FOREIGN KEY (`content_id`)
-    REFERENCES `tripsaga`.`content` (`content_id`),
-  CONSTRAINT `fk_Schedule_Group1`
-    FOREIGN KEY (`group_id`)
-    REFERENCES `tripsaga`.`group` (`group_id`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb3;
+  PRIMARY KEY (`group_id`, `day`, `order`),
+  FOREIGN KEY (`content_id`) REFERENCES `tripsaga`.`content` (`content_id`),
+  FOREIGN KEY (`group_id`) REFERENCES `tripsaga`.`travel_group` (`group_id`)
+) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb3;
 
-
--- -----------------------------------------------------
--- Table `tripsaga`.`schedule_proposal`
--- -----------------------------------------------------
+-- schedule_proposal
 CREATE TABLE IF NOT EXISTS `tripsaga`.`schedule_proposal` (
   `proposal_id` INT NOT NULL AUTO_INCREMENT,
   `group_id` INT NOT NULL,
   `user_id` VARCHAR(100) NOT NULL,
   `location_id` INT NOT NULL,
   PRIMARY KEY (`proposal_id`),
-  INDEX `fk_ScheduleProposal_Group1_idx` (`group_id` ASC) VISIBLE,
-  INDEX `fk_ScheduleProposal_User1_idx` (`user_id` ASC) VISIBLE,
-  INDEX `fk_scheduleproposal_location1_idx` (`location_id` ASC) VISIBLE,
-  CONSTRAINT `fk_ScheduleProposal_Group1`
-    FOREIGN KEY (`group_id`)
-    REFERENCES `tripsaga`.`group` (`group_id`),
-  CONSTRAINT `fk_scheduleproposal_location1`
-    FOREIGN KEY (`location_id`)
-    REFERENCES `tripsaga`.`location` (`location_id`),
-  CONSTRAINT `fk_ScheduleProposal_User1`
-    FOREIGN KEY (`user_id`)
-    REFERENCES `tripsaga`.`user` (`id`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb3;
+  FOREIGN KEY (`group_id`) REFERENCES `tripsaga`.`travel_group` (`group_id`),
+  FOREIGN KEY (`location_id`) REFERENCES `tripsaga`.`location` (`location_id`),
+  FOREIGN KEY (`user_id`) REFERENCES `tripsaga`.`user` (`id`)
+) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb3;
 
-
--- -----------------------------------------------------
--- Table `tripsaga`.`transportation_type`
--- -----------------------------------------------------
+-- transportation_type
 CREATE TABLE IF NOT EXISTS `tripsaga`.`transportation_type` (
   `type_id` INT NOT NULL AUTO_INCREMENT,
-  `type_name` VARCHAR(45) NULL DEFAULT NULL,
-  PRIMARY KEY (`type_id`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb3;
+  `type_name` VARCHAR(50),
+  PRIMARY KEY (`type_id`)
+) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb3;
 
-
--- -----------------------------------------------------
--- Table `tripsaga`.`transportation`
--- -----------------------------------------------------
+-- transportation
 CREATE TABLE IF NOT EXISTS `tripsaga`.`transportation` (
   `transportation_id` INT NOT NULL AUTO_INCREMENT,
   `type_id` INT NOT NULL,
   `group_id` INT NOT NULL,
-  `departure` DATETIME NULL DEFAULT NULL,
-  `arrival` DATETIME NULL DEFAULT NULL,
-  `from` VARCHAR(45) NULL DEFAULT NULL,
-  `to` VARCHAR(45) NULL DEFAULT NULL,
-  `description` VARCHAR(45) NULL DEFAULT NULL,
+  `departure` DATETIME,
+  `arrival` DATETIME,
+  `from` VARCHAR(100),
+  `to` VARCHAR(100),
+  `description` VARCHAR(255),
   PRIMARY KEY (`transportation_id`),
-  INDEX `fk_transportation_transportation_type1_idx` (`type_id` ASC) VISIBLE,
-  INDEX `fk_transportation_group1_idx` (`group_id` ASC) VISIBLE,
-  CONSTRAINT `fk_transportation_group1`
-    FOREIGN KEY (`group_id`)
-    REFERENCES `tripsaga`.`group` (`group_id`),
-  CONSTRAINT `fk_transportation_transportation_type1`
-    FOREIGN KEY (`type_id`)
-    REFERENCES `tripsaga`.`transportation_type` (`type_id`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb3;
+  FOREIGN KEY (`type_id`) REFERENCES `tripsaga`.`transportation_type` (`type_id`),
+  FOREIGN KEY (`group_id`) REFERENCES `tripsaga`.`travel_group` (`group_id`)
+) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb3;
 
-CREATE TABLE IF NOT EXISTS user_experience (
-  user_id VARCHAR(100) NOT NULL,
-  leader_exp INT DEFAULT 0,
-  schedule_exp INT DEFAULT 0,
-  finance_exp INT DEFAULT 0,
-  logistics_exp INT DEFAULT 0,
-  member_exp INT DEFAULT 0,
-  PRIMARY KEY (user_id),
-  FOREIGN KEY (user_id) REFERENCES user(id)
-);
+-- role
+CREATE TABLE IF NOT EXISTS `tripsaga`.`role` (
+  `role_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(100) NOT NULL,
+  PRIMARY KEY (`role_id`)
+) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb3;
 
--- ✅ 여행 준비 progress 테이블 (각 단계 boolean)
-CREATE TABLE IF NOT EXISTS group_progress (
-  group_id INT NOT NULL,
-  schedule_coordination BOOLEAN DEFAULT FALSE,
-  role_assignment BOOLEAN DEFAULT FALSE,
-  trip_planning BOOLEAN DEFAULT FALSE,
-  on_trip BOOLEAN DEFAULT FALSE,
-  settlement BOOLEAN DEFAULT FALSE,
-  finished BOOLEAN DEFAULT FALSE,
-  PRIMARY KEY (group_id),
-  FOREIGN KEY (group_id) REFERENCES `group`(group_id)
-);
+-- group_user_info
+CREATE TABLE IF NOT EXISTS `tripsaga`.`group_user_info` (
+  `user_id` VARCHAR(100) NOT NULL,
+  `group_id` INT NOT NULL,
+  `role_id` INT UNSIGNED NOT NULL,
+  PRIMARY KEY (`user_id`, `group_id`, `role_id`),
+  FOREIGN KEY (`group_id`) REFERENCES `tripsaga`.`travel_group` (`group_id`) ON DELETE CASCADE,
+  FOREIGN KEY (`role_id`) REFERENCES `tripsaga`.`role` (`role_id`),
+  FOREIGN KEY (`user_id`) REFERENCES `tripsaga`.`user` (`id`)
+) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb3;
 
--- ✅ 역할 제한 테이블 (role_id 참조)
-CREATE TABLE IF NOT EXISTS group_role_limit (
-  group_id INT NOT NULL,
-  role_id INT UNSIGNED NOT NULL,
-  limit_count INT NOT NULL,
-  PRIMARY KEY (group_id, role_id),
-  FOREIGN KEY (group_id) REFERENCES `group`(group_id),
-  FOREIGN KEY (role_id) REFERENCES role(role_id)
-);
+-- group_progress
+CREATE TABLE IF NOT EXISTS `tripsaga`.`group_progress` (
+  `group_id` INT NOT NULL,
+  `schedule_coordination` BOOLEAN DEFAULT FALSE,
+  `role_assignment` BOOLEAN DEFAULT FALSE,
+  `trip_planning` BOOLEAN DEFAULT FALSE,
+  `on_trip` BOOLEAN DEFAULT FALSE,
+  `settlement` BOOLEAN DEFAULT FALSE,
+  `finished` BOOLEAN DEFAULT FALSE,
+  PRIMARY KEY (`group_id`),
+  FOREIGN KEY (`group_id`) REFERENCES `tripsaga`.`travel_group` (`group_id`)
+) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb3;
 
--- ✅ 게시판 카테고리 테이블
-CREATE TABLE IF NOT EXISTS post_category (
-  category_id INT AUTO_INCREMENT PRIMARY KEY,
-  category_name VARCHAR(50) NOT NULL
-);
+-- group_role_limit
+CREATE TABLE IF NOT EXISTS `tripsaga`.`group_role_limit` (
+  `group_id` INT NOT NULL,
+  `role_id` INT UNSIGNED NOT NULL,
+  `limit_count` INT NOT NULL,
+  PRIMARY KEY (`group_id`, `role_id`),
+  FOREIGN KEY (`group_id`) REFERENCES `tripsaga`.`travel_group` (`group_id`),
+  FOREIGN KEY (`role_id`) REFERENCES `tripsaga`.`role` (`role_id`)
+) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb3;
 
--- ✅ 게시글 테이블
-CREATE TABLE IF NOT EXISTS post (
-  post_id INT AUTO_INCREMENT PRIMARY KEY,
-  title VARCHAR(255) NOT NULL,
-  content TEXT NOT NULL,
-  category_id INT NOT NULL,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  views INT DEFAULT 0,
-  author VARCHAR(100) NOT NULL,
-  FOREIGN KEY (category_id) REFERENCES post_category(category_id),
-  FOREIGN KEY (author) REFERENCES user(id)
-);
+-- user_experience
+CREATE TABLE IF NOT EXISTS `tripsaga`.`user_experience` (
+  `user_id` VARCHAR(100) NOT NULL,
+  `leader_exp` INT DEFAULT 0,
+  `schedule_exp` INT DEFAULT 0,
+  `finance_exp` INT DEFAULT 0,
+  `logistics_exp` INT DEFAULT 0,
+  `member_exp` INT DEFAULT 0,
+  PRIMARY KEY (`user_id`),
+  FOREIGN KEY (`user_id`) REFERENCES `tripsaga`.`user` (`id`)
+) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb3;
 
--- ✅ 댓글 테이블
-CREATE TABLE IF NOT EXISTS comment (
-  comment_id INT AUTO_INCREMENT PRIMARY KEY,
-  post_id INT NOT NULL,
-  content TEXT NOT NULL,
-  writer VARCHAR(100) NOT NULL,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (post_id) REFERENCES post(post_id),
-  FOREIGN KEY (writer) REFERENCES user(id)
-);
+-- expense_category
+CREATE TABLE IF NOT EXISTS `tripsaga`.`expense_category` (
+  `category_id` INT NOT NULL AUTO_INCREMENT,
+  `category_name` VARCHAR(100),
+  PRIMARY KEY (`category_id`)
+) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb3;
 
--- ✅ 좋아요 테이블
-CREATE TABLE IF NOT EXISTS post_like (
-  post_id INT NOT NULL,
-  user_id VARCHAR(100) NOT NULL,
-  PRIMARY KEY (post_id, user_id),
-  FOREIGN KEY (post_id) REFERENCES post(post_id),
-  FOREIGN KEY (user_id) REFERENCES user(id)
-);
+-- expense_tracker
+CREATE TABLE IF NOT EXISTS `tripsaga`.`expense_tracker` (
+  `expense_id` INT NOT NULL AUTO_INCREMENT,
+  `group_id` INT NOT NULL,
+  `content_id` INT NOT NULL,
+  `category_id` INT NOT NULL,
+  `datetime` DATETIME,
+  `description` VARCHAR(255),
+  `amount` INT,
+  PRIMARY KEY (`expense_id`),
+  FOREIGN KEY (`group_id`) REFERENCES `tripsaga`.`travel_group` (`group_id`),
+  FOREIGN KEY (`content_id`) REFERENCES `tripsaga`.`content` (`content_id`),
+  FOREIGN KEY (`category_id`) REFERENCES `tripsaga`.`expense_category` (`category_id`)
+) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb3;
 
+-- member_expense_info
+CREATE TABLE IF NOT EXISTS `tripsaga`.`member_expense_info` (
+  `user_id` VARCHAR(100) NOT NULL,
+  `group_id` INT NOT NULL,
+  `expense_to_pay` INT NOT NULL,
+  `paid_amount` INT NOT NULL DEFAULT 0,
+  PRIMARY KEY (`user_id`, `group_id`),
+  FOREIGN KEY (`user_id`) REFERENCES `tripsaga`.`user` (`id`),
+  FOREIGN KEY (`group_id`) REFERENCES `tripsaga`.`travel_group` (`group_id`)
+) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb3;
+
+-- post_category
+CREATE TABLE IF NOT EXISTS `tripsaga`.`post_category` (
+  `category_id` INT AUTO_INCREMENT PRIMARY KEY,
+  `category_name` VARCHAR(50) NOT NULL
+) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb3;
+
+-- post
+CREATE TABLE IF NOT EXISTS `tripsaga`.`post` (
+  `post_id` INT AUTO_INCREMENT PRIMARY KEY,
+  `title` VARCHAR(255) NOT NULL,
+  `content` TEXT NOT NULL,
+  `category_id` INT NOT NULL,
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `views` INT NOT NULL DEFAULT 0,
+  `author` VARCHAR(100) NOT NULL,
+  FOREIGN KEY (`category_id`) REFERENCES `tripsaga`.`post_category` (`category_id`),
+  FOREIGN KEY (`author`) REFERENCES `tripsaga`.`user` (`id`)
+) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb3;
+
+-- comment
+CREATE TABLE IF NOT EXISTS `tripsaga`.`comment` (
+  `comment_id` INT AUTO_INCREMENT PRIMARY KEY,
+  `post_id` INT NOT NULL,
+  `content` TEXT NOT NULL,
+  `writer` VARCHAR(100) NOT NULL,
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`post_id`) REFERENCES `tripsaga`.`post` (`post_id`),
+  FOREIGN KEY (`writer`) REFERENCES `tripsaga`.`user` (`id`)
+) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb3;
+
+-- post_like
+CREATE TABLE IF NOT EXISTS `tripsaga`.`post_like` (
+  `post_id` INT NOT NULL,
+  `user_id` VARCHAR(100) NOT NULL,
+  PRIMARY KEY (`post_id`, `user_id`),
+  FOREIGN KEY (`post_id`) REFERENCES `tripsaga`.`post` (`post_id`),
+  FOREIGN KEY (`user_id`) REFERENCES `tripsaga`.`user` (`id`)
+) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb3;
+
+-- 마무리 설정 복구
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
