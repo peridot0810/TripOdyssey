@@ -5,4 +5,5 @@ import com.ssafy.pjt.user.entity.User;
 public interface UserRepository {
 
 	public User findByEmail(String email);
+	public int insertUser(User user);
 }

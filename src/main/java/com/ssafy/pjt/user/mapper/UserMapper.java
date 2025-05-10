@@ -7,4 +7,5 @@ import com.ssafy.pjt.user.entity.User;
 @Mapper
 public interface UserMapper {
 	User findByEmail(String email);
+	int insertUser(User user);
 }

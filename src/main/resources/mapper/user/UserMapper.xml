@@ -6,8 +6,14 @@
 <mapper namespace="com.ssafy.pjt.user.mapper.UserMapper">
 
     <select id="findByEmail">
-        SELECT * FROM user
+        SELECT id, email, pw, nickname, gender, age 
+        FROM user
         WHERE email = #{email}
     </select>
+    
+    <insert id="insertUser">
+    	INSERT INTO user(id, email, pw, nickname, gender, age)
+    	VALUES(#{id},#{email},#{pw},#{nickname},#{gender},#{age})
+    </insert>
 
 </mapper>

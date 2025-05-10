@@ -1,9 +1,13 @@
 package com.ssafy.pjt.user.service;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import com.ssafy.pjt.user.entity.User;
+import com.ssafy.pjt.user.exception.DuplicateUserException;
+import com.ssafy.pjt.user.exception.LoginFailedException;
 import com.ssafy.pjt.user.model.request.LoginRequestDto;
+import com.ssafy.pjt.user.model.request.SignUpRequestDto;
 import com.ssafy.pjt.user.model.response.LoginResponseDto;
 import com.ssafy.pjt.user.repository.UserRepository;
 
@@ -31,6 +35,28 @@ public class UserServiceImpl implements UserService{
 					.build();
 		}
 		// 로그인 실패
-		return null;
+		throw new LoginFailedException("로그인에 실패했습니다.");
+	}
+	
+	@Override
+	public void signup(SignUpRequestDto signupUser) {
+		
+		User user = User.builder()
+				.id(signupUser.getId())
+				.email(signupUser.getEmail())
+				.pw(signupUser.getPw())
+				.nickname(signupUser.getNickname())
+				.gender(signupUser.getGender())
+				.age(signupUser.getAge())
+				.build();
+		
+		// 비밀번호 암호화 로직 추가 필요 
+		
+		try {
+			userRepository.insertUser(user);
+		} catch (DataIntegrityViolationException e) {
+			throw new DuplicateUserException("이미 사용 중인 아이디 또는 이메일 입니다.");
+		}
+		
 	}
 }
