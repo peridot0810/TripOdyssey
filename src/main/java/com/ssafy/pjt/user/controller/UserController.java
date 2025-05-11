@@ -1,11 +1,13 @@
 package com.ssafy.pjt.user.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ssafy.pjt.user.model.request.LoginRequestDto;
@@ -59,6 +61,7 @@ public class UserController {
 	    return ResponseEntity.ok("회원가입 성공");
 	}
 	
+	
 	/**
 	 * 본인 정보 조회 
 	 * 
@@ -74,7 +77,33 @@ public class UserController {
 		return ResponseEntity.ok(myInfo);
 	}
 	
-//	@GetMapping("/check-email")
+	
+	/**
+	 * 이메일 중복 체크 
+	 * 
+	 * @param email
+	 * @return
+	 */
+	@GetMapping("/check/email")
+	public ResponseEntity<?> checkEmailDuplicate(@RequestParam String email){
+		userService.isEmailDuplicated(email);
+		return ResponseEntity.ok("사용 가능한 이메일 입니다.");
+	}
+	
+	
+	/**
+	 * 아이디 중복 체크
+	 * 
+	 * @param id
+	 * @return
+	 */
+	@GetMapping("/check/id")
+	public ResponseEntity<?> checkIdDuplicate(@RequestParam String id){
+		userService.isIdDuplicated(id);
+		return ResponseEntity.ok("사용 가능한 아이디 입니다.");
+	}
+	
+	
 	
 
 }

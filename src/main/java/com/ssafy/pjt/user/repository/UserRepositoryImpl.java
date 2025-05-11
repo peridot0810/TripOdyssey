@@ -33,4 +33,14 @@ public class UserRepositoryImpl implements UserRepository{
 	public int insertUser(User user) {
 		return userMapper.insertUser(user);
 	}
+	
+	@Override
+	public boolean checkEmailExists(String email) {
+		return userMapper.checkEmailExists(email);
+	}
+	
+	@Override
+	public boolean checkIdExists(String userId) {
+		return userMapper.checkIdExists(userId);
+	}
 }

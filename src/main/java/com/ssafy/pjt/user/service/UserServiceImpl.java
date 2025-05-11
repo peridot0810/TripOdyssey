@@ -77,4 +77,18 @@ public class UserServiceImpl implements UserService{
 		throw new GetUserInfoFailedException("존재하지 않는 유저입니다.");
 		
 	}
+	
+	@Override
+	public void isEmailDuplicated(String email) {
+		if(userRepository.checkEmailExists(email)) {
+			throw new DuplicateUserException("이미 존재하는 이메일 입니다.");
+		}
+	}
+	
+	@Override
+	public void isIdDuplicated(String userId) {
+		if(userRepository.checkIdExists(userId)) {
+			throw new DuplicateUserException("이미 존재하는 아이디 입니다.");
+		}
+	}
 }

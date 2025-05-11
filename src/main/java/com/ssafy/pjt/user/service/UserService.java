@@ -7,7 +7,15 @@ import com.ssafy.pjt.user.model.response.UserInfoResponseDto;
 
 public interface UserService {
 
+	// 로그인/회원가입 
 	public LoginResponseDto login(LoginRequestDto loginUser);
-	public UserInfoResponseDto getUserInfo(String userId);
 	public void signup(SignUpRequestDto signupUser);
+	
+	// 유저 정보 조회 
+	public UserInfoResponseDto getUserInfo(String userId);
+	
+	// 중복 체크
+	public void isEmailDuplicated(String email);
+	public void isIdDuplicated(String userId);
+	
 }
