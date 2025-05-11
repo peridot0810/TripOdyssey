@@ -41,7 +41,7 @@ public class JwtUtil {
         return Jwts.parserBuilder()    // parserBuilder() 사용
                 .setSigningKey(key)    // setSigningKey을 builder에서 설정
                 .build()
-                .parseClaimsJws(token)
+                .parseClaimsJws(token.replace("Bearer ", ""))
                 .getBody();
     }
 

@@ -22,5 +22,11 @@ public class UserExceptionHandler {
 		// 로그인 실패 처리 
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
 	}
+	
+	@ExceptionHandler(GetUserInfoFailedException.class)
+	public ResponseEntity<?> handleGetUserInfoFailed(GetUserInfoFailedException e){
+		// 유저 정보 조회 실패 처리
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+	}
 
 }

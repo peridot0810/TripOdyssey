@@ -1,14 +1,17 @@
 package com.ssafy.pjt.user.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ssafy.pjt.user.model.request.LoginRequestDto;
 import com.ssafy.pjt.user.model.request.SignUpRequestDto;
 import com.ssafy.pjt.user.model.response.LoginResponseDto;
+import com.ssafy.pjt.user.model.response.UserInfoResponseDto;
 import com.ssafy.pjt.user.service.UserService;
 import com.ssafy.pjt.util.JwtUtil;
 
@@ -24,9 +27,14 @@ public class UserController {
 	private final UserService userService;
 	private final JwtUtil jwtUtil;
 	
+	/**
+	 * 로그인 
+	 * 
+	 * @param loginRequest
+	 * @return
+	 */
 	@PostMapping("/login")
 	public ResponseEntity<?> login(@RequestBody LoginRequestDto loginRequest){
-		
 		LoginResponseDto loginResponse = userService.login(loginRequest);
 		
 		// JWT 발급
@@ -39,11 +47,34 @@ public class UserController {
 	}
 	
 	
+	/**
+	 * 회원가입 
+	 * 
+	 * @param signupRequest
+	 * @return
+	 */
 	@PostMapping("/signup")
 	public ResponseEntity<?> signup(@RequestBody SignUpRequestDto signupRequest){
-		
 		userService.signup(signupRequest);
 	    return ResponseEntity.ok("회원가입 성공");
 	}
+	
+	/**
+	 * 본인 정보 조회 
+	 * 
+	 * @param token
+	 * @return
+	 */
+	@GetMapping
+	public ResponseEntity<?> getMyInfo(@RequestHeader("Authorization") String token){
+		// JWT 토큰에서 id 추출 
+		String myId = jwtUtil.extractUserId(token);
+		
+		UserInfoResponseDto myInfo = userService.getUserInfo(myId);
+		return ResponseEntity.ok(myInfo);
+	}
+	
+//	@GetMapping("/check-email")
+	
 
 }

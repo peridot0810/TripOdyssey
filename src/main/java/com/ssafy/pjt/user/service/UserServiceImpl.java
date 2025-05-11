@@ -5,16 +5,20 @@ import org.springframework.stereotype.Service;
 
 import com.ssafy.pjt.user.entity.User;
 import com.ssafy.pjt.user.exception.DuplicateUserException;
+import com.ssafy.pjt.user.exception.GetUserInfoFailedException;
 import com.ssafy.pjt.user.exception.LoginFailedException;
 import com.ssafy.pjt.user.model.request.LoginRequestDto;
 import com.ssafy.pjt.user.model.request.SignUpRequestDto;
 import com.ssafy.pjt.user.model.response.LoginResponseDto;
+import com.ssafy.pjt.user.model.response.UserInfoResponseDto;
 import com.ssafy.pjt.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService{
 
 	private final UserRepository userRepository;
@@ -57,6 +61,20 @@ public class UserServiceImpl implements UserService{
 		} catch (DataIntegrityViolationException e) {
 			throw new DuplicateUserException("이미 사용 중인 아이디 또는 이메일 입니다.");
 		}
+	}
+	
+	@Override
+	public UserInfoResponseDto getUserInfo(String userId) {
+		
+		log.debug("targetId : {}", userId);
+		
+		UserInfoResponseDto userInfo = userRepository.getUserInfo(userId);
+		if(userInfo != null) {
+			// 유저 정보 조회 성공  
+			return userInfo;
+		}
+		// 유저 정보 조회 실패
+		throw new GetUserInfoFailedException("존재하지 않는 유저입니다.");
 		
 	}
 }
