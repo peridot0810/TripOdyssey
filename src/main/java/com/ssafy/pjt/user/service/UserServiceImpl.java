@@ -10,6 +10,7 @@ import com.ssafy.pjt.user.exception.LoginFailedException;
 import com.ssafy.pjt.user.model.request.LoginRequestDto;
 import com.ssafy.pjt.user.model.request.SignUpRequestDto;
 import com.ssafy.pjt.user.model.response.LoginResponseDto;
+import com.ssafy.pjt.user.model.response.SearchUserResponseDto;
 import com.ssafy.pjt.user.model.response.UserInfoResponseDto;
 import com.ssafy.pjt.user.repository.UserRepository;
 
@@ -74,8 +75,22 @@ public class UserServiceImpl implements UserService{
 			return userInfo;
 		}
 		// 유저 정보 조회 실패
-		throw new GetUserInfoFailedException("존재하지 않는 유저입니다.");
+		throw new GetUserInfoFailedException("존재하지 않는 사용자 입니다.");
 		
+	}
+	
+	@Override
+	public SearchUserResponseDto searchUserByEmail(String email) {
+		User targetUser = userRepository.findByEmail(email);
+		if(targetUser != null) {
+			// 검색 유저가 존재 
+			return SearchUserResponseDto.builder()
+					.id(targetUser.getId())
+					.nickname(targetUser.getNickname())
+					.build();
+		}
+		// 검색 유저가 존재하지 않음 
+		throw new GetUserInfoFailedException("존재하지 않는 사용자 입니다.");
 	}
 	
 	@Override

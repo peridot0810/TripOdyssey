@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ssafy.pjt.user.model.request.LoginRequestDto;
 import com.ssafy.pjt.user.model.request.SignUpRequestDto;
 import com.ssafy.pjt.user.model.response.LoginResponseDto;
+import com.ssafy.pjt.user.model.response.SearchUserResponseDto;
 import com.ssafy.pjt.user.model.response.UserInfoResponseDto;
 import com.ssafy.pjt.user.service.UserService;
 import com.ssafy.pjt.util.JwtUtil;
@@ -104,6 +105,17 @@ public class UserController {
 	}
 	
 	
+	/**
+	 * 유저 검색
+	 * 
+	 * @param email
+	 * @return
+	 */
+	@GetMapping("/search")
+	public ResponseEntity<?> searchUserByEmail(@RequestParam String email){
+		SearchUserResponseDto targetUser = userService.searchUserByEmail(email);
+		return ResponseEntity.ok(targetUser);
+	}
 	
 
 }
