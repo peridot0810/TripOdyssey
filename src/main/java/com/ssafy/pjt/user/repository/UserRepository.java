@@ -12,6 +12,14 @@ public interface UserRepository {
 	
 	// 유저 추가 
 	public int insertUser(User user);
+	public int insertUserExp(String userId);
+	
+	// 유저 삭제
+	public int deleteUser(String userId);
+	
+	// 유저 활성화/비활성화
+	public int activateUser(String userId);
+	public int deactivateUSer(String userId);
 	
 	// 중복 체크
 	public boolean checkIdExists(String userId);

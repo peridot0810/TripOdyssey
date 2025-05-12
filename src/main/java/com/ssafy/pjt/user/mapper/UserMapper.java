@@ -15,6 +15,14 @@ public interface UserMapper {
 	
 	// 유저 추가 
 	int insertUser(User user);
+	int insertUserExp(String userId);
+	
+	// 유저 삭제
+	int deleteUser(String userId);
+	
+	// 유저 활성화/비활성화
+	int activateUser(String userId);
+	int deactivateUser(String userId);
 	
 	// 중복 체크
 	boolean checkIdExists(String userId);

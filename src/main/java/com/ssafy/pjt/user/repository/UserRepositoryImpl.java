@@ -35,6 +35,26 @@ public class UserRepositoryImpl implements UserRepository{
 	}
 	
 	@Override
+	public int insertUserExp(String userId) {
+		return userMapper.insertUserExp(userId);
+	}
+	
+	@Override
+	public int deleteUser(String userId) {
+		return userMapper.deleteUser(userId);
+	}
+	
+	@Override
+	public int activateUser(String userId) {
+		return userMapper.activateUser(userId);
+	}
+	
+	@Override
+	public int deactivateUSer(String userId) {
+		return userMapper.deactivateUser(userId);
+	}
+	
+	@Override
 	public boolean checkEmailExists(String email) {
 		return userMapper.checkEmailExists(email);
 	}

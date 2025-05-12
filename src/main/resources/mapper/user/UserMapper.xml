@@ -5,14 +5,15 @@
 
 <mapper namespace="com.ssafy.pjt.user.mapper.UserMapper">
 
+	<!-- 유저 조회 -->
     <select id="findByEmail">
-        SELECT id, email, pw, nickname, gender, age 
+        SELECT id, email, pw, nickname, gender, age, role, activated 
         FROM user
         WHERE email = #{email}
     </select>
     
     <select id="findById">
-        SELECT id, email, pw, nickname, gender, age 
+        SELECT id, email, pw, nickname, gender, age, role, activated
         FROM user
         WHERE id = #{userId}
     </select>
@@ -25,12 +26,39 @@
     	WHERE u.id = #{userId}
     </select>
     
+    <!-- 유저 삽입 -->
     <insert id="insertUser">
     	INSERT INTO user(id, email, pw, nickname, gender, age)
     	VALUES(#{id},#{email},#{pw},#{nickname},#{gender},#{age})
     </insert>
     
+    <insert id="insertUserExp">
+    	INSERT INTO user_experience(user_id)
+		VALUES(#{userId});
+    </insert>
     
+    <!-- 유저 삭제 -->
+    <delete id="deleteUser">
+    	DELETE FROM user
+    	WHERE id=#{userId}
+    </delete>
+    
+    <!-- 유저 활성화/비활성화 -->
+    <update id="activateUser">
+		UPDATE user
+		SET activated=1
+		WHERE id=#{userId}    
+    </update>
+    
+    <update id="deactivateUser">
+    	UPDATE user
+		SET activated=0
+		WHERE id=#{userId}
+    </update>
+
+    
+    
+    <!-- 중복 확인 -->
     <select id="checkEmailExists">
     	SELECT EXISTS (
     		SELECT 1 FROM user 

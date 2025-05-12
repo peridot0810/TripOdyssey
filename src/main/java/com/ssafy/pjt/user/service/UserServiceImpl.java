@@ -29,7 +29,7 @@ public class UserServiceImpl implements UserService{
 		
 		User userInfo = userRepository.findByEmail(loginUser.getEmail());
 		
-		if(userInfo != null && userInfo.getPw().equals(loginUser.getPw())) {
+		if(userInfo != null && userInfo.getPw().equals(loginUser.getPw()) && userInfo.getActivated()) {
 			// 로그인 성공 
 			return LoginResponseDto.builder()
 					.id(userInfo.getId())
@@ -59,6 +59,7 @@ public class UserServiceImpl implements UserService{
 		
 		try {
 			userRepository.insertUser(user);
+			userRepository.insertUserExp(user.getId());
 		} catch (DataIntegrityViolationException e) {
 			throw new DuplicateUserException("이미 사용 중인 아이디 또는 이메일 입니다.");
 		}
@@ -66,9 +67,6 @@ public class UserServiceImpl implements UserService{
 	
 	@Override
 	public UserInfoResponseDto getUserInfo(String userId) {
-		
-		log.debug("targetId : {}", userId);
-		
 		UserInfoResponseDto userInfo = userRepository.getUserInfo(userId);
 		if(userInfo != null) {
 			// 유저 정보 조회 성공  
@@ -76,13 +74,12 @@ public class UserServiceImpl implements UserService{
 		}
 		// 유저 정보 조회 실패
 		throw new GetUserInfoFailedException("존재하지 않는 사용자 입니다.");
-		
 	}
 	
 	@Override
 	public SearchUserResponseDto searchUserByEmail(String email) {
 		User targetUser = userRepository.findByEmail(email);
-		if(targetUser != null) {
+		if(targetUser != null && targetUser.getActivated()) {
 			// 검색 유저가 존재 
 			return SearchUserResponseDto.builder()
 					.id(targetUser.getId())

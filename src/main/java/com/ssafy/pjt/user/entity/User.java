@@ -12,4 +12,6 @@ public class User {
 	private String gender;
 	private String nickname;
 	private Integer age;
+	private String role;
+	private Boolean activated;
 }
