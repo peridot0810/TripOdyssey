@@ -1,8 +1,14 @@
 package com.ssafy.pjt.user.repository;
 
+import java.util.List;
+
 import org.springframework.stereotype.Repository;
 
+import com.ssafy.pjt.user.dto.request.EditPasswordRequestDto;
+import com.ssafy.pjt.user.dto.request.EditUserInfoRequestDto;
+import com.ssafy.pjt.user.dto.response.GroupProgressResponseDto;
 import com.ssafy.pjt.user.dto.response.UserInfoResponseDto;
+import com.ssafy.pjt.user.entity.Group;
 import com.ssafy.pjt.user.entity.User;
 import com.ssafy.pjt.user.mapper.UserMapper;
 
@@ -45,6 +51,16 @@ public class UserRepositoryImpl implements UserRepository{
 	}
 	
 	@Override
+	public int editPassword(EditPasswordRequestDto editPasswordRequest) {
+		return userMapper.editPassword(editPasswordRequest);
+	}
+	
+	@Override
+	public int editUserInfo(EditUserInfoRequestDto editUserInfoRequest) {
+		return userMapper.editUserInfo(editUserInfoRequest);
+	}
+	
+	@Override
 	public int activateUser(String userId) {
 		return userMapper.activateUser(userId);
 	}
@@ -62,5 +78,15 @@ public class UserRepositoryImpl implements UserRepository{
 	@Override
 	public boolean checkIdExists(String userId) {
 		return userMapper.checkIdExists(userId);
+	}
+	
+	@Override
+	public List<Group> getGroupList(String userId) {
+		return userMapper.getGroupList(userId);
+	}
+	
+	@Override
+	public GroupProgressResponseDto getGroupProgress(String groupId) {
+		return userMapper.getGroupProgress(groupId);
 	}
 }

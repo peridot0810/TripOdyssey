@@ -43,6 +43,28 @@
     	WHERE id=#{userId}
     </delete>
     
+    
+    <!-- 유저 정보 수정 -->
+    <update id="editPassword">
+    	UPDATE user
+    	SET pw = #{newPassword}
+    	WHERE id = #{id}
+    </update>
+    
+    <update id="editUserInfo">
+    	UPDATE user
+	    <set>
+	        <if test="newNickname != null">
+	            nickname = #{newNickname},
+	        </if>
+	        <if test="newAge != null">
+	            age = #{newAge},
+	        </if>
+	    </set>
+	    WHERE id = #{id}
+    </update>
+    
+    
     <!-- 유저 활성화/비활성화 -->
     <update id="activateUser">
 		UPDATE user
@@ -72,5 +94,22 @@
     		WHERE id = #{userId}
     	)
     </select>
+    
+    
+    <!-- 그룹 조회 -->
+    <select id="getGroupList">
+    	SELECT group_id, name, created_at, status, start_date, end_date
+    	FROM group_user_info gui
+    		INNER JOIN travel_group tg 
+    		USING (group_id)
+    	WHERE user_id=#{userId}
+    </select>
+    
+    <select id="getGroupProgress">
+    	SELECT * 
+    	FROM group_progress
+    	WHERE group_id=#{groupId}
+    </select>
+    
 	
 </mapper>

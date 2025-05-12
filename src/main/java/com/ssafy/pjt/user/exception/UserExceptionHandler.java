@@ -28,5 +28,11 @@ public class UserExceptionHandler {
 		// 유저 정보 조회 실패 처리
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 	}
+	
+	@ExceptionHandler(EditUserInfoFailedException.class)
+	public ResponseEntity<?> handleEditUserInfoFailed(EditUserInfoFailedException e){
+		// 유저 정보 수정 실패 처리 
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+	}
 
 }

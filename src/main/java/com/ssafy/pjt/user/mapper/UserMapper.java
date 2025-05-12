@@ -1,9 +1,15 @@
 package com.ssafy.pjt.user.mapper;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 
+import com.ssafy.pjt.user.dto.request.EditPasswordRequestDto;
+import com.ssafy.pjt.user.dto.request.EditUserInfoRequestDto;
+import com.ssafy.pjt.user.dto.response.GroupProgressResponseDto;
 import com.ssafy.pjt.user.dto.response.UserInfoResponseDto;
 import com.ssafy.pjt.user.entity.User;
+import com.ssafy.pjt.user.entity.Group;
 
 @Mapper
 public interface UserMapper {
@@ -20,6 +26,10 @@ public interface UserMapper {
 	// 유저 삭제
 	int deleteUser(String userId);
 	
+	// 유저 정보 수정
+	int editPassword(EditPasswordRequestDto editPasswordRequest);
+	int editUserInfo(EditUserInfoRequestDto editUserInfoRequest);
+	
 	// 유저 활성화/비활성화
 	int activateUser(String userId);
 	int deactivateUser(String userId);
@@ -27,4 +37,8 @@ public interface UserMapper {
 	// 중복 체크
 	boolean checkIdExists(String userId);
 	boolean checkEmailExists(String email);
+	
+	// 그룹 조회
+	List<Group> getGroupList(String userId);
+	GroupProgressResponseDto getGroupProgress(String groupId);
 }
