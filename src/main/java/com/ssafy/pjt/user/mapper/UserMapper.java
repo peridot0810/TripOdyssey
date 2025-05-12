@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 
 import com.ssafy.pjt.user.dto.request.EditPasswordRequestDto;
 import com.ssafy.pjt.user.dto.request.EditUserInfoRequestDto;
+import com.ssafy.pjt.user.dto.request.GetMyRoleInGroupRequestDto;
 import com.ssafy.pjt.user.dto.response.GroupProgressResponseDto;
 import com.ssafy.pjt.user.dto.response.UserInfoResponseDto;
 import com.ssafy.pjt.user.entity.User;
@@ -41,4 +42,7 @@ public interface UserMapper {
 	// 그룹 조회
 	List<Group> getGroupList(String userId);
 	GroupProgressResponseDto getGroupProgress(String groupId);
+	String getMyRoleInGroup(GetMyRoleInGroupRequestDto myRoleRequest);
+	Integer getMemberCntInGroup(String groupId);
+	
 }

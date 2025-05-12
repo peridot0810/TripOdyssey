@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.ssafy.pjt.user.dto.request.EditPasswordRequestDto;
 import com.ssafy.pjt.user.dto.request.EditUserInfoRequestDto;
+import com.ssafy.pjt.user.dto.request.GetMyRoleInGroupRequestDto;
 import com.ssafy.pjt.user.dto.response.GroupProgressResponseDto;
 import com.ssafy.pjt.user.dto.response.UserInfoResponseDto;
 import com.ssafy.pjt.user.entity.Group;
@@ -38,4 +39,6 @@ public interface UserRepository {
 	// 그룹 조회
 	public List<Group> getGroupList(String userId);
 	public GroupProgressResponseDto getGroupProgress(String groupId);
+	public String getMyRoleInGroup(GetMyRoleInGroupRequestDto myRoleRequest);
+	public Integer getMemberCntInGroup(String groupId);
 }

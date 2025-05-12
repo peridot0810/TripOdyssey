@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import com.ssafy.pjt.user.dto.request.EditPasswordRequestDto;
 import com.ssafy.pjt.user.dto.request.EditUserInfoRequestDto;
+import com.ssafy.pjt.user.dto.request.GetMyRoleInGroupRequestDto;
 import com.ssafy.pjt.user.dto.response.GroupProgressResponseDto;
 import com.ssafy.pjt.user.dto.response.UserInfoResponseDto;
 import com.ssafy.pjt.user.entity.Group;
@@ -88,5 +89,15 @@ public class UserRepositoryImpl implements UserRepository{
 	@Override
 	public GroupProgressResponseDto getGroupProgress(String groupId) {
 		return userMapper.getGroupProgress(groupId);
+	}
+	
+	@Override
+	public String getMyRoleInGroup(GetMyRoleInGroupRequestDto myRoleRequest) {
+		return userMapper.getMyRoleInGroup(myRoleRequest);
+	}
+	
+	@Override
+	public Integer getMemberCntInGroup(String groupId) {
+		return userMapper.getMemberCntInGroup(groupId);
 	}
 }

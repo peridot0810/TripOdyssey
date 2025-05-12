@@ -14,7 +14,7 @@ public class GroupResponseDto {
 	private String status;
 	private Integer memberCount;
 	private String myRole;
-	private String startDate;
-	private String endDate;
+	private LocalDate startDate;
+	private LocalDate endDate;
 	private GroupProgressResponseDto progress;
 }

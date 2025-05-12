@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.ssafy.pjt.user.dto.request.EditPasswordRequestDto;
 import com.ssafy.pjt.user.dto.request.EditUserInfoRequestDto;
+import com.ssafy.pjt.user.dto.request.GetMyRoleInGroupRequestDto;
 import com.ssafy.pjt.user.dto.request.LoginRequestDto;
 import com.ssafy.pjt.user.dto.request.SignUpRequestDto;
 import com.ssafy.pjt.user.dto.response.GroupProgressResponseDto;
@@ -150,15 +151,24 @@ public class UserServiceImpl implements UserService{
 	public List<GroupResponseDto> getGroupList(String userId) {
 		List<Group> groupList = userRepository.getGroupList(userId); 
 		List<GroupResponseDto> retList = new ArrayList<>();
+		
 		for(Group group : groupList) {
 			GroupProgressResponseDto progress = userRepository.getGroupProgress(group.getGroupId());
+			String myRole = userRepository.getMyRoleInGroup(GetMyRoleInGroupRequestDto.builder()
+					.userId(userId)
+					.groupId(group.getGroupId())
+					.build()
+					);
+			Integer memberCnt = userRepository.getMemberCntInGroup(group.getGroupId());
 			
 			retList.add(GroupResponseDto.builder()
 					.groupId(group.getGroupId())
 					.name(group.getName())
 					.status(group.getStatus())
-					.startDate(group.getStartDate())
-					.endDate(group.getEndDate())
+					.myRole(myRole)
+					.memberCount(memberCnt)
+					.startDate(LocalDate.parse(group.getStartDate()))
+					.endDate(LocalDate.parse(group.getEndDate()))
 					.progress(progress)
 					.build()
 					);

@@ -100,14 +100,26 @@
     <select id="getGroupList">
     	SELECT group_id, name, created_at, status, start_date, end_date
     	FROM group_user_info gui
-    		INNER JOIN travel_group tg 
-    		USING (group_id)
+    		INNER JOIN travel_group tg USING (group_id)
     	WHERE user_id=#{userId}
     </select>
     
     <select id="getGroupProgress">
     	SELECT * 
     	FROM group_progress
+    	WHERE group_id=#{groupId}
+    </select>
+    
+    <select id="getMyRoleInGroup">
+    	SELECT name
+    	FROM group_user_info gui
+    		INNER JOIN role r USING (role_id)
+    	WHERE user_id=#{userId} AND group_id=#{groupId}
+    </select>
+    
+    <select id="getMemberCntInGroup">
+    	SELECT COUNT(*)
+    	FROM group_user_info
     	WHERE group_id=#{groupId}
     </select>
     
