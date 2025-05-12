@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.ssafy.pjt.user.dto.request.EditPasswordRequestDto;
@@ -34,13 +35,15 @@ import lombok.extern.slf4j.Slf4j;
 public class UserServiceImpl implements UserService{
 
 	private final UserRepository userRepository;
+	private final PasswordEncoder passwordEncoder;
 	
 	@Override
 	public LoginResponseDto login(LoginRequestDto loginUser) {
 		
-		User userInfo = userRepository.findByEmail(loginUser.getEmail());
+		User userInfo = userRepository.findByEmail(loginUser.getEmail())
+				.orElse(null);
 		
-		if(userInfo != null && userInfo.getPw().equals(loginUser.getPw()) && userInfo.getActivated()) {
+		if(userInfo != null && passwordEncoder.matches(loginUser.getPw(), userInfo.getPw()) && userInfo.getActivated()) {
 			// 로그인 성공 
 			return LoginResponseDto.builder()
 					.id(userInfo.getId())
@@ -60,13 +63,11 @@ public class UserServiceImpl implements UserService{
 		User user = User.builder()
 				.id(signupUser.getId())
 				.email(signupUser.getEmail())
-				.pw(signupUser.getPw())
+				.pw(passwordEncoder.encode(signupUser.getPw()))
 				.nickname(signupUser.getNickname())
 				.gender(signupUser.getGender())
 				.age(signupUser.getAge())
 				.build();
-		
-		// 비밀번호 암호화 로직 추가 필요 
 		
 		try {
 			userRepository.insertUser(user);
@@ -89,7 +90,9 @@ public class UserServiceImpl implements UserService{
 	
 	@Override
 	public SearchUserResponseDto searchUserByEmail(String email) {
-		User targetUser = userRepository.findByEmail(email);
+		User targetUser = userRepository.findByEmail(email)
+				.orElse(null);
+		
 		if(targetUser != null && targetUser.getActivated()) {
 			// 검색 유저가 존재 
 			return SearchUserResponseDto.builder()
@@ -103,9 +106,10 @@ public class UserServiceImpl implements UserService{
 	
 	@Override
 	public void editUserPassword(EditPasswordRequestDto editPasswordRequest) {
-		User targetUser = userRepository.findById(editPasswordRequest.getId());
+		User targetUser = userRepository.findById(editPasswordRequest.getId())
+				.orElse(null);
 		
-		if(targetUser != null && targetUser.getPw().equals(editPasswordRequest.getCurrentPassword())) {
+		if(targetUser != null && passwordEncoder.matches(editPasswordRequest.getCurrentPassword(), targetUser.getPw())) {
 			// 비밀번호를 수정할 유저가 존재 + 비밀번호 일치
 			userRepository.editPassword(editPasswordRequest);
 			return;
@@ -153,14 +157,20 @@ public class UserServiceImpl implements UserService{
 		List<GroupResponseDto> retList = new ArrayList<>();
 		
 		for(Group group : groupList) {
+			// 진행 상태 조회 
 			GroupProgressResponseDto progress = userRepository.getGroupProgress(group.getGroupId());
+			
+			// 나의 역할 조회 
 			String myRole = userRepository.getMyRoleInGroup(GetMyRoleInGroupRequestDto.builder()
 					.userId(userId)
 					.groupId(group.getGroupId())
 					.build()
 					);
+			
+			// 멤버 수 조회 
 			Integer memberCnt = userRepository.getMemberCntInGroup(group.getGroupId());
 			
+			// 반환 리스트에 추가 
 			retList.add(GroupResponseDto.builder()
 					.groupId(group.getGroupId())
 					.name(group.getName())

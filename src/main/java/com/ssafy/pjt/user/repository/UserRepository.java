@@ -1,6 +1,7 @@
 package com.ssafy.pjt.user.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.ssafy.pjt.user.dto.request.EditPasswordRequestDto;
 import com.ssafy.pjt.user.dto.request.EditUserInfoRequestDto;
@@ -13,8 +14,8 @@ import com.ssafy.pjt.user.entity.User;
 public interface UserRepository {
 
 	// 유저 조회 
-	public User findByEmail(String email);
-	public User findById(String userId);
+	public Optional<User> findByEmail(String email);
+	public Optional<User> findById(String userId);
 	public UserInfoResponseDto getUserInfo(String userId);
 	
 	// 유저 추가 

@@ -2,9 +2,9 @@ package com.ssafy.pjt.user.controller;
 
 import java.util.List;
 
-import org.apache.catalina.connector.Response;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,13 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ssafy.pjt.user.dto.request.EditPasswordRequestDto;
 import com.ssafy.pjt.user.dto.request.EditUserInfoRequestDto;
-import com.ssafy.pjt.user.dto.request.LoginRequestDto;
-import com.ssafy.pjt.user.dto.request.SignUpRequestDto;
 import com.ssafy.pjt.user.dto.response.GroupResponseDto;
-import com.ssafy.pjt.user.dto.response.LoginResponseDto;
 import com.ssafy.pjt.user.dto.response.SearchUserResponseDto;
 import com.ssafy.pjt.user.dto.response.UserInfoResponseDto;
-import com.ssafy.pjt.user.entity.Group;
 import com.ssafy.pjt.user.service.UserService;
 import com.ssafy.pjt.util.JwtUtil;
 
@@ -40,50 +36,14 @@ public class UserController {
 	private final JwtUtil jwtUtil;
 	
 	/**
-	 * 로그인 
-	 * 
-	 * @param loginRequest
-	 * @return
-	 */
-	@PostMapping("/login")
-	public ResponseEntity<?> login(@RequestBody LoginRequestDto loginRequest){
-		LoginResponseDto loginResponse = userService.login(loginRequest);
-		
-		// JWT 발급
-		String token = jwtUtil.createToken(loginResponse.getId());
-		
-		// 응답에 JWT 토큰 포함
-		return ResponseEntity.ok()
-				.header("Authorization", "Bearer " + token)
-				.body(loginResponse);	
-	}
-	
-	
-	/**
-	 * 회원가입 
-	 * 
-	 * @param signupRequest
-	 * @return
-	 */
-	@PostMapping("/signup")
-	public ResponseEntity<?> signup(@RequestBody SignUpRequestDto signupRequest){
-		userService.signup(signupRequest);
-	    return ResponseEntity.ok("회원가입 성공");
-	}
-	
-	
-	/**
 	 * 본인 정보 조회 
 	 * 
 	 * @param token
 	 * @return
 	 */
 	@GetMapping
-	public ResponseEntity<?> getMyInfo(@RequestHeader("Authorization") String token){
-		// JWT 토큰에서 id 추출 
-		String myId = jwtUtil.extractUserId(token);
-		
-		UserInfoResponseDto myInfo = userService.getUserInfo(myId);
+	public ResponseEntity<?> getMyInfo(@AuthenticationPrincipal UserDetails userDetails){		
+		UserInfoResponseDto myInfo = userService.getUserInfo(userDetails.getUsername());
 		return ResponseEntity.ok(myInfo);
 	}
 	

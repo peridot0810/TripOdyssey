@@ -1,6 +1,7 @@
 package com.ssafy.pjt.user.mapper;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.ibatis.annotations.Mapper;
 
@@ -16,8 +17,8 @@ import com.ssafy.pjt.user.entity.Group;
 public interface UserMapper {
 	
 	// 유저 조회 
-	User findByEmail(String email);
-	User findById(String userId);
+	Optional<User> findByEmail(String email);
+	Optional<User> findById(String userId);
 	UserInfoResponseDto getUserInfo(String userId);
 	
 	// 유저 추가 

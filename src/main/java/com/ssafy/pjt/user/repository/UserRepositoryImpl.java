@@ -1,6 +1,7 @@
 package com.ssafy.pjt.user.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
@@ -22,12 +23,12 @@ public class UserRepositoryImpl implements UserRepository{
 	private final UserMapper userMapper;
 	
 	@Override
-	public User findByEmail(String email) {
+	public Optional<User> findByEmail(String email) {
 		return userMapper.findByEmail(email);
 	}
 	
 	@Override
-	public User findById(String userId) {
+	public Optional<User> findById(String userId) {
 		return userMapper.findById(userId);
 	}
 	
