@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.pjt.meet.repository.AvailableScheduleRepository">
+	<insert id="insertAvailableSchedule" useGeneratedKeys="true" keyProperty="id">
+	  INSERT INTO available_schedule (
+	    group_id, user_id, start_date, end_date
+	  ) VALUES (
+	    #{groupId}, #{userId}, #{startDate}, #{endDate}
+	  )
+	</insert>
+	
+	  <!-- 일정 수정 -->
+  <update id="updateAvailableSchedule">
+    UPDATE available_schedule
+    SET start_date = #{startDate}, end_date = #{endDate}
+    WHERE id = #{id}
+  </update>
+  
+    <!-- 일정 삭제 -->
+  <delete id="deleteAvailableScheduleById">
+    DELETE FROM available_schedule
+    WHERE id = #{id}
+  </delete>
+  
+</mapper>

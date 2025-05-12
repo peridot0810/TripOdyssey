@@ -244,6 +244,7 @@ CREATE TABLE IF NOT EXISTS `available_schedule` (
   `start_date` DATE NOT NULL,
   `end_date` DATE NOT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY uq_schedule_user_group_date (group_id, user_id, start_date, end_date),
   FOREIGN KEY (`group_id`) REFERENCES `travel_group`(`group_id`) ON DELETE CASCADE,
   FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb3;
