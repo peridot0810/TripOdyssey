@@ -10,11 +10,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ssafy.pjt.user.model.request.LoginRequestDto;
-import com.ssafy.pjt.user.model.request.SignUpRequestDto;
-import com.ssafy.pjt.user.model.response.LoginResponseDto;
-import com.ssafy.pjt.user.model.response.SearchUserResponseDto;
-import com.ssafy.pjt.user.model.response.UserInfoResponseDto;
+import com.ssafy.pjt.user.dto.request.LoginRequestDto;
+import com.ssafy.pjt.user.dto.request.SignUpRequestDto;
+import com.ssafy.pjt.user.dto.response.LoginResponseDto;
+import com.ssafy.pjt.user.dto.response.SearchUserResponseDto;
+import com.ssafy.pjt.user.dto.response.UserInfoResponseDto;
 import com.ssafy.pjt.user.service.UserService;
 import com.ssafy.pjt.util.JwtUtil;
 

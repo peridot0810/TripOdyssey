@@ -2,9 +2,9 @@ package com.ssafy.pjt.user.repository;
 
 import org.springframework.stereotype.Repository;
 
+import com.ssafy.pjt.user.dto.response.UserInfoResponseDto;
 import com.ssafy.pjt.user.entity.User;
 import com.ssafy.pjt.user.mapper.UserMapper;
-import com.ssafy.pjt.user.model.response.UserInfoResponseDto;
 
 import lombok.RequiredArgsConstructor;
 

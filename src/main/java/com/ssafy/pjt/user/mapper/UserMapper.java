@@ -2,8 +2,8 @@ package com.ssafy.pjt.user.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
 
+import com.ssafy.pjt.user.dto.response.UserInfoResponseDto;
 import com.ssafy.pjt.user.entity.User;
-import com.ssafy.pjt.user.model.response.UserInfoResponseDto;
 
 @Mapper
 public interface UserMapper {

@@ -1,7 +1,7 @@
 package com.ssafy.pjt.user.repository;
 
+import com.ssafy.pjt.user.dto.response.UserInfoResponseDto;
 import com.ssafy.pjt.user.entity.User;
-import com.ssafy.pjt.user.model.response.UserInfoResponseDto;
 
 public interface UserRepository {
 

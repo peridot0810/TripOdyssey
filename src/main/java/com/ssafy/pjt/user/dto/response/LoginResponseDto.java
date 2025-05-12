@@ -1,4 +1,4 @@
-package com.ssafy.pjt.user.model.response;
+package com.ssafy.pjt.user.dto.response;
 
 import lombok.Builder;
 import lombok.Data;

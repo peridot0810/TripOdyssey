@@ -1,10 +1,10 @@
 package com.ssafy.pjt.user.service;
 
-import com.ssafy.pjt.user.model.request.LoginRequestDto;
-import com.ssafy.pjt.user.model.request.SignUpRequestDto;
-import com.ssafy.pjt.user.model.response.LoginResponseDto;
-import com.ssafy.pjt.user.model.response.SearchUserResponseDto;
-import com.ssafy.pjt.user.model.response.UserInfoResponseDto;
+import com.ssafy.pjt.user.dto.request.LoginRequestDto;
+import com.ssafy.pjt.user.dto.request.SignUpRequestDto;
+import com.ssafy.pjt.user.dto.response.LoginResponseDto;
+import com.ssafy.pjt.user.dto.response.SearchUserResponseDto;
+import com.ssafy.pjt.user.dto.response.UserInfoResponseDto;
 
 public interface UserService {
 

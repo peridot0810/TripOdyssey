@@ -3,15 +3,15 @@ package com.ssafy.pjt.user.service;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import com.ssafy.pjt.user.dto.request.LoginRequestDto;
+import com.ssafy.pjt.user.dto.request.SignUpRequestDto;
+import com.ssafy.pjt.user.dto.response.LoginResponseDto;
+import com.ssafy.pjt.user.dto.response.SearchUserResponseDto;
+import com.ssafy.pjt.user.dto.response.UserInfoResponseDto;
 import com.ssafy.pjt.user.entity.User;
 import com.ssafy.pjt.user.exception.DuplicateUserException;
 import com.ssafy.pjt.user.exception.GetUserInfoFailedException;
 import com.ssafy.pjt.user.exception.LoginFailedException;
-import com.ssafy.pjt.user.model.request.LoginRequestDto;
-import com.ssafy.pjt.user.model.request.SignUpRequestDto;
-import com.ssafy.pjt.user.model.response.LoginResponseDto;
-import com.ssafy.pjt.user.model.response.SearchUserResponseDto;
-import com.ssafy.pjt.user.model.response.UserInfoResponseDto;
 import com.ssafy.pjt.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;

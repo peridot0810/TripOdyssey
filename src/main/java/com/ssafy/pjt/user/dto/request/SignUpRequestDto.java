@@ -1,4 +1,4 @@
-package com.ssafy.pjt.user.model.request;
+package com.ssafy.pjt.user.dto.request;
 
 import lombok.Data;
 
