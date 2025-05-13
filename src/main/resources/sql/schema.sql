@@ -27,6 +27,8 @@ CREATE TABLE IF NOT EXISTS `tripsaga`.`user` (
   `gender` ENUM('male', 'female') NOT NULL,
   `nickname` VARCHAR(100) NOT NULL,
   `age` INT UNSIGNED NOT NULL,
+  `role` VARCHAR(45) NOT NULL DEFAULT "USER",
+  `activated` TINYINT(1) NOT NULL DEFAULT 1,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `email_UNIQUE` (`email` ASC)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb3;
