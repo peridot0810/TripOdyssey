@@ -164,7 +164,7 @@ CREATE TABLE IF NOT EXISTS `tripsaga`.`user_experience` (
   `logistics_exp` INT DEFAULT 0,
   `member_exp` INT DEFAULT 0,
   PRIMARY KEY (`user_id`),
-  FOREIGN KEY (`user_id`) REFERENCES `tripsaga`.`user` (`id`)
+  FOREIGN KEY (`user_id`) REFERENCES `tripsaga`.`user` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb3;
 
 -- expense_category
