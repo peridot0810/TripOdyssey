@@ -111,6 +111,7 @@ public class UserServiceImpl implements UserService{
 		
 		if(targetUser != null && passwordEncoder.matches(editPasswordRequest.getCurrentPassword(), targetUser.getPw())) {
 			// 비밀번호를 수정할 유저가 존재 + 비밀번호 일치
+			editPasswordRequest.setNewPassword(passwordEncoder.encode(editPasswordRequest.getNewPassword())); 
 			userRepository.editPassword(editPasswordRequest);
 			return;
 		}
