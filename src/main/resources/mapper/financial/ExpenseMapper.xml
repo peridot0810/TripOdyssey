@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.pjt.financial.mapper.ExpenseMapper">
+
+	<select id="getExpenseListOfGroup">
+		SELECT expense_id, group_id, content_id, category_id, name AS content_name, category_name, datetime, et.description, amount
+		FROM expense_tracker et
+			JOIN content c USING(content_id)
+		    JOIN expense_category ec USING(category_id)
+		WHERE group_id=#{groupId};
+	</select>
+
+	<select id="checkUserInGroup">
+		SELECT EXISTS (
+    		SELECT 1 FROM group_user_info 
+    		WHERE user_id = #{userId} AND group_id = #{groupId}
+    	)		
+	</select>
+	
+	<select id="getUserRole">
+		SELECT name 
+		FROM group_user_info gui JOIN role r USING (role_id)
+		WHERE user_id=#{userId} AND group_id=#{groupId}
+	</select>
+	
+	<insert id="insertExpense">
+		INSERT INTO expense_tracker (
+			group_id,
+	        content_id,
+	        category_id,
+	        datetime,
+	        description,
+	        amount
+		) VALUES (
+			#{groupId},
+	        #{contentId},
+	        #{categoryId},
+	        #{datetime},
+	        #{description},
+	        #{amount}
+		)
+	</insert>
+
+
+</mapper>

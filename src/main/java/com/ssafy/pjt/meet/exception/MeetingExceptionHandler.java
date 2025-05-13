@@ -34,14 +34,14 @@ public class MeetingExceptionHandler {
         ));
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<CommonResponse<Void>> handleGeneric(Exception e) {
-    	e.printStackTrace();
-        return ResponseEntity.internalServerError().body(new CommonResponse<>(
-            false,
-            "Unexpected error occurred.",
-            null
-        ));
-    }
+//    @ExceptionHandler(Exception.class)
+//    public ResponseEntity<CommonResponse<Void>> handleGeneric(Exception e) {
+//    	e.printStackTrace();
+//        return ResponseEntity.internalServerError().body(new CommonResponse<>(
+//            false,
+//            "Unexpected error occurred.",
+//            null
+//        ));
+//    }
 }
 
