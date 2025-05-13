@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class AvailableScheduleUpdateResponse {
+public class AvailableScheduleResponse {
 	private Integer id;
 	private LocalDate startDate;
 	private LocalDate endDate;

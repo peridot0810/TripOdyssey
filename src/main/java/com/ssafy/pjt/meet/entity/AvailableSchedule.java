@@ -7,16 +7,25 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
+//@NoArgsConstructor
+//@AllArgsConstructor
 @Builder
 public class AvailableSchedule {
 	private Integer id;
-	private @NonNull String userId;
-	private @NonNull String groupId;
-	private @NonNull LocalDate startDate;
-	private @NonNull LocalDate endDate;
 
+	//@NonNull
+	private String userId;
+
+	//@NonNull
+	private String groupId;
+
+	//@NonNull
+	private LocalDate startDate;
+
+	//@NonNull
+	private LocalDate endDate;
 }
+
