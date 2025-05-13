@@ -12,9 +12,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Order(Ordered.LOWEST_PRECEDENCE)
 public class GlobalExceptionHandler {
 
-	@ExceptionHandler(Exception.class)
-	public ResponseEntity<?> handleException(Exception e){
-		// 모든 예외 처리
-		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-	}
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<?> handleException(Exception e) {
+        // Log the full stack trace for debugging (only in logs, not to client)
+        e.printStackTrace(); // or use logger.error(...)
+
+        // Return a generic response to the client
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("An unexpected error occurred. Please try again later.");
+    }
 }
