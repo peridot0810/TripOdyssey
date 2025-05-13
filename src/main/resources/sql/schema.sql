@@ -27,6 +27,8 @@ CREATE TABLE IF NOT EXISTS `tripsaga`.`user` (
   `gender` ENUM('male', 'female') NOT NULL,
   `nickname` VARCHAR(100) NOT NULL,
   `age` INT UNSIGNED NOT NULL,
+  `role` VARCHAR(45) NOT NULL DEFAULT "USER",
+  `activated` TINYINT(1) NOT NULL DEFAULT 1,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `email_UNIQUE` (`email` ASC)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb3;
@@ -162,7 +164,7 @@ CREATE TABLE IF NOT EXISTS `tripsaga`.`user_experience` (
   `logistics_exp` INT DEFAULT 0,
   `member_exp` INT DEFAULT 0,
   PRIMARY KEY (`user_id`),
-  FOREIGN KEY (`user_id`) REFERENCES `tripsaga`.`user` (`id`)
+  FOREIGN KEY (`user_id`) REFERENCES `tripsaga`.`user` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb3;
 
 -- expense_category
