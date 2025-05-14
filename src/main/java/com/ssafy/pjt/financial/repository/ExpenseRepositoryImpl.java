@@ -5,6 +5,8 @@ import java.util.Map;
 
 import org.springframework.stereotype.Repository;
 
+import com.ssafy.pjt.common.dto.request.UserRoleInGroupRequestDto;
+import com.ssafy.pjt.common.mapper.CommonMapper;
 import com.ssafy.pjt.financial.dto.request.CheckUserInGroupRequestDto;
 import com.ssafy.pjt.financial.dto.request.UserRoleRequestDto;
 import com.ssafy.pjt.financial.entity.Expense;
@@ -17,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 public class ExpenseRepositoryImpl implements ExpenseRepository{
 
 	private final ExpenseMapper expenseMapper;
+	private final CommonMapper commonMapper;
 	
 	@Override
 	public List<Expense> getExpenseListOfGroup(Integer groupId) {
@@ -34,7 +37,7 @@ public class ExpenseRepositoryImpl implements ExpenseRepository{
 	}
 	
 	@Override
-	public String getUserRole(UserRoleRequestDto userRoleRequest) {
-		return expenseMapper.getUserRole(userRoleRequest);
+	public Integer getUserRole(UserRoleInGroupRequestDto userRoleRequest) {
+		return commonMapper.getUserRoleInGroup(userRoleRequest);
 	}
 }

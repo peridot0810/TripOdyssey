@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import com.ssafy.pjt.common.dto.request.UserRoleInGroupRequestDto;
 import com.ssafy.pjt.financial.dto.request.AddExpenseRequestDto;
 import com.ssafy.pjt.financial.dto.request.CheckUserInGroupRequestDto;
 import com.ssafy.pjt.financial.dto.request.UserRoleRequestDto;
@@ -55,9 +56,9 @@ public class ExpenseTrackerServiceImpl implements ExpenseTrackerService{
 	@Override
 	public void addExpense(String userId, Integer groupId, AddExpenseRequestDto expense) {
 		// 유저 역할 확인 
-		String userRole = expenseRepository.getUserRole(new UserRoleRequestDto(userId, groupId));
-		if(!userRole.equals("재무")) {
-			throw new UnauthorizedRoleAccessException("'재무' 담당자만 가계부 항목을 추가할 수 있습니다. 당신의 역할 : " + userRole);
+		Integer userRole = expenseRepository.getUserRole(new UserRoleInGroupRequestDto(userId, groupId));
+		if(userRole != 3) {
+			throw new UnauthorizedRoleAccessException("'재무' 담당자만 가계부 항목을 추가할 수 있습니다.");
 		}
 		
 		// 평탄화 

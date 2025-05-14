@@ -20,11 +20,6 @@
     	)		
 	</select>
 	
-	<select id="getUserRole">
-		SELECT name 
-		FROM group_user_info gui JOIN role r USING (role_id)
-		WHERE user_id=#{userId} AND group_id=#{groupId}
-	</select>
 	
 	<insert id="insertExpense">
 		INSERT INTO expense_tracker (
