@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class UserRoleInGroupRequestDto {
+public class UserGroupRequestDto {
 	private String userId;
 	private Integer groupId;
 }

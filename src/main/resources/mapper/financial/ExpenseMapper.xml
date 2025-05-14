@@ -12,13 +12,6 @@
 		    JOIN expense_category ec USING(category_id)
 		WHERE group_id=#{groupId};
 	</select>
-
-	<select id="checkUserInGroup">
-		SELECT EXISTS (
-    		SELECT 1 FROM group_user_info 
-    		WHERE user_id = #{userId} AND group_id = #{groupId}
-    	)		
-	</select>
 	
 	
 	<insert id="insertExpense">
