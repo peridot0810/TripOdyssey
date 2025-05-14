@@ -1,4 +1,4 @@
-package com.ssafy.pjt.common.dto;
+package com.ssafy.pjt.common.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
