@@ -6,6 +6,10 @@
 <mapper namespace="com.ssafy.pjt.financial.mapper.FinancialMapper">
 
 	
-    
+    <update id="setFee">
+    	UPDATE member_expense_info
+    	SET expense_to_pay = #{budget}
+    	WHERE group_id=#{groupId}
+    </update>
 	
 </mapper>

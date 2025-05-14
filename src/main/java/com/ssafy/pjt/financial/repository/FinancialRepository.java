@@ -1,5 +1,7 @@
 package com.ssafy.pjt.financial.repository;
 
-public interface FinancialRepository {
+import com.ssafy.pjt.financial.dto.request.SetFeeRequestDto;
 
+public interface FinancialRepository {
+	void setFee(SetFeeRequestDto setFeeRequest);
 }
