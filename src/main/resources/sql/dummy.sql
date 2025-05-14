@@ -22,7 +22,7 @@ INSERT INTO `user` (`id`, `pw`, `email`, `gender`, `nickname`, `age`) VALUES
 
 
 INSERT INTO `role` (`name`) VALUES
-('방장'), ('일정'), ('재무'), ('교통/숙소'), ('일반');
+('master'), ('schedule'), ('finance'), ('logistics'), ('normal');
 
 
 INSERT INTO `travel_group` (`name`, `created_at`, `status`, `start_date`, `end_date`) VALUES

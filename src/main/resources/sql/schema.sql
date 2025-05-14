@@ -12,6 +12,7 @@ USE `tripsaga`;
 CREATE TABLE IF NOT EXISTS `tripsaga`.`travel_group` (
   `group_id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(100) NOT NULL,
+  `description` TEXT,
   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `status` ENUM('planning', 'onGoing', 'finished', 'canceled') NOT NULL,
   `start_date` DATE,
