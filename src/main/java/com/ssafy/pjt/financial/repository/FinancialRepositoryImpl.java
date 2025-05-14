@@ -4,6 +4,8 @@ import org.springframework.stereotype.Repository;
 
 import com.ssafy.pjt.common.dto.request.PayAmountRequestDto;
 import com.ssafy.pjt.financial.dto.request.SetFeeRequestDto;
+import com.ssafy.pjt.financial.dto.request.UpdateFeeRequestDto;
+import com.ssafy.pjt.financial.dto.response.TotalAmountResponseDto;
 import com.ssafy.pjt.financial.mapper.FinancialMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -25,7 +27,12 @@ public class FinancialRepositoryImpl implements FinancialRepository{
 	}
 	
 	@Override
-	public Integer getTotalAmount(Integer groupId) {
+	public void updateFee(UpdateFeeRequestDto updateFeeRequest) {
+		financialMapper.updateFee(updateFeeRequest);
+	}
+	
+	@Override
+	public TotalAmountResponseDto getTotalAmount(Integer groupId) {
 		return financialMapper.getTotalAmount(groupId);
 	}
 }

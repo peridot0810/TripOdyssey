@@ -18,8 +18,14 @@
     	WHERE user_id = #{userId} AND group_id = #{groupId}
     </update>
     
+    <update id="updateFee">
+    	UPDATE member_expense_info
+    	SET expense_to_pay = #{newFee}
+    	WHERE user_id = #{userId} AND group_id = #{groupId}
+    </update>
+    
     <select id="getTotalAmount">
-    	SELECT SUM(paid_amount)
+    	SELECT SUM(paid_amount) AS raised_amount, SUM(expense_to_pay) AS goal_amount
     	FROM member_expense_info
     	WHERE group_id=#{groupId}
     </select>
