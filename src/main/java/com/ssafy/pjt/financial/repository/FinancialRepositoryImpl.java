@@ -2,6 +2,7 @@ package com.ssafy.pjt.financial.repository;
 
 import org.springframework.stereotype.Repository;
 
+import com.ssafy.pjt.common.dto.request.PayAmountRequestDto;
 import com.ssafy.pjt.financial.dto.request.SetFeeRequestDto;
 import com.ssafy.pjt.financial.mapper.FinancialMapper;
 
@@ -16,5 +17,15 @@ public class FinancialRepositoryImpl implements FinancialRepository{
 	@Override
 	public void setFee(SetFeeRequestDto setFeeRequest) {
 		financialMapper.setFee(setFeeRequest);
+	}
+	
+	@Override
+	public void payAmount(PayAmountRequestDto payAmountRequest) {
+		financialMapper.payAmount(payAmountRequest);
+	}
+	
+	@Override
+	public Integer getTotalAmount(Integer groupId) {
+		return financialMapper.getTotalAmount(groupId);
 	}
 }

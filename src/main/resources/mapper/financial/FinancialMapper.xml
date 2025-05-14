@@ -11,5 +11,17 @@
     	SET expense_to_pay = #{budget}
     	WHERE group_id=#{groupId}
     </update>
+    
+    <update id="payAmount">
+    	UPDATE member_expense_info
+    	SET paid_amount = paid_amount + #{paidAmount}
+    	WHERE user_id = #{userId} AND group_id = #{groupId}
+    </update>
+    
+    <select id="getTotalAmount">
+    	SELECT SUM(paid_amount)
+    	FROM member_expense_info
+    	WHERE group_id=#{groupId}
+    </select>
 	
 </mapper>
