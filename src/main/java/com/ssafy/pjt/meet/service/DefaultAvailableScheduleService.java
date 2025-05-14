@@ -4,10 +4,10 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.ssafy.pjt.common.dto.CommonResponse;
 import com.ssafy.pjt.meet.dto.request.AvailableSchedulePostRequest;
 import com.ssafy.pjt.meet.dto.request.AvailableScheduleUpdateRequest;
 import com.ssafy.pjt.meet.dto.response.AvailableScheduleResponse;
-import com.ssafy.pjt.meet.dto.response.CommonResponse;
 import com.ssafy.pjt.meet.entity.AvailableSchedule;
 import com.ssafy.pjt.meet.repository.AvailableScheduleRepository;
 
