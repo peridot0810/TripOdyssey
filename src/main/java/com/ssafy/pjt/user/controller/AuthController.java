@@ -54,6 +54,7 @@ public class AuthController {
 			String jwt = jwtUtil.createToken(authentication);
 			
 			log.debug("jwt : {}", jwt);
+			log.debug("userInfo : {}",jwtUtil.extractUserInfo(jwt));
 			
 			//서비스 메서드에서 LoginResponseDto 가져오기
 	        LoginResponseDto userDto = userService.login(loginRequest);

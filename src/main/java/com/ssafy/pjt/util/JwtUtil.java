@@ -7,6 +7,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import io.jsonwebtoken.Claims;
 import java.util.Date;
+import java.util.Map;
 
 import javax.crypto.SecretKey;
 
@@ -14,6 +15,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+
+import com.ssafy.pjt.user.entity.CustomUserDetails;
 
 @Component
 @Slf4j
@@ -35,10 +38,18 @@ public class JwtUtil {
 
     // JWT 생성
     public String createToken(Authentication authentication) {
+    	CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+    	String userId = userDetails.getUsername();
+    	String nickname = userDetails.getNickname();
+    	String email = userDetails.getEmail();
+    	String role = userDetails.getAuthorities().iterator().next().getAuthority();
     	
     	log.debug("authentication.name : {}", authentication.getName());
         return Jwts.builder()
-                .setSubject(authentication.getName())
+                .setSubject(userId)
+                .claim("email", email)
+                .claim("nickname", nickname)
+                .claim("role", role)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(secretKey, SignatureAlgorithm.HS256)  // Key 객체 사용
@@ -57,6 +68,17 @@ public class JwtUtil {
     // 토큰에서 유저 아이디 추출
     public String extractUserId(String token) {
         return extractClaims(token).getSubject();
+    }
+    
+    // 토큰에서 유저 정보 추출
+    public Map<String, String> extractUserInfo(String token){
+    	Claims claims = extractClaims(token);
+    	return Map.of(
+    				"userId" , claims.getSubject(),
+    				"email", claims.get("email", String.class),
+    				"nickname", claims.get("nickname", String.class),
+    				"role", claims.get("role", String.class)
+    			);
     }
 
     // 토큰 유효성 검사
