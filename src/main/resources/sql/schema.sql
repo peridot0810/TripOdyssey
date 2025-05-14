@@ -193,7 +193,7 @@ CREATE TABLE IF NOT EXISTS `tripsaga`.`expense_tracker` (
 CREATE TABLE IF NOT EXISTS `tripsaga`.`member_expense_info` (
   `user_id` VARCHAR(100) NOT NULL,
   `group_id` INT NOT NULL,
-  `expense_to_pay` INT NOT NULL,
+  `expense_to_pay` INT NOT NULL DEFAULT 0,
   `paid_amount` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`user_id`, `group_id`),
   FOREIGN KEY (`user_id`) REFERENCES `tripsaga`.`user` (`id`),
