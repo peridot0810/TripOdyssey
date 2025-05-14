@@ -10,6 +10,7 @@ public interface ExpenseRepository {
 
 	List<Expense> getExpenseListOfGroup(Integer groupId);
 	Boolean checkUserInGroup(UserGroupRequestDto checkUserInGroupRequest);
-	void insertExpense(Map<String, Object> expense);
 	Integer getUserRole(UserGroupRequestDto userRoleRequest);
+	void insertExpense(Map<String, Object> expense);
+	void deleteExpense(Integer expenseId);
 }

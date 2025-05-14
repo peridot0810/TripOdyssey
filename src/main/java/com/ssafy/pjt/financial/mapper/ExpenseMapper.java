@@ -11,4 +11,5 @@ import com.ssafy.pjt.financial.entity.Expense;
 public interface ExpenseMapper {
 	List<Expense> getExpenseListOfGroup(Integer groupId);
 	void insertExpense(Map<String, Object> expense);
+	void deleteExpense(Integer expenseId);
 }

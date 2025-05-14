@@ -9,4 +9,5 @@ public interface ExpenseTrackerService {
 
 	List<ExpenseInfoResponseDto> getExpenseTracker(String userId, Integer groupId);
 	void addExpense(String userId, Integer groupId, AddExpenseRequestDto expense);
+	void deleteExpense(String userId, Integer groupId, Integer expenseId);
 }

@@ -39,4 +39,9 @@ public class ExpenseRepositoryImpl implements ExpenseRepository{
 	public Integer getUserRole(UserGroupRequestDto userRoleRequest) {
 		return commonMapper.getUserRoleInGroup(userRoleRequest);
 	}
+	
+	@Override
+	public void deleteExpense(Integer expenseId) {
+		expenseMapper.deleteExpense(expenseId);
+	}
 }

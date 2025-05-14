@@ -32,5 +32,9 @@
 		)
 	</insert>
 
+	<delete id="deleteExpense">
+		DELETE FROM expense_tracker
+		WHERE expense_id=#{expenseId}
+	</delete>
 
 </mapper>
