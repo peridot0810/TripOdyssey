@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ssafy.pjt.common.dto.CommonResponse;
+import com.ssafy.pjt.common.dto.response.CommonResponse;
 import com.ssafy.pjt.meet.dto.request.AvailableSchedulePostRequest;
 import com.ssafy.pjt.meet.dto.request.AvailableScheduleUpdateRequest;
 import com.ssafy.pjt.meet.dto.response.AvailableScheduleResponse;

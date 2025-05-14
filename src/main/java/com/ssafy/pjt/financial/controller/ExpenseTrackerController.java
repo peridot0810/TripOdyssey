@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ssafy.pjt.common.dto.CommonResponse;
+import com.ssafy.pjt.common.dto.response.CommonResponse;
 import com.ssafy.pjt.financial.dto.request.AddExpenseRequestDto;
 import com.ssafy.pjt.financial.dto.request.AddExpenseRequestWrapperDto;
 import com.ssafy.pjt.financial.dto.response.ExpenseInfoResponseDto;

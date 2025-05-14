@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.ssafy.pjt.common.dto.CommonResponse;
+import com.ssafy.pjt.common.dto.response.CommonResponse;
 
 @RestControllerAdvice
 @Order(Ordered.HIGHEST_PRECEDENCE)
