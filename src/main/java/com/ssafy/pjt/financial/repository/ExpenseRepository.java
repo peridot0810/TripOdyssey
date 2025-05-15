@@ -9,8 +9,10 @@ import com.ssafy.pjt.financial.entity.Expense;
 public interface ExpenseRepository {
 
 	List<Expense> getExpenseListOfGroup(Integer groupId);
-	Boolean checkUserInGroup(UserGroupRequestDto checkUserInGroupRequest);
-	Integer getUserRole(UserGroupRequestDto userRoleRequest);
 	void insertExpense(Map<String, Object> expense);
 	void deleteExpense(Integer expenseId);
+	
+	// 공통 기능 
+	Boolean checkUserInGroup(UserGroupRequestDto checkUserInGroupRequest);
+	Integer getUserRole(UserGroupRequestDto userRoleRequest);
 }

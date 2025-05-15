@@ -12,6 +12,18 @@ VALUES 	('Transportation'),
 		('Leisure'),
 		('Shared Supplies'),
 		('Others');
+        
+-- 교통편 카테고리 
+INSERT INTO transportation_type (type_name) VALUES 
+('Airplane'),
+('Train'),
+('Bus'),
+('Car'),
+('Taxi'),
+('Subway'),
+('Ferry'),
+('Bicycle'),
+('Walking');
 
 
 INSERT INTO `travel_group` (`name`, `created_at`, `status`, `start_date`, `end_date`) 
@@ -118,3 +130,11 @@ INSERT INTO expense_tracker (group_id, content_id, category_id, datetime, descri
 (1, 17, 5, '2025-07-03 11:00:00', '전통 공연용 돗자리 구매', 8000),
 (1, 30, 6, '2025-07-03 13:50:00', '기념품 구매', 15000),
 (1, 11, 4, '2025-07-03 15:20:00', '유람선 탑승 요금', 38000);
+
+-- transportation에 더미 데이터 추가
+INSERT INTO transportation (type_id, group_id, departure, arrival, `from`, `to`, description) VALUES
+(1, 1, '2025-06-01 09:00:00', '2025-06-01 12:00:00', 'Seoul', 'Jeju', '비행기로 제주도 이동'),
+(2, 1, '2025-06-03 14:30:00', '2025-06-03 18:00:00', 'Jeju', 'Busan', '기차를 타고 부산으로 이동'),
+(3, 1, '2025-06-04 08:00:00', '2025-06-04 11:30:00', 'Busan', 'Gyeongju', '고속버스로 경주 관광'),
+(4, 1, '2025-06-05 10:00:00', '2025-06-05 11:00:00', 'Gyeongju', 'Ulsan', '렌터카로 울산 이동'),
+(6, 1, '2025-06-06 09:00:00', '2025-06-06 09:30:00', 'Ulsan Station', 'Busan Station', '지하철로 부산 복귀');
