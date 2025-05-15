@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RoleLimits {
-	private Integer finance;
-	private Integer schedule;
-	private Integer logistics;
+public class GroupMemberInfo {
+	private String userId;
+	private String nickName;
+	private String roleName;
 }

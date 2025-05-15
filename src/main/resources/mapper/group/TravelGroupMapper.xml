@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.pjt.group.mapper.TravelGroupMapper">
+
+  <!-- Insert Travel Group -->
+  <insert id="insertTravelGroup" useGeneratedKeys="true" keyProperty="groupId">
+    INSERT INTO travel_group (
+      name, description, status, created_at, start_date, end_date
+    ) VALUES (
+      #{name}, #{description}, #{status}, #{createdAt}, #{startDate}, #{endDate}
+    )
+  </insert>
+  
+  <insert id="insertUserRole">
+  	INSERT INTO group_user_info (user_id, group_id, role_id)
+  	VALUES(#{userId}, #{groupId}, #{roleId})
+  </insert>
+
+  <!-- Insert Group Role Limit -->
+  <insert id="insertGroupRoleLimits">
+    INSERT INTO group_role_limit (
+      group_id, role_id, limit_count
+    ) VALUES (
+      #{groupId}, #{roleId}, #{limitCount}
+    )
+  </insert>
+
+  <!-- Get Role ID by Role Name -->
+  <select id="getRoleIdByRoleName" resultType="int">
+    SELECT role_id
+    FROM role
+    WHERE name = #{roleName}
+  </select>
+  
+    <!-- 여행 그룹 정보 업데이트 -->
+  <update id="updateTravelGroup">
+    UPDATE travel_group
+    SET
+      name = #{name},
+      description = #{description},
+      start_date = #{startDate},
+      end_date = #{endDate}
+    WHERE group_id = #{groupId}
+  </update>
+
+  <!-- 그룹 역할 제한 수정 -->
+  <update id="updateGroupRoleLimits">
+    UPDATE group_role_limit
+    SET limit_count = #{limitCount}
+    WHERE group_id = #{groupId} AND role_id = #{roleId}
+  </update>
+  
+	<select id="selectTravelGroupById">
+	  SELECT group_id, name, description, status, created_at, start_date, end_date
+	  FROM travel_group
+	  WHERE group_id = #{groupId}
+ 	</select>
+	
+	<select id="selectGroupRoleLimits">
+	  SELECT role_id, limit_count
+	  FROM group_role_limit
+	  WHERE group_id = #{groupId}
+	</select>
+  
+
+</mapper>

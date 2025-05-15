@@ -1,4 +1,4 @@
-package com.ssafy.pjt.group.entity;
+package com.ssafy.pjt.common.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RoleLimits {
-	private Integer finance;
-	private Integer schedule;
-	private Integer logistics;
+public class GroupUserInfo {
+	private String userId;
+	private Integer groupId;
+	private Integer roleId;
 }

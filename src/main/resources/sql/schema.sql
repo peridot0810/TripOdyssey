@@ -126,8 +126,8 @@ CREATE TABLE IF NOT EXISTS `tripsaga`.`role` (
 CREATE TABLE IF NOT EXISTS `tripsaga`.`group_user_info` (
   `user_id` VARCHAR(100) NOT NULL,
   `group_id` INT NOT NULL,
-  `role_id` INT UNSIGNED NOT NULL,
-  PRIMARY KEY (`user_id`, `group_id`, `role_id`),
+  `role_id` INT UNSIGNED NULL DEFAULT 5,
+  PRIMARY KEY (`user_id`, `group_id`),
   FOREIGN KEY (`group_id`) REFERENCES `tripsaga`.`travel_group` (`group_id`) ON DELETE CASCADE,
   FOREIGN KEY (`role_id`) REFERENCES `tripsaga`.`role` (`role_id`),
   FOREIGN KEY (`user_id`) REFERENCES `tripsaga`.`user` (`id`)

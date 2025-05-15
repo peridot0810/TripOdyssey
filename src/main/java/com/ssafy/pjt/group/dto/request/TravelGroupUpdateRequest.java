@@ -1,11 +1,7 @@
 package com.ssafy.pjt.group.dto.request;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-
-import com.ssafy.pjt.group.dto.response.TravelGroupPostResponse;
 import com.ssafy.pjt.group.entity.RoleLimits;
-import com.ssafy.pjt.group.entity.TravelGroupStatus;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,6 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TravelGroupUpdateRequest {
+	private Integer groupId;
 	private String name;
 	private String description;
 	private LocalDate startDate;

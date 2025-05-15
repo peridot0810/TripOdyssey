@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.pjt.group.mapper.TravelGroupMemberMapper">
+
+	<insert id="insertUserToGroup">
+	    INSERT INTO group_user_info (group_id, user_id)
+	    SELECT #{groupId}, u.id
+	    FROM user u
+	    WHERE u.email = #{userEmail}
+	</insert>
+
+  <delete id="deleteUserFromGroup">
+    DELETE FROM group_user_info
+    WHERE group_id = #{groupId}
+      AND user_id = #{userId}
+  </delete>
+
+	<update id="updateGroupUserRole">
+	  UPDATE group_user_info
+	  SET role_id = #{roleId}
+	  WHERE user_id = #{userId} AND group_id = #{groupId}
+	</update>
+
+  <select id="selectAllGroupUserInfo" resultType="com.ssafy.pjt.group.entity.GroupMemberInfo">
+    SELECT
+      gui.user_id AS userId,
+      u.nickname AS nickName,
+      r.name AS roleName
+    FROM group_user_info gui
+    JOIN user u ON gui.user_id = u.id
+    JOIN role r ON gui.role_id = r.role_id
+    WHERE gui.group_id = #{groupId}
+  </select>
+
+</mapper>
