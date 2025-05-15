@@ -1,11 +1,10 @@
 package com.ssafy.pjt.common.dto.request;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
-@AllArgsConstructor
-public class UserGroupRequestDto {
+public class PayAmountRequestDto {
 	private String userId;
 	private Integer groupId;
+	private Integer paidAmount;
 }

@@ -6,6 +6,6 @@ import com.ssafy.pjt.common.dto.request.UserGroupRequestDto;
 
 @Mapper
 public interface CommonMapper {
-	Integer GetUserRoleInGroup(UserGroupRequestDto userRoleInGroupRequest);
+	Integer getUserRoleInGroup(UserGroupRequestDto userRoleInGroupRequest);
 	Boolean checkUserInGroup(UserGroupRequestDto checkUserInGroupRequest);
 }

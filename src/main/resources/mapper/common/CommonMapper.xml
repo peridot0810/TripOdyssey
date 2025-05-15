@@ -6,7 +6,7 @@
 
 <mapper namespace="com.ssafy.pjt.common.mapper.CommonMapper">
 
-	<select id="GetUserRoleInGroup">
+	<select id="getUserRoleInGroup">
 		SELECT role_id
 		FROM group_user_info
 		WHERE user_id=#{userId} AND group_id=#{groupId}
