@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.pjt.transportation.mapper.TransportationMapper">
+
+	
+    <select id="getTransportationList">
+    	SELECT transportation_id, type_id, group_id, departure, arrival, `from`, `to`, description
+    	FROM transportation
+    	WHERE group_id = #{groupId}
+    </select>
+    
+    <select id="getTransportation">
+    	SELECT transportation_id, type_id, group_id, departure, arrival, `from`, `to`, description
+    	FROM transportation
+    	WHERE transportation_id = #{transportationId}
+    </select>
+    
+    <insert id="addTransportation">
+    	INSERT INTO transportation(type_id, group_id, departure, arrival, `from`, `to`, description)
+    	VALUES(#{typeId},#{groupId},#{departure},#{arrival},#{from},#{to},#{description})
+    </insert>
+    
+    <update id="updateTransportation">
+	    UPDATE transportation
+	    <set>
+		    <if test="typeId != null">
+		        type_id = #{typeId},
+		    </if>
+		    <if test="departure != null">
+		        departure = #{departure},
+		    </if>
+		    <if test="arrival != null">
+		        arrival = #{arrival},
+		    </if>
+		    <if test="from != null">
+		        `from` = #{from},
+		    </if>
+		    <if test="to != null">
+		        `to` = #{to},
+		    </if>
+		    <if test="description != null">
+		        description = #{description},
+		    </if>
+		</set>
+	    WHERE transportation_id = #{transportationId}
+    </update>
+    
+    <delete id="deleteTransportation">
+    	DELETE from transportation
+    	WHERE transportation_id=#{transportationId}
+    </delete>
+	
+</mapper>
