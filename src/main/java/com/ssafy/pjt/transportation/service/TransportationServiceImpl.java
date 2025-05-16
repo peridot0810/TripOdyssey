@@ -5,8 +5,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.ssafy.pjt.common.dto.request.UserGroupRequestDto;
-import com.ssafy.pjt.financial.exception.UnauthorizedRoleAccessException;
-import com.ssafy.pjt.financial.exception.UserNotInGroupException;
+import com.ssafy.pjt.common.exception.UnauthorizedRoleAccessException;
+import com.ssafy.pjt.common.exception.UserNotInGroupException;
 import com.ssafy.pjt.transportation.dto.request.AddTransportationRequestDto;
 import com.ssafy.pjt.transportation.dto.request.UpdateTransportationRequestDto;
 import com.ssafy.pjt.transportation.dto.response.TransportationResponseDto;
