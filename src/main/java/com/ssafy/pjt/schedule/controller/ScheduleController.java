@@ -3,9 +3,11 @@ package com.ssafy.pjt.schedule.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ssafy.pjt.common.dto.response.CommonResponse;
 import com.ssafy.pjt.schedule.dto.request.AddContentRequestDto;
+import com.ssafy.pjt.schedule.dto.request.UpdateContentRequestDto;
 import com.ssafy.pjt.schedule.dto.response.GetProposalResponseDto;
 import com.ssafy.pjt.schedule.service.ScheduleService;
 import com.ssafy.pjt.util.JwtUtil;
@@ -59,4 +62,25 @@ public class ScheduleController {
 		return ResponseEntity.ok(new CommonResponse<>(true, "콘텐츠 생성에 성공했습니다.", null));
 	}
 	
+	@PutMapping("/content")
+	public ResponseEntity<?> updateContent(@RequestHeader("Authorization") String token,
+			@PathVariable Integer groupId,
+			@RequestBody UpdateContentRequestDto updateContentRequest){
+		// JWT 토큰에서 아이디 추출
+		String userId = jwtUtil.extractUserId(token);
+		
+		scheduleService.updateContent(userId, groupId, updateContentRequest);
+		return ResponseEntity.ok(new CommonResponse<>(true, "콘텐츠 수정에 성공했습니다.", null));
+	}
+	
+	@DeleteMapping("/content/{contentId}")
+	public ResponseEntity<?> deleteContent(@RequestHeader("Authorization") String token,
+			@PathVariable Integer groupId,
+			@PathVariable Integer contentId){
+		// JWT 토큰에서 아이디 추출
+		String userId = jwtUtil.extractUserId(token);
+		
+		scheduleService.deleteContent(userId, groupId, contentId);
+		return ResponseEntity.ok(new CommonResponse<>(true, "콘텐츠 삭제에 성공했습니다.", null));
+	}
 }

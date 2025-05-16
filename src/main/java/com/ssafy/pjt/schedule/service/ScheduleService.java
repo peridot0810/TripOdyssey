@@ -3,6 +3,7 @@ package com.ssafy.pjt.schedule.service;
 import java.util.List;
 
 import com.ssafy.pjt.schedule.dto.request.AddContentRequestDto;
+import com.ssafy.pjt.schedule.dto.request.UpdateContentRequestDto;
 import com.ssafy.pjt.schedule.dto.response.GetProposalResponseDto;
 
 public interface ScheduleService {
@@ -10,4 +11,6 @@ public interface ScheduleService {
 	List<GetProposalResponseDto> getProposalList(String userId, Integer groupId);
 	
 	void addContent(String userId, Integer groupId, AddContentRequestDto addContentRequest);
+	void updateContent(String userId, Integer groupId, UpdateContentRequestDto updateContentRequest);
+	void deleteContent(String userId, Integer groupId, Integer contentId);
 }

@@ -15,6 +15,27 @@
 		VALUES(#{name}, #{description}, #{attractionNo})
 	</insert>
 	
+	<update id="updateContent">
+		UPDATE content
+		<set>
+		    <if test="name != null">
+		        name = #{name},
+		    </if>
+		    <if test="description != null">
+		        description = #{description},
+		    </if>
+		    <if test="attractionNo != null">
+		        attraction_no = #{attractionNo},
+		    </if>
+		</set>
+		WHERE content_id = #{contentId}
+	</update>
+	
+	<delete id="deleteContent">
+		DELETE FROM content
+		WHERE content_id=#{contentId}
+	</delete>
+	
 	<insert id="addSchedule">
 		INSERT INTO schedule(content_id, group_id)
 		VALUES(#{contentId}, #{groupId})

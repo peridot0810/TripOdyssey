@@ -420,10 +420,13 @@ CREATE TABLE IF NOT EXISTS `tripsaga`.`schedule` (
   INDEX `content_id` (`content_id` ASC) VISIBLE,
   CONSTRAINT `schedule_ibfk_1`
     FOREIGN KEY (`content_id`)
-    REFERENCES `tripsaga`.`content` (`content_id`),
+    REFERENCES `tripsaga`.`content` (`content_id`)
+	ON DELETE CASCADE,
   CONSTRAINT `schedule_ibfk_2`
     FOREIGN KEY (`group_id`)
-    REFERENCES `tripsaga`.`travel_group` (`group_id`))
+    REFERENCES `tripsaga`.`travel_group` (`group_id`)
+    ON DELETE CASCADE
+    )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
 

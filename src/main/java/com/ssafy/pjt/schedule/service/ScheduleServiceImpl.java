@@ -11,6 +11,7 @@ import com.ssafy.pjt.common.service.UserValidationService;
 import com.ssafy.pjt.schedule.dto.request.AddContentRequestDto;
 import com.ssafy.pjt.schedule.dto.request.AddProposalRequestDto;
 import com.ssafy.pjt.schedule.dto.request.AddScheduleRequestDto;
+import com.ssafy.pjt.schedule.dto.request.UpdateContentRequestDto;
 import com.ssafy.pjt.schedule.dto.response.GetProposalResponseDto;
 import com.ssafy.pjt.schedule.repository.ScheduleRepository;
 
@@ -71,6 +72,38 @@ public class ScheduleServiceImpl implements ScheduleService{
 				.contentId(addContentRequest.getContentId())
 				.groupId(groupId)
 				.build());
+	}
+	
+	@Override
+	public void updateContent(String userId, Integer groupId, UpdateContentRequestDto updateContentRequest) {
+		// 유저가 그룹원이 맞는지 확인
+		if(!userValidationService.isUserInGroup(userId, groupId)) {
+			throw new UserNotInGroupException("그룹원만 요청할 수 있는 기능입니다.");
+		}
+		
+		// 유저의 역할 확인
+		if(!userValidationService.isUserRoleValid(userId, groupId, MemberRole.LOGISTICS.getId())) {
+			throw new UnauthorizedRoleAccessException("교통/숙소 담당자만 요청할 수 있는 기능입니다.");
+		}
+		
+		// 비즈니스 로직
+		scheduleRepository.updateContent(updateContentRequest);
+	}
+	
+	@Override
+	public void deleteContent(String userId, Integer groupId, Integer contentId) {
+		// 유저가 그룹원이 맞는지 확인
+		if(!userValidationService.isUserInGroup(userId, groupId)) {
+			throw new UserNotInGroupException("그룹원만 요청할 수 있는 기능입니다.");
+		}
+		
+		// 유저의 역할 확인
+		if(!userValidationService.isUserRoleValid(userId, groupId, MemberRole.LOGISTICS.getId())) {
+			throw new UnauthorizedRoleAccessException("교통/숙소 담당자만 요청할 수 있는 기능입니다.");
+		}
+		
+		// 비즈니스 로직
+		scheduleRepository.deleteContent(contentId);
 	}
 	
 }

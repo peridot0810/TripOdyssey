@@ -5,6 +5,7 @@ import java.util.List;
 import com.ssafy.pjt.schedule.dto.request.AddContentRequestDto;
 import com.ssafy.pjt.schedule.dto.request.AddProposalRequestDto;
 import com.ssafy.pjt.schedule.dto.request.AddScheduleRequestDto;
+import com.ssafy.pjt.schedule.dto.request.UpdateContentRequestDto;
 import com.ssafy.pjt.schedule.dto.response.GetProposalResponseDto;
 
 public interface ScheduleRepository {
@@ -12,5 +13,8 @@ public interface ScheduleRepository {
 	List<GetProposalResponseDto> getProposalList(Integer groupId);
 	
 	void addContent(AddContentRequestDto addContentRequest);
+	void updateContent(UpdateContentRequestDto updateContentRequest);
+	void deleteContent(Integer contentId);
+	
 	void addSchedule(AddScheduleRequestDto addScheduleRequest);
 }
