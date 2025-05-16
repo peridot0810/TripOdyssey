@@ -5,6 +5,31 @@
 
 <mapper namespace="com.ssafy.pjt.schedule.mapper.ScheduleMapper">
 
-
+	<insert id="addScheduleProposal">
+		INSERT INTO schedule_proposal(group_id, user_id, attractions_no)
+		VALUES(#{groupId},#{userId},#{attractionsNo})
+	</insert>
+	
+	<select id="getProposalList">
+		SELECT user_id, 
+				proposal_id, 
+				group_id, 
+				no, 
+				title, 
+				content_type_name, 
+				first_image1, 
+				first_image2, 
+				latitude, 
+				longitude, 
+				tel, 
+				addr1, 
+				addr2, 
+				homepage, 
+				overview
+		FROM schedule_proposal sp
+			JOIN attractions a ON (sp.attractions_no = a.no)
+			JOIN contenttypes c USING (content_type_id)
+		WHERE group_id=#{groupId}
+	</select>
 
 </mapper>
