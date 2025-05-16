@@ -5,9 +5,15 @@ SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
 
 -- -----------------------------------------------------
+-- Schema mydb
+-- -----------------------------------------------------
+-- -----------------------------------------------------
 -- Schema tripsaga
 -- -----------------------------------------------------
-DROP SCHEMA IF EXISTS `tripsaga`;
+
+-- -----------------------------------------------------
+-- Schema tripsaga
+-- -----------------------------------------------------
 CREATE SCHEMA IF NOT EXISTS `tripsaga` DEFAULT CHARACTER SET utf8mb3 ;
 USE `tripsaga` ;
 
@@ -135,9 +141,7 @@ CREATE TABLE IF NOT EXISTS `tripsaga`.`accommodation` (
     REFERENCES `tripsaga`.`travel_group` (`group_id`),
   CONSTRAINT `fk_accommodation_attractions1`
     FOREIGN KEY (`attractions_no`)
-    REFERENCES `tripsaga`.`attractions` (`no`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    REFERENCES `tripsaga`.`attractions` (`no`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
 
@@ -248,14 +252,12 @@ CREATE TABLE IF NOT EXISTS `tripsaga`.`content` (
   `content_id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(100) NULL DEFAULT NULL,
   `description` VARCHAR(500) NULL DEFAULT NULL,
-  `attractions_no` INT NULL,
+  `attractions_no` INT NULL DEFAULT NULL,
   PRIMARY KEY (`content_id`),
   INDEX `fk_content_attractions1_idx` (`attractions_no` ASC) VISIBLE,
   CONSTRAINT `fk_content_attractions1`
     FOREIGN KEY (`attractions_no`)
-    REFERENCES `tripsaga`.`attractions` (`no`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    REFERENCES `tripsaga`.`attractions` (`no`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
 
@@ -371,6 +373,7 @@ CREATE TABLE IF NOT EXISTS `tripsaga`.`group_user_info` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
 
+
 -- -----------------------------------------------------
 -- Table `tripsaga`.`member_expense_info`
 -- -----------------------------------------------------
@@ -413,12 +416,12 @@ DEFAULT CHARACTER SET = utf8mb3;
 -- Table `tripsaga`.`schedule`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `tripsaga`.`schedule` (
-  `order` INT NOT NULL,
-  `day` INT NOT NULL,
+  `order` INT NULL,
+  `day` INT NULL,
   `content_id` INT NOT NULL,
   `group_id` INT NOT NULL,
-  `is_official` TINYINT(1) NULL DEFAULT '1',
-  PRIMARY KEY (`group_id`, `day`, `order`),
+  `is_official` TINYINT(1) NULL DEFAULT '0',
+  PRIMARY KEY (`content_id`),
   INDEX `content_id` (`content_id` ASC) VISIBLE,
   CONSTRAINT `schedule_ibfk_1`
     FOREIGN KEY (`content_id`)
@@ -442,17 +445,15 @@ CREATE TABLE IF NOT EXISTS `tripsaga`.`schedule_proposal` (
   INDEX `group_id` (`group_id` ASC) VISIBLE,
   INDEX `user_id` (`user_id` ASC) VISIBLE,
   INDEX `fk_schedule_proposal_attractions1_idx` (`attractions_no` ASC) VISIBLE,
+  CONSTRAINT `fk_schedule_proposal_attractions1`
+    FOREIGN KEY (`attractions_no`)
+    REFERENCES `tripsaga`.`attractions` (`no`),
   CONSTRAINT `schedule_proposal_ibfk_1`
     FOREIGN KEY (`group_id`)
     REFERENCES `tripsaga`.`travel_group` (`group_id`),
   CONSTRAINT `schedule_proposal_ibfk_3`
     FOREIGN KEY (`user_id`)
-    REFERENCES `tripsaga`.`user` (`id`),
-  CONSTRAINT `fk_schedule_proposal_attractions1`
-    FOREIGN KEY (`attractions_no`)
-    REFERENCES `tripsaga`.`attractions` (`no`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    REFERENCES `tripsaga`.`user` (`id`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
 
