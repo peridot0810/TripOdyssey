@@ -248,6 +248,7 @@ CREATE TABLE IF NOT EXISTS `tripsaga`.`content` (
   `description` VARCHAR(500) NULL DEFAULT NULL,
   `attractions_no` INT NULL DEFAULT NULL,
   PRIMARY KEY (`content_id`),
+  UNIQUE KEY `uq_name_attraction` (`name`, `attractions_no`),
   INDEX `fk_content_attractions1_idx` (`attractions_no` ASC) VISIBLE,
   CONSTRAINT `fk_content_attractions1`
     FOREIGN KEY (`attractions_no`)
