@@ -1,4 +1,4 @@
-package com.ssafy.pjt.financial.exception;
+package com.ssafy.pjt.common.exception;
 
 
 public class UserNotInGroupException extends RuntimeException {
