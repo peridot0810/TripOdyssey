@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ssafy.pjt.common.dto.response.CommonResponse;
+import com.ssafy.pjt.schedule.dto.request.AddContentRequestDto;
 import com.ssafy.pjt.schedule.dto.response.GetProposalResponseDto;
 import com.ssafy.pjt.schedule.service.ScheduleService;
 import com.ssafy.pjt.util.JwtUtil;
@@ -45,6 +46,17 @@ public class ScheduleController {
 		
 		scheduleService.addScheduleProposal(userId, groupId, attractionNo);
 		return ResponseEntity.ok(new CommonResponse<>(true, "장소 추천에 성공했습니다.", null));
+	}
+	
+	@PostMapping("/content")
+	public ResponseEntity<?> addContent(@RequestHeader("Authorization") String token,
+			@PathVariable Integer groupId,
+			@RequestBody AddContentRequestDto addContentRequest){
+		// JWT 토큰에서 아이디 추출
+		String userId = jwtUtil.extractUserId(token);
+		
+		scheduleService.addContent(userId, groupId, addContentRequest);
+		return ResponseEntity.ok(new CommonResponse<>(true, "콘텐츠 생성에 성공했습니다.", null));
 	}
 	
 }

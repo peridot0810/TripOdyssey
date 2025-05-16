@@ -10,6 +10,16 @@
 		VALUES(#{groupId},#{userId},#{attractionsNo})
 	</insert>
 	
+	<insert id="addContent" useGeneratedKeys="true" keyProperty="contentId">
+		INSERT INTO content(name, description, attractions_no)
+		VALUES(#{name}, #{description}, #{attractionNo})
+	</insert>
+	
+	<insert id="addSchedule">
+		INSERT INTO schedule(content_id, group_id)
+		VALUES(#{contentId}, #{groupId})
+	</insert>
+	
 	<select id="getProposalList">
 		SELECT user_id, 
 				proposal_id, 
