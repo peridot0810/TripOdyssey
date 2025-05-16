@@ -9,6 +9,8 @@ import com.ssafy.pjt.common.entity.GroupUserInfo;
 public interface CommonMapper {
 	Integer GetUserRoleInGroup(UserGroupRequestDto userRoleInGroupRequest);
 	
+	Integer getUserRoleInGroup(UserGroupRequestDto userRoleInGroupRequest);
+	
 	Boolean checkUserInGroup(UserGroupRequestDto checkUserInGroupRequest);
 	
 	Boolean checkUserRoleAndGroup(GroupUserInfo groupUserInfo);

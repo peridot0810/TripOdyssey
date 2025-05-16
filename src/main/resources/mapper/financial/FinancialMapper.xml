@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.pjt.financial.mapper.FinancialMapper">
+
+	
+    <update id="setFee">
+    	UPDATE member_expense_info
+    	SET expense_to_pay = #{budget}
+    	WHERE group_id=#{groupId}
+    </update>
+    
+    <update id="payAmount">
+    	UPDATE member_expense_info
+    	SET paid_amount = paid_amount + #{paidAmount}
+    	WHERE user_id = #{userId} AND group_id = #{groupId}
+    </update>
+    
+    <update id="updateFee">
+    	UPDATE member_expense_info
+    	SET expense_to_pay = #{newFee}
+    	WHERE user_id = #{userId} AND group_id = #{groupId}
+    </update>
+    
+    <select id="getTotalAmount">
+    	SELECT SUM(paid_amount) AS raised_amount, SUM(expense_to_pay) AS goal_amount
+    	FROM member_expense_info
+    	WHERE group_id=#{groupId}
+    </select>
+	
+</mapper>
