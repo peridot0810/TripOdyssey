@@ -102,6 +102,7 @@ INSERT INTO content (name, description) VALUES
 ('천문대 방문', '별과 우주에 대해 배우고 별자리를 관찰할 수 있는 체험입니다.'),
 ('도예 체험', '도자기를 직접 빚어보며 작품을 만들어볼 수 있는 공방 체험입니다.');
 
+
 -- schedule 더미 데이터 추가
 INSERT INTO schedule (`order`, day, content_id, group_id, is_official) VALUES
 (1, 1, 5, 1, 1),
