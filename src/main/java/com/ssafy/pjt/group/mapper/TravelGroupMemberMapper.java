@@ -1,0 +1,27 @@
+package com.ssafy.pjt.group.mapper;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import com.ssafy.pjt.group.entity.GroupMemberInfo;
+
+@Mapper
+public interface TravelGroupMemberMapper {
+	
+	public void insertUserToGroup(
+			@Param("groupId") Integer groupId, 
+			@Param("userEmail") String userEmail);
+	
+	public void deleteUserFromGroup(
+			@Param("groupId") Integer groupId, 
+			@Param("userId") String userId);
+	
+	public void updateGroupUserRole(
+			@Param("groupId") Integer groupId, 
+			@Param("userId") String userId,
+			@Param("roleId") Integer roleId);
+	
+	public List<GroupMemberInfo> selectAllGroupUserInfo(Integer groupId);
+}

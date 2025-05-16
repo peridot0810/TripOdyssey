@@ -1,9 +1,5 @@
 USE tripsaga;
 
--- role 분류
-INSERT INTO `role` (`name`) 
-VALUES ('방장'), ('일정'), ('재무'), ('교통/숙소'), ('일반');
-
 -- 지출 카테고리 
 INSERT INTO `expense_category` (`category_name`) 
 VALUES 	('Transportation'),
@@ -25,6 +21,9 @@ INSERT INTO transportation_type (type_name) VALUES
 ('Bicycle'),
 ('Walking');
 
+
+INSERT INTO `role` (`name`) VALUES
+('master'), ('schedule'), ('finance'), ('logistics'), ('normal');
 
 INSERT INTO `travel_group` (`name`, `created_at`, `status`, `start_date`, `end_date`) 
 VALUES ('제주도 우정여행', NOW(), 'planning', '2025-07-01', '2025-07-10');
