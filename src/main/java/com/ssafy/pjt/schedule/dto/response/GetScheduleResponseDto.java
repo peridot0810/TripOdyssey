@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class GetScheduleResponseDto {
+	private Integer contentId;
 	 private String name;
 	 private Integer order;
 	 private Integer day;

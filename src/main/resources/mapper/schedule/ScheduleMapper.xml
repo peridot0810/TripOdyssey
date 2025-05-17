@@ -64,7 +64,7 @@
 	</select>
 	
 	<select id="getScheduleList">
-		SELECT name, `order`, day, description, attractions_no, is_official
+		SELECT name, `order`, day, content_id, description, attractions_no, is_official
 		FROM schedule s
 			JOIN content c USING(content_id)
 		WHERE group_id=#{groupId}
@@ -76,5 +76,38 @@
 			JOIN contenttypes USING (content_type_id)
 		WHERE no = #{attractionNo} 
 	</select>
+	
+	<update id="updateScheduleNew">
+		<foreach collection="newScheduleList" item="schedule"  separator=";">
+			UPDATE schedule
+			SET 
+				`order`=#{schedule.order}, 
+				`day`=#{schedule.day},
+				is_official='1'
+			WHERE content_id=#{schedule.contentId}
+		</foreach>
+		
+		
+	</update>
+	
+	<update id="updateScheduleModified">
+		<foreach collection="modifiedScheduleList" item="schedule"  separator=";">
+			UPDATE schedule
+			SET
+				`order`=#{schedule.order}, 
+				`day`=#{schedule.day} 
+			WHERE content_id=#{schedule.contentId}
+		</foreach>
+	</update>
+	
+	<update id="updateScheduleRemoved">
+		<foreach collection="removedScheduleList" item="schedule" separator=";">
+			UPDATE schedule
+			SET `order`=NULL,
+				`day`=NULL,
+				is_official='0'
+			WHERE content_id=#{schedule.contentId}	
+		</foreach>
+	</update>
 
 </mapper>

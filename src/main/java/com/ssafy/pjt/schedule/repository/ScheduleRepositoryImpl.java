@@ -7,6 +7,9 @@ import org.springframework.stereotype.Repository;
 import com.ssafy.pjt.schedule.dto.request.AddContentRequestDto;
 import com.ssafy.pjt.schedule.dto.request.AddProposalRequestDto;
 import com.ssafy.pjt.schedule.dto.request.AddScheduleRequestDto;
+import com.ssafy.pjt.schedule.dto.request.ModifiedOfficialScheduleRequestDto;
+import com.ssafy.pjt.schedule.dto.request.NewOfficialScheduleRequestDto;
+import com.ssafy.pjt.schedule.dto.request.RemovedOfficialScheduleRequestDto;
 import com.ssafy.pjt.schedule.dto.request.UpdateContentRequestDto;
 import com.ssafy.pjt.schedule.dto.response.GetAttractionResponseDto;
 import com.ssafy.pjt.schedule.dto.response.GetProposalResponseDto;
@@ -59,5 +62,18 @@ public class ScheduleRepositoryImpl implements ScheduleRepository{
 	@Override
 	public GetAttractionResponseDto getAttractionInfo(Integer attractionNo) {
 		return scheduleMapper.getAttractionInfo(attractionNo);
+	}
+	
+	@Override
+	public void updateScheduleModified(List<ModifiedOfficialScheduleRequestDto> modifiedScheduleList) {
+		scheduleMapper.updateScheduleModified(modifiedScheduleList);
+	}
+	@Override
+	public void updateScheduleNew(List<NewOfficialScheduleRequestDto> newScheduleLiust) {
+		scheduleMapper.updateScheduleNew(newScheduleLiust);
+	}
+	@Override
+	public void UpdateScheduleRemoved(List<RemovedOfficialScheduleRequestDto> removedScheduleList) {
+		scheduleMapper.updateScheduleRemoved(removedScheduleList);
 	}
 }

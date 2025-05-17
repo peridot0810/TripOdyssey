@@ -104,18 +104,18 @@ INSERT INTO content (name, description) VALUES
 
 
 -- schedule 더미 데이터 추가
-INSERT INTO schedule (`order`, day, content_id, group_id, is_official) VALUES
-(1, 1, 5, 1, 1),
-(2, 1, 12, 1, 1),
-(3, 1, 23, 1, 1),
+INSERT INTO schedule (content_id, group_id) VALUES
+(5, 1),
+(12, 1),
+(23, 1),
 
-(1, 2, 8, 1, 1),
-(2, 2, 19, 1, 1),
-(3, 2, 2, 1, 1),
+(8, 1),
+(19, 1),
+(2, 1),
 
-(1, 3, 17, 1, 1),
-(2, 3, 30, 1, 1),
-(3, 3, 11, 1, 1);
+(17, 1),
+(30, 1),
+(11, 1);
 
 -- expense_tracker 더미 데이터 추가
 INSERT INTO expense_tracker (group_id, content_id, category_id, datetime, description, amount) VALUES

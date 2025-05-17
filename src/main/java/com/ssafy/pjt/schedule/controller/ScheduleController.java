@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ssafy.pjt.common.dto.response.CommonResponse;
 import com.ssafy.pjt.schedule.dto.request.AddContentRequestDto;
 import com.ssafy.pjt.schedule.dto.request.UpdateContentRequestDto;
+import com.ssafy.pjt.schedule.dto.request.UpdateScheduleRequestWrapperDto;
 import com.ssafy.pjt.schedule.dto.response.GetProposalResponseDto;
 import com.ssafy.pjt.schedule.dto.response.GetScheduleResponseDto;
 import com.ssafy.pjt.schedule.service.ScheduleService;
@@ -93,6 +94,17 @@ public class ScheduleController {
 		
 		List<GetScheduleResponseDto> scheduleList = scheduleService.getScheduleList(userId, groupId);
 		return ResponseEntity.ok(new CommonResponse<>(true, "스케줄 조회에 성공했습니다.", scheduleList));
+	}
+	
+	@PostMapping("/update")
+	public ResponseEntity<?> updateSchedule(@RequestHeader("Authorization") String token,
+			@PathVariable Integer groupId,
+			@RequestBody UpdateScheduleRequestWrapperDto updateScheduleRequest){
+		// JWT 토큰에서 아이디 추출
+		String userId = jwtUtil.extractUserId(token);
+		
+		scheduleService.updateSchedules(userId, groupId, updateScheduleRequest);
+		return ResponseEntity.ok(new CommonResponse<>(true, "스케줄 업데이트에 성공했습니다.", null));
 	}
 	
 	
