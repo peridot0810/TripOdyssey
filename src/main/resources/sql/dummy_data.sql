@@ -104,18 +104,18 @@ INSERT INTO content (name, description) VALUES
 
 
 -- schedule 더미 데이터 추가
-INSERT INTO schedule (`order`, day, content_id, group_id, is_official) VALUES
-(1, 1, 5, 1, 1),
-(2, 1, 12, 1, 1),
-(3, 1, 23, 1, 1),
+INSERT INTO schedule (content_id, group_id) VALUES
+(5, 1),
+(12, 1),
+(23, 1),
 
-(1, 2, 8, 1, 1),
-(2, 2, 19, 1, 1),
-(3, 2, 2, 1, 1),
+(8, 1),
+(19, 1),
+(2, 1),
 
-(1, 3, 17, 1, 1),
-(2, 3, 30, 1, 1),
-(3, 3, 11, 1, 1);
+(17, 1),
+(30, 1),
+(11, 1);
 
 -- expense_tracker 더미 데이터 추가
 INSERT INTO expense_tracker (group_id, content_id, category_id, datetime, description, amount) VALUES
@@ -138,3 +138,5 @@ INSERT INTO transportation (type_id, group_id, departure, arrival, `from`, `to`,
 (3, 1, '2025-06-04 08:00:00', '2025-06-04 11:30:00', 'Busan', 'Gyeongju', '고속버스로 경주 관광'),
 (4, 1, '2025-06-05 10:00:00', '2025-06-05 11:00:00', 'Gyeongju', 'Ulsan', '렌터카로 울산 이동'),
 (6, 1, '2025-06-06 09:00:00', '2025-06-06 09:30:00', 'Ulsan Station', 'Busan Station', '지하철로 부산 복귀');
+
+
