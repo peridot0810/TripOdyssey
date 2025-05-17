@@ -13,6 +13,7 @@ public interface ScheduleService {
 	// Proposal
 	void addScheduleProposal(String userId, Integer groupId, Integer attractionNo);
 	List<GetProposalResponseDto> getProposalList(String userId, Integer groupId);
+	void likeProposal(String userId, Integer groupId, Integer proposalId);
 	
 	// Content
 	void addContent(String userId, Integer groupId, AddContentRequestDto addContentRequest);

@@ -42,6 +42,18 @@ public class ScheduleController {
 		return ResponseEntity.ok(new CommonResponse<>(true, "추천된 장소 리스트 조회에 성공했습니다.", proposalList));
 	}
 	
+	@PostMapping("/recommended/like")
+	public ResponseEntity<?> likeProposal(@RequestHeader("Authorization") String token,
+			@PathVariable Integer groupId,
+			@RequestBody Integer proposalId){
+		// JWT 토큰에서 아이디 추출
+		String userId = jwtUtil.extractUserId(token);
+		
+		scheduleService.likeProposal(userId, groupId, proposalId);
+		return ResponseEntity.ok(new CommonResponse<>(true, "추천된 장소 좋아요 누르기에 성공했습니다.", null));
+	}
+	
+	
 	@PostMapping("/recommend")
 	public ResponseEntity<?> addProposal(@RequestHeader("Authorization") String token,
 			@PathVariable Integer groupId,

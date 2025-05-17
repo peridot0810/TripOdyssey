@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 import com.ssafy.pjt.schedule.dto.request.AddContentRequestDto;
 import com.ssafy.pjt.schedule.dto.request.AddProposalRequestDto;
 import com.ssafy.pjt.schedule.dto.request.AddScheduleRequestDto;
+import com.ssafy.pjt.schedule.dto.request.LikeProposalRequestDto;
 import com.ssafy.pjt.schedule.dto.request.ModifiedOfficialScheduleRequestDto;
 import com.ssafy.pjt.schedule.dto.request.NewOfficialScheduleRequestDto;
 import com.ssafy.pjt.schedule.dto.request.RemovedOfficialScheduleRequestDto;
@@ -20,6 +21,7 @@ public interface ScheduleRepository {
 	// Proposal
 	void addScheduleProposal(AddProposalRequestDto addProposalRequest);
 	List<GetProposalResponseDto> getProposalList(Integer groupId);
+	void likeProposal(LikeProposalRequestDto likeProposalRequest);
 	
 	// Content
 	void addContent(AddContentRequestDto addContentRequest);

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import com.ssafy.pjt.schedule.dto.request.AddContentRequestDto;
 import com.ssafy.pjt.schedule.dto.request.AddProposalRequestDto;
 import com.ssafy.pjt.schedule.dto.request.AddScheduleRequestDto;
+import com.ssafy.pjt.schedule.dto.request.LikeProposalRequestDto;
 import com.ssafy.pjt.schedule.dto.request.ModifiedOfficialScheduleRequestDto;
 import com.ssafy.pjt.schedule.dto.request.NewOfficialScheduleRequestDto;
 import com.ssafy.pjt.schedule.dto.request.RemovedOfficialScheduleRequestDto;
@@ -32,6 +33,11 @@ public class ScheduleRepositoryImpl implements ScheduleRepository{
 	@Override
 	public List<GetProposalResponseDto> getProposalList(Integer groupId) {
 		return scheduleMapper.getProposalList(groupId);
+	}
+	
+	@Override
+	public void likeProposal(LikeProposalRequestDto likeProposalRequest) {
+		scheduleMapper.likeProposal(likeProposalRequest);
 	}
 	
 	@Override

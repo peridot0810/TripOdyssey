@@ -10,6 +10,11 @@
 		VALUES(#{groupId},#{userId},#{attractionsNo})
 	</insert>
 	
+	<insert id="likeProposal">
+		INSERT INTO proposal_like(user_id, proposal_id)
+		VALUES(#{userId}, #{proposalId})
+	</insert>
+	
 	<insert id="addContent" useGeneratedKeys="true" keyProperty="contentId">
 		INSERT INTO content(name, description, attractions_no)
 		VALUES(#{name}, #{description}, #{attractionNo})
