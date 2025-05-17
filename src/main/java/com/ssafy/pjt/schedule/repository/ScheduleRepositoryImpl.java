@@ -8,7 +8,9 @@ import com.ssafy.pjt.schedule.dto.request.AddContentRequestDto;
 import com.ssafy.pjt.schedule.dto.request.AddProposalRequestDto;
 import com.ssafy.pjt.schedule.dto.request.AddScheduleRequestDto;
 import com.ssafy.pjt.schedule.dto.request.UpdateContentRequestDto;
+import com.ssafy.pjt.schedule.dto.response.GetAttractionResponseDto;
 import com.ssafy.pjt.schedule.dto.response.GetProposalResponseDto;
+import com.ssafy.pjt.schedule.dto.response.GetScheduleResponseDto;
 import com.ssafy.pjt.schedule.mapper.ScheduleMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -47,5 +49,15 @@ public class ScheduleRepositoryImpl implements ScheduleRepository{
 	@Override
 	public void deleteContent(Integer contentId) {
 		scheduleMapper.deleteContent(contentId);	
+	}
+	
+	@Override
+	public List<GetScheduleResponseDto> getScheduleList(Integer groupId) {
+		return scheduleMapper.getScheduleList(groupId);
+	}
+	
+	@Override
+	public GetAttractionResponseDto getAttractionInfo(Integer attractionNo) {
+		return scheduleMapper.getAttractionInfo(attractionNo);
 	}
 }

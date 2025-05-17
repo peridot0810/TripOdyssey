@@ -62,5 +62,19 @@
 			JOIN contenttypes c USING (content_type_id)
 		WHERE group_id=#{groupId}
 	</select>
+	
+	<select id="getScheduleList">
+		SELECT name, `order`, day, description, attractions_no, is_official
+		FROM schedule s
+			JOIN content c USING(content_id)
+		WHERE group_id=#{groupId}
+	</select>
+	
+	<select id="getAttractionInfo">
+		SELECT no, title, content_type_name, first_image1, first_image2, latitude, longitude, tel, addr1, addr2, homepage, overview
+		FROM attractions 
+			JOIN contenttypes USING (content_type_id)
+		WHERE no = #{attractionNo} 
+	</select>
 
 </mapper>

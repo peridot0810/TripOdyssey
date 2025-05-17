@@ -5,6 +5,7 @@ import java.util.List;
 import com.ssafy.pjt.schedule.dto.request.AddContentRequestDto;
 import com.ssafy.pjt.schedule.dto.request.UpdateContentRequestDto;
 import com.ssafy.pjt.schedule.dto.response.GetProposalResponseDto;
+import com.ssafy.pjt.schedule.dto.response.GetScheduleResponseDto;
 
 public interface ScheduleService {
 	void addScheduleProposal(String userId, Integer groupId, Integer attractionNo);
@@ -13,4 +14,6 @@ public interface ScheduleService {
 	void addContent(String userId, Integer groupId, AddContentRequestDto addContentRequest);
 	void updateContent(String userId, Integer groupId, UpdateContentRequestDto updateContentRequest);
 	void deleteContent(String userId, Integer groupId, Integer contentId);
+	
+	List<GetScheduleResponseDto> getScheduleList(String userId, Integer groupId);
 }

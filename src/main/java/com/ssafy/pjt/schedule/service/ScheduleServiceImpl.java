@@ -13,6 +13,7 @@ import com.ssafy.pjt.schedule.dto.request.AddProposalRequestDto;
 import com.ssafy.pjt.schedule.dto.request.AddScheduleRequestDto;
 import com.ssafy.pjt.schedule.dto.request.UpdateContentRequestDto;
 import com.ssafy.pjt.schedule.dto.response.GetProposalResponseDto;
+import com.ssafy.pjt.schedule.dto.response.GetScheduleResponseDto;
 import com.ssafy.pjt.schedule.repository.ScheduleRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -104,6 +105,24 @@ public class ScheduleServiceImpl implements ScheduleService{
 		
 		// 비즈니스 로직
 		scheduleRepository.deleteContent(contentId);
+	}
+	
+	@Override
+	public List<GetScheduleResponseDto> getScheduleList(String userId, Integer groupId) {
+		// 유저가 그룹원이 맞는지 확인
+		if(!userValidationService.isUserInGroup(userId, groupId)) {
+			throw new UserNotInGroupException("그룹원만 요청할 수 있는 기능입니다.");
+		}
+		
+		// 비즈니스 로직 
+		List<GetScheduleResponseDto> scheduleList = scheduleRepository.getScheduleList(groupId);
+		for(GetScheduleResponseDto schedule :scheduleList) {
+			if(schedule.getAttractionsNo() != null) {
+				schedule.setAttractionInfo(scheduleRepository.getAttractionInfo(schedule.getAttractionsNo()));
+			}
+		}
+		
+		return scheduleList;
 	}
 	
 }

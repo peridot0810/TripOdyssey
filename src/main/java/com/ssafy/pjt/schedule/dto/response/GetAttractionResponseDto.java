@@ -6,7 +6,7 @@ import lombok.Data;
 public class GetAttractionResponseDto {
 	private Integer no; 
 	private String title; 
-	private String contentType; 
+	private String contentTypeName; 
 	private String firstImage1; 
 	private String firstImage2; 
 	private Double latitude; 

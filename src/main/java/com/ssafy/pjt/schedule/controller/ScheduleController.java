@@ -17,6 +17,7 @@ import com.ssafy.pjt.common.dto.response.CommonResponse;
 import com.ssafy.pjt.schedule.dto.request.AddContentRequestDto;
 import com.ssafy.pjt.schedule.dto.request.UpdateContentRequestDto;
 import com.ssafy.pjt.schedule.dto.response.GetProposalResponseDto;
+import com.ssafy.pjt.schedule.dto.response.GetScheduleResponseDto;
 import com.ssafy.pjt.schedule.service.ScheduleService;
 import com.ssafy.pjt.util.JwtUtil;
 
@@ -83,4 +84,16 @@ public class ScheduleController {
 		scheduleService.deleteContent(userId, groupId, contentId);
 		return ResponseEntity.ok(new CommonResponse<>(true, "콘텐츠 삭제에 성공했습니다.", null));
 	}
+	
+	@GetMapping("/all")
+	public ResponseEntity<?> getScheduleList(@RequestHeader("Authorization") String token,
+			@PathVariable Integer groupId){
+		// JWT 토큰에서 아이디 추출
+		String userId = jwtUtil.extractUserId(token);
+		
+		List<GetScheduleResponseDto> scheduleList = scheduleService.getScheduleList(userId, groupId);
+		return ResponseEntity.ok(new CommonResponse<>(true, "스케줄 조회에 성공했습니다.", scheduleList));
+	}
+	
+	
 }

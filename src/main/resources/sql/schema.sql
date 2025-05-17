@@ -417,6 +417,7 @@ CREATE TABLE IF NOT EXISTS `tripsaga`.`schedule` (
   `group_id` INT NOT NULL,
   `is_official` TINYINT(1) NULL DEFAULT '0',
   PRIMARY KEY (`content_id`),
+  UNIQUE KEY `uq_order_day` (`order`, `day`),
   INDEX `content_id` (`content_id` ASC) VISIBLE,
   CONSTRAINT `schedule_ibfk_1`
     FOREIGN KEY (`content_id`)
