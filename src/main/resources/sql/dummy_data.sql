@@ -21,6 +21,11 @@ INSERT INTO transportation_type (type_name) VALUES
 ('Bicycle'),
 ('Walking');
 
+-- 게시글 카테고리
+INSERT INTO post_category(category_name) VALUES
+("Community"),
+("Recruitment");
+
 
 INSERT INTO `role` (`name`) VALUES
 ('master'), ('schedule'), ('finance'), ('logistics'), ('normal');

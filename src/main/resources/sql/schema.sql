@@ -5,15 +5,9 @@ SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
 
 -- -----------------------------------------------------
--- Schema mydb
--- -----------------------------------------------------
--- -----------------------------------------------------
 -- Schema tripsaga
 -- -----------------------------------------------------
-
--- -----------------------------------------------------
--- Schema tripsaga
--- -----------------------------------------------------
+DROP SCHEMA IF EXISTS `tripsaga`;
 CREATE SCHEMA IF NOT EXISTS `tripsaga` DEFAULT CHARACTER SET utf8mb3 ;
 USE `tripsaga` ;
 
@@ -208,7 +202,7 @@ CREATE TABLE IF NOT EXISTS `tripsaga`.`post` (
   `content` TEXT NOT NULL,
   `category_id` INT NOT NULL,
   `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
-  `views` INT NOT NULL DEFAULT '0',
+  `views` INT NOT NULL DEFAULT 0,
   `author` VARCHAR(100) NOT NULL,
   PRIMARY KEY (`post_id`),
   INDEX `category_id` (`category_id` ASC) VISIBLE,
