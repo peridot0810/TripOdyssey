@@ -9,5 +9,80 @@
 		INSERT INTO post(title, content, category_id, author)
 		VALUES(#{title},#{content},#{categoryId},#{author})
 	</insert>
+	
+	
+	<select id="getPost">
+		SELECT post_id, title, content, views, created_at, author, likes, category_id, category_name
+		FROM post
+			LEFT JOIN(
+				SELECT post_id, COUNT(*) AS likes
+				FROM post_like
+				GROUP BY post_id
+			)AS pl
+			USING(post_id)
+			JOIN post_category USING (category_id)
+		WHERE post_id=#{postId}
+	</select>
+	
+	
+	
+	<select id="getPostList">
+		SELECT post_id, title, views, created_at, author, likes, category_id, category_name
+		FROM post
+			LEFT JOIN(
+				SELECT post_id, COUNT(*) AS likes
+				FROM post_like
+				GROUP BY post_id
+			)AS pl
+			USING(post_id)
+			JOIN post_category USING (category_id)
+		<where>
+			category_id = #{categoryId}
+			<if test="keyword != null and keyword != ''">
+				AND ( title LIKE CONCAT('%', #{keyword}, '%') )
+			</if>
+			<if test="author != null and author != ''">
+				AND ( author = #{author} )
+			</if>
+		</where>
+		ORDER BY created_at DESC
+		LIMIT #{limit} OFFSET #{offset}
+	</select>
+	
+	<select id="getComments">
+		SELECT comment_id, post_id, content, writer, created_at
+		FROM comment
+		WHERE post_id=#{postId}
+	</select>
+	
+	<update id="editPost">
+		UPDATE post
+		
+		<set>
+			<if test="title != null and title !=''">
+				title=#{title},
+			</if>
+			
+			<if test="content != null and content !=''">
+				content=#{content},
+			</if>
+		</set>
+		
+		WHERE post_id=#{postId} AND author=#{userId}
+	</update>
 
+	<delete id="deletePost">
+		DELETE FROM post
+		WHERE post_id=#{postId} AND author=#{userId}
+	</delete>
+	
+	<insert id="likePost">
+		INSERT INTO post_like(post_id, user_id)
+		VALUES(#{postId}, #{userId})
+	</insert>
+	
+	<insert id="createComment" useGeneratedKeys="true" keyProperty="commentId">
+		INSERT INTO comment(post_id, content, writer)
+		VALUES(#{postId},#{content},#{writer})
+	</insert>
 </mapper>

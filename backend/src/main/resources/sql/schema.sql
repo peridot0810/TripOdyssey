@@ -231,10 +231,12 @@ CREATE TABLE IF NOT EXISTS `tripsaga`.`comment` (
   INDEX `writer` (`writer` ASC) VISIBLE,
   CONSTRAINT `comment_ibfk_1`
     FOREIGN KEY (`post_id`)
-    REFERENCES `tripsaga`.`post` (`post_id`),
+    REFERENCES `tripsaga`.`post` (`post_id`)
+    ON DELETE CASCADE,
   CONSTRAINT `comment_ibfk_2`
     FOREIGN KEY (`writer`)
-    REFERENCES `tripsaga`.`user` (`id`))
+    REFERENCES `tripsaga`.`user` (`id`)
+    ON DELETE CASCADE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
 
@@ -399,10 +401,13 @@ CREATE TABLE IF NOT EXISTS `tripsaga`.`post_like` (
   INDEX `user_id` (`user_id` ASC) VISIBLE,
   CONSTRAINT `post_like_ibfk_1`
     FOREIGN KEY (`post_id`)
-    REFERENCES `tripsaga`.`post` (`post_id`),
+    REFERENCES `tripsaga`.`post` (`post_id`)
+    ON DELETE CASCADE,
   CONSTRAINT `post_like_ibfk_2`
     FOREIGN KEY (`user_id`)
-    REFERENCES `tripsaga`.`user` (`id`))
+    REFERENCES `tripsaga`.`user` (`id`)
+    ON DELETE CASCADE
+    )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
 
