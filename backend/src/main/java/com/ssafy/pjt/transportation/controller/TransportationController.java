@@ -1,6 +1,7 @@
 package com.ssafy.pjt.transportation.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -54,8 +55,8 @@ public class TransportationController {
 		// JWT 토큰에서 아이디 추출
 		String userId = jwtUtil.extractUserId(token);
 		
-		transportationService.addTransportation(userId, groupId, requestDto);
-		return ResponseEntity.ok(new CommonResponse<>(true, "교통편 추가에 성공했습니다.", null));
+		Integer newTransportationId = transportationService.addTransportation(userId, groupId, requestDto);
+		return ResponseEntity.ok(new CommonResponse<>(true, "교통편 추가에 성공했습니다.", Map.of("transportationId", newTransportationId)));
 	}
 
 	@PutMapping

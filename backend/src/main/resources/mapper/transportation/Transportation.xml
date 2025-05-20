@@ -19,7 +19,7 @@
     	WHERE transportation_id = #{transportationId}
     </select>
     
-    <insert id="addTransportation">
+    <insert id="addTransportation" useGeneratedKeys="true" keyProperty="transportationId">
     	INSERT INTO transportation(type_id, group_id, departure, arrival, `from`, `to`, description)
     	VALUES(#{typeId},#{groupId},#{departure},#{arrival},#{from},#{to},#{description})
     </insert>

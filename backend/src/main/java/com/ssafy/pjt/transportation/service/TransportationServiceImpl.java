@@ -21,7 +21,7 @@ public class TransportationServiceImpl implements TransportationService{
 	private final TransportationRepository transportationRepository;
 
 	@Override
-	public void addTransportation(String userId, Integer groupId, AddTransportationRequestDto addRequest) {
+	public Integer addTransportation(String userId, Integer groupId, AddTransportationRequestDto addRequest) {
 		// 요청한 유저가 그룹원이 맞는지 확인 
 		if(!transportationRepository.checkUserInGroup(new UserGroupRequestDto(userId, groupId))) {
 			// 아니라면 예외 던지기 
@@ -36,6 +36,7 @@ public class TransportationServiceImpl implements TransportationService{
 		// 비즈니스 로직 
 		addRequest.setGroupId(groupId);
 		transportationRepository.addTransportation(addRequest);
+		return addRequest.getTransportationId();
 	}
 	
 	@Override

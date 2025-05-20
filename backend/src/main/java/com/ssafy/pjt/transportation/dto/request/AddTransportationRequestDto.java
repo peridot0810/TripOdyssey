@@ -11,4 +11,5 @@ public class AddTransportationRequestDto {
 	private String from;
 	private String to;
 	private String description;
+	private Integer transportationId;
 }

@@ -27,19 +27,22 @@ public class ScheduleServiceImpl implements ScheduleService{
 	private final UserValidationService userValidationService;
 
 	@Override
-	public void addScheduleProposal(String userId, Integer groupId, Integer attractionNo) {
+	public Integer addScheduleProposal(String userId, Integer groupId, Integer attractionNo) {
 		// 유저가 그룹원이 맞는지 확인
 		if(!userValidationService.isUserInGroup(userId, groupId)) {
 			throw new UserNotInGroupException("그룹원만 요청할 수 있는 기능입니다.");
 		}
 		
 		// 비즈니스 로직
-		
-		scheduleRepository.addScheduleProposal(AddProposalRequestDto.builder()
+		AddProposalRequestDto newProposal = AddProposalRequestDto.builder()
 				.userId(userId)
 				.groupId(groupId)
 				.attractionsNo(attractionNo)
-				.build());
+				.build();
+		
+		scheduleRepository.addScheduleProposal(newProposal);
+		
+		return newProposal.getProposalId();
 	}
 	
 	@Override
@@ -69,7 +72,7 @@ public class ScheduleServiceImpl implements ScheduleService{
 	}
 	
 	@Override
-	public void addContent(String userId, Integer groupId, AddContentRequestDto addContentRequest) {
+	public Integer addContent(String userId, Integer groupId, AddContentRequestDto addContentRequest) {
 		// 유저가 그룹원이 맞는지 확인
 		if(!userValidationService.isUserInGroup(userId, groupId)) {
 			throw new UserNotInGroupException("그룹원만 요청할 수 있는 기능입니다.");
@@ -89,6 +92,8 @@ public class ScheduleServiceImpl implements ScheduleService{
 				.contentId(addContentRequest.getContentId())
 				.groupId(groupId)
 				.build());
+		
+		return addContentRequest.getContentId();
 	}
 	
 	@Override

@@ -5,7 +5,7 @@
 
 <mapper namespace="com.ssafy.pjt.schedule.mapper.ScheduleMapper">
 
-	<insert id="addScheduleProposal">
+	<insert id="addScheduleProposal" useGeneratedKeys="true" keyProperty="proposalId">
 		INSERT INTO schedule_proposal(group_id, user_id, attractions_no)
 		VALUES(#{groupId},#{userId},#{attractionsNo})
 	</insert>
@@ -61,10 +61,15 @@
 				addr1, 
 				addr2, 
 				homepage, 
-				overview
+				overview,
+				likes
 		FROM schedule_proposal sp
 			JOIN attractions a ON (sp.attractions_no = a.no)
 			JOIN contenttypes c USING (content_type_id)
+			LEFT JOIN (
+				SELECT proposal_id, COUNT(*) AS likes FROM proposal_like
+			    GROUP BY proposal_id
+			) likes USING(proposal_id)
 		WHERE group_id=#{groupId}
 	</select>
 	
