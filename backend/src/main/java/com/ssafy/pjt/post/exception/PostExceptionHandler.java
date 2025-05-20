@@ -29,4 +29,16 @@ public class PostExceptionHandler {
 		// 게시글 좋아요 실패 예외 처리
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 	}
+	
+	@ExceptionHandler(EditCommentFailedException.class)
+	public ResponseEntity<?> handleEditCommentFailed(EditCommentFailedException e){
+		// 댓글 수정 실패 예외 처리 
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+	}
+	
+	@ExceptionHandler(DeleteCommentFailedException.class)
+	public ResponseEntity<?> handleDeleteCommentFailed(DeleteCommentFailedException e){
+		// 댓글 삭제 실패 예외 처리 
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+	}
 }

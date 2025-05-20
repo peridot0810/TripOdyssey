@@ -80,4 +80,9 @@
 		INSERT INTO post_like(post_id, user_id)
 		VALUES(#{postId}, #{userId})
 	</insert>
+	
+	<insert id="createComment" useGeneratedKeys="true" keyProperty="commentId">
+		INSERT INTO comment(post_id, content, writer)
+		VALUES(#{postId},#{content},#{writer})
+	</insert>
 </mapper>

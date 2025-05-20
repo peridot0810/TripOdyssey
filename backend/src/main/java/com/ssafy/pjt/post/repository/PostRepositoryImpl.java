@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
+import com.ssafy.pjt.post.dto.request.CreateCommentRequestDto;
 import com.ssafy.pjt.post.dto.request.CreatePostRequestDto;
 import com.ssafy.pjt.post.dto.request.DeletePostRequestDto;
 import com.ssafy.pjt.post.dto.request.EditPostRequestDto;
@@ -54,5 +55,10 @@ public class PostRepositoryImpl implements PostRepository{
 	@Override
 	public void likePost(LikePostRequestDto likePostRequest) {
 		postMapper.likePost(likePostRequest);
+	}
+	
+	@Override
+	public void createComment(CreateCommentRequestDto createCommentRequest) {
+		postMapper.createComment(createCommentRequest);
 	}
 }

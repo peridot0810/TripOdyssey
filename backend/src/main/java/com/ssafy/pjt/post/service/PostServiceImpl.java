@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
+import com.ssafy.pjt.post.dto.request.CreateCommentRequestDto;
 import com.ssafy.pjt.post.dto.request.CreatePostRequestDto;
 import com.ssafy.pjt.post.dto.request.DeletePostRequestDto;
 import com.ssafy.pjt.post.dto.request.EditPostRequestDto;
@@ -103,6 +104,17 @@ public class PostServiceImpl implements PostService{
 		} catch (DuplicateKeyException e) {
 			throw new LikePostFailedException("이미 좋아요를 누른 게시글입니다.");
 		}
+	}
+	
+	@Override
+	public Integer createComment(String userId, Integer postId, String content) {
 		
+		CreateCommentRequestDto newComment = CreateCommentRequestDto.builder()
+																	.writer(userId)
+																	.postId(postId)
+																	.content(content)
+																	.build(); 
+		postRepository.createComment(newComment);
+		return newComment.getCommentId();
 	}
 }
