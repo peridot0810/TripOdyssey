@@ -35,7 +35,14 @@ public class SecurityConfig {
 		http
 			.csrf(csrf -> csrf.disable())
 			.authorizeHttpRequests(auth -> auth
-					.requestMatchers("/auth/login", "/auth/signup").permitAll()
+					.requestMatchers(
+							"/auth/login", 
+							"/auth/signup",
+							"/v3/api-docs/**",            // OpenAPI 문서 JSON
+							"/swagger-ui/**",             // Swagger UI 정적 파일
+							"/swagger-ui.html",            // 리디렉션 경로
+							"/favicon.ico"
+						).permitAll()
 					.anyRequest().authenticated()
 			)
 			.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
