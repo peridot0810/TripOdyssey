@@ -23,6 +23,9 @@ import com.ssafy.pjt.user.dto.response.UserInfoResponseDto;
 import com.ssafy.pjt.user.service.UserService;
 import com.ssafy.pjt.util.JwtUtil;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,14 +38,12 @@ public class UserController {
 	private final UserService userService;
 	private final JwtUtil jwtUtil;
 	
-	/**
-	 * 본인 정보 조회 
-	 * 
-	 * @param token
-	 * @return
-	 */
+	@Operation(summary="사용자 정보 조회", description="사용자 아이디로 사용자 정보를 조회합니다.")
+	@ApiResponse(responseCode = "200", description="사용자 정보 조회 성공")
 	@GetMapping
-	public ResponseEntity<?> getMyInfo(@AuthenticationPrincipal UserDetails userDetails){		
+	public ResponseEntity<?> getMyInfo(
+			@AuthenticationPrincipal UserDetails userDetails
+			){		
 		UserInfoResponseDto myInfo = userService.getUserInfo(userDetails.getUsername());
 		return ResponseEntity.ok(myInfo);
 	}
@@ -87,28 +88,26 @@ public class UserController {
 	}
 	
 	
-	/**
-	 * 비밀번호 변경
-	 * 
-	 * @param token
-	 * @param editPasswordRequest
-	 * @return
-	 */
+	@Operation(summary="사용자 비밀번호 변경", description="사용자의 비밀번호를 변경합니다.")
+	@ApiResponse(responseCode = "200", description="비밀번호 변경 성공")
 	@PostMapping("/change/password")
-	public ResponseEntity<?> changePassword(@RequestHeader("Authorization") String token, @RequestBody EditPasswordRequestDto editPasswordRequest){
-		// JWT 토큰에서 id 추출
-		String targetId = jwtUtil.extractUserId(token);
+	public ResponseEntity<?> changePassword(
+			@AuthenticationPrincipal UserDetails userDetails, 
+			@RequestBody EditPasswordRequestDto editPasswordRequest){
+		String targetId = userDetails.getUsername();
 		editPasswordRequest.setId(targetId);
 		
 		userService.editUserPassword(editPasswordRequest);
 		return ResponseEntity.ok("비밀번호 수정에 성공했습니다.");
 	}
 	
-	
+	@Operation(summary="사용자 정보 수정", description="사용자의 정보를 수정합니다.")
+	@ApiResponse(responseCode = "200", description="사용자 정보 수정 성공")
 	@PutMapping 
-	public ResponseEntity<?> changeUserInfo(@RequestHeader("Authorization") String token, @RequestBody EditUserInfoRequestDto editUserInfoRequest){
-		// JWT 토큰에서 id 추출
-		String targetId = jwtUtil.extractUserId(token);
+	public ResponseEntity<?> changeUserInfo(
+			@AuthenticationPrincipal UserDetails userDetails, 
+			@RequestBody EditUserInfoRequestDto editUserInfoRequest){
+		String targetId = userDetails.getUsername();
 		editUserInfoRequest.setId(targetId);
 		
 		userService.editUserInfo(editUserInfoRequest);
@@ -123,9 +122,8 @@ public class UserController {
 	 * @return
 	 */
 	@DeleteMapping
-	public ResponseEntity<?> deactivateUser(@RequestHeader("Authorization") String token){
-		// JWT 토큰에서 id 추출 
-		String myId = jwtUtil.extractUserId(token);
+	public ResponseEntity<?> deactivateUser(@AuthenticationPrincipal UserDetails userDetails){
+		String myId = userDetails.getUsername();
 		
 		userService.deactivateUser(myId);
 		return ResponseEntity.ok("회원 탈퇴 성공");
@@ -133,9 +131,8 @@ public class UserController {
 	
 	
 	@GetMapping("/groups")
-	public ResponseEntity<?> getMyGroupList(@RequestHeader("Authorization") String token){
-		// JWT 토큰에서 id 추출 
-		String myId = jwtUtil.extractUserId(token);
+	public ResponseEntity<?> getMyGroupList(@AuthenticationPrincipal UserDetails userDetails){
+		String myId = userDetails.getUsername();
 		
 		List<GroupResponseDto> myGroupList = userService.getGroupList(myId);
 		return ResponseEntity.ok(myGroupList);
