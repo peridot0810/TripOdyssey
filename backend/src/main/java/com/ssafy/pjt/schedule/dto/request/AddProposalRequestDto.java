@@ -9,4 +9,5 @@ public class AddProposalRequestDto {
 	private String userId;
 	private Integer groupId;
 	private Integer attractionsNo;
+	private Integer proposalId;
 }

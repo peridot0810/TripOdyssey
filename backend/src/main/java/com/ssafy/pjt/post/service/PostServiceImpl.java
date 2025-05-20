@@ -14,6 +14,7 @@ import com.ssafy.pjt.post.dto.response.GetPostResponseDto;
 import com.ssafy.pjt.post.exception.DeletePostFailedException;
 import com.ssafy.pjt.post.exception.EditPostFailedException;
 import com.ssafy.pjt.post.exception.LikePostFailedException;
+import com.ssafy.pjt.post.exception.PostNotFoundException;
 import com.ssafy.pjt.post.repository.PostRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -53,6 +54,10 @@ public class PostServiceImpl implements PostService{
 		
 		// 게시글 정보 가져오기 
 		GetPostResponseDto post = postRepository.getPost(postId);
+		
+		if(post == null) {
+			throw new PostNotFoundException("존재하지 않는 게시물입니다.");
+		}
 		
 		// 댓글 정보 가져오기 
 		post.setCommentList(postRepository.getComments(postId));

@@ -11,12 +11,12 @@ import com.ssafy.pjt.schedule.dto.response.GetScheduleResponseDto;
 public interface ScheduleService {
 	
 	// Proposal
-	void addScheduleProposal(String userId, Integer groupId, Integer attractionNo);
+	Integer addScheduleProposal(String userId, Integer groupId, Integer attractionNo);
 	List<GetProposalResponseDto> getProposalList(String userId, Integer groupId);
 	void likeProposal(String userId, Integer groupId, Integer proposalId);
 	
 	// Content
-	void addContent(String userId, Integer groupId, AddContentRequestDto addContentRequest);
+	Integer addContent(String userId, Integer groupId, AddContentRequestDto addContentRequest);
 	void updateContent(String userId, Integer groupId, UpdateContentRequestDto updateContentRequest);
 	void deleteContent(String userId, Integer groupId, Integer contentId);
 	

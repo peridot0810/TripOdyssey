@@ -9,6 +9,7 @@ public class GetProposalResponseDto {
 	private Integer groupId;
 	private Integer no; 
 	private String title; 
+	private Integer likes;
 	private String contentTypeName; 
 	private String firstImage1; 
 	private String firstImage2; 

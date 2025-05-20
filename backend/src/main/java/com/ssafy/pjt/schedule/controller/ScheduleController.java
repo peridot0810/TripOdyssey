@@ -1,6 +1,7 @@
 package com.ssafy.pjt.schedule.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -61,8 +62,8 @@ public class ScheduleController {
 		// JWT 토큰에서 아이디 추출
 		String userId = jwtUtil.extractUserId(token);
 		
-		scheduleService.addScheduleProposal(userId, groupId, attractionNo);
-		return ResponseEntity.ok(new CommonResponse<>(true, "장소 추천에 성공했습니다.", null));
+		Integer newProposalId = scheduleService.addScheduleProposal(userId, groupId, attractionNo);
+		return ResponseEntity.ok(new CommonResponse<>(true, "장소 추천에 성공했습니다.", Map.of("proposalId", newProposalId)));
 	}
 	
 	@PostMapping("/content")
@@ -72,8 +73,8 @@ public class ScheduleController {
 		// JWT 토큰에서 아이디 추출
 		String userId = jwtUtil.extractUserId(token);
 		
-		scheduleService.addContent(userId, groupId, addContentRequest);
-		return ResponseEntity.ok(new CommonResponse<>(true, "콘텐츠 생성에 성공했습니다.", null));
+		Integer newContentId = scheduleService.addContent(userId, groupId, addContentRequest);
+		return ResponseEntity.ok(new CommonResponse<>(true, "콘텐츠 생성에 성공했습니다.", Map.of("contentId", newContentId)));
 	}
 	
 	@PutMapping("/content")

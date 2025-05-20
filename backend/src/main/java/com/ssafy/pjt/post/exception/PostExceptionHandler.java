@@ -29,4 +29,10 @@ public class PostExceptionHandler {
 		// 게시글 좋아요 실패 예외 처리
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 	}
+	
+	@ExceptionHandler(PostNotFoundException.class)
+	public ResponseEntity<?> handlePostNotFound(PostNotFoundException e){
+		// 게시글 없는 경우 처리 
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+	}
 }
