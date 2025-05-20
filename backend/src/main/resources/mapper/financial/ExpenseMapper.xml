@@ -14,7 +14,7 @@
 	</select>
 	
 	
-	<insert id="insertExpense">
+	<insert id="insertExpense" useGeneratedKeys="true" keyProperty="expenseId">
 		INSERT INTO expense_tracker (
 			group_id,
 	        content_id,

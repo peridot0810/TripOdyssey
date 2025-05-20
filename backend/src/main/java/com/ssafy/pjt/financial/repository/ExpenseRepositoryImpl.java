@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import com.ssafy.pjt.common.dto.request.UserGroupRequestDto;
 import com.ssafy.pjt.common.mapper.CommonMapper;
-
+import com.ssafy.pjt.financial.dto.request.AddExpenseRequestDto;
 import com.ssafy.pjt.financial.entity.Expense;
 import com.ssafy.pjt.financial.mapper.ExpenseMapper;
 
@@ -31,8 +31,8 @@ public class ExpenseRepositoryImpl implements ExpenseRepository{
 	}
 	
 	@Override
-	public void insertExpense(Map<String, Object> expense) {
-		expenseMapper.insertExpense(expense);
+	public void insertExpense(AddExpenseRequestDto addExpenseRequest) {
+		expenseMapper.insertExpense(addExpenseRequest);
 	}
 	
 	@Override

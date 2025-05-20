@@ -49,7 +49,7 @@ public class ExpenseTrackerServiceImpl implements ExpenseTrackerService{
 	}
 	
 	@Override
-	public void addExpense(String userId, Integer groupId, AddExpenseRequestDto expense) {
+	public Integer addExpense(String userId, Integer groupId, AddExpenseRequestDto expense) {
 		// 요청한 유저가 그룹원이 맞는지 확인 
 		if(!expenseRepository.checkUserInGroup(new UserGroupRequestDto(userId, groupId))) {
 			// 아니라면 예외 던지기 
@@ -62,17 +62,10 @@ public class ExpenseTrackerServiceImpl implements ExpenseTrackerService{
 		}
 		
 		// 비즈니스 로직
-		// 평탄화 
-		Map<String, Object> param = new HashMap<>();
-	    param.put("groupId", groupId);
-	    param.put("userId", userId);
-	    param.put("datetime", expense.getDatetime());
-	    param.put("description", expense.getDescription());
-	    param.put("amount", expense.getAmount());
-	    param.put("categoryId", expense.getCategoryId());  // 주의: DB 컬럼 이름과 맞추기
-	    param.put("contentId", expense.getContentId());
+		expense.setGroupId(groupId);
+	    expenseRepository.insertExpense(expense);
 	    
-	    expenseRepository.insertExpense(param);
+	    return expense.getExpenseId();
 	}
 	
 	@Override

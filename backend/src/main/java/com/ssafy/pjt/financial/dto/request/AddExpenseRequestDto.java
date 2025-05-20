@@ -9,4 +9,6 @@ public class AddExpenseRequestDto {
 	private Integer amount;
 	private Integer categoryId;
 	private Integer contentId;
+	private Integer groupId;
+	private Integer expenseId;
 }

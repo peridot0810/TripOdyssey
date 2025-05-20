@@ -1,6 +1,7 @@
 package com.ssafy.pjt.financial.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -43,8 +44,8 @@ public class ExpenseTrackerController {
 		// JWT 토큰에서 userId 추출
 		String userId = jwtUtil.extractUserId(token);
 		
-		expenseTrackerService.addExpense(userId, groupId, expense);
-		return ResponseEntity.ok(new CommonResponse<>(true, "가계부 항목 추가에 성공했습니다.", null));
+		Integer newExpenseId = expenseTrackerService.addExpense(userId, groupId, expense);
+		return ResponseEntity.ok(new CommonResponse<>(true, "가계부 항목 추가에 성공했습니다.", Map.of("expenseId", newExpenseId)));
 	}
 	
 	@DeleteMapping

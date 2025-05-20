@@ -5,11 +5,12 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 
+import com.ssafy.pjt.financial.dto.request.AddExpenseRequestDto;
 import com.ssafy.pjt.financial.entity.Expense;
 
 @Mapper
 public interface ExpenseMapper {
 	List<Expense> getExpenseListOfGroup(Integer groupId);
-	void insertExpense(Map<String, Object> expense);
+	void insertExpense(AddExpenseRequestDto addExpenseRequest);
 	void deleteExpense(Integer expenseId);
 }
