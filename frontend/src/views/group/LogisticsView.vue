@@ -1,5 +1,5 @@
 <template>
-  <div>user page</div>
+  <div>교통/숙소</div>
 </template>
 
 <script setup></script>

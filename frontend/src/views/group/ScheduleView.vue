@@ -1,5 +1,5 @@
 <template>
-  <div>user page</div>
+  <div>일정 조율</div>
 </template>
 
 <script setup></script>
