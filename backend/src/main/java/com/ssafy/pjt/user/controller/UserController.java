@@ -26,6 +26,7 @@ import com.ssafy.pjt.util.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -49,12 +50,8 @@ public class UserController {
 	}
 	
 	
-	/**
-	 * 이메일 중복 체크 
-	 * 
-	 * @param email
-	 * @return
-	 */
+	@Operation(summary="이메일 중복 체크", description="사용 가능한 이메일인지 확인합니다.")
+	@ApiResponse(responseCode = "200", description="사용 가능한 이메일")
 	@GetMapping("/check/email")
 	public ResponseEntity<?> checkEmailDuplicate(@RequestParam String email){
 		userService.isEmailDuplicated(email);
@@ -62,12 +59,8 @@ public class UserController {
 	}
 	
 	
-	/**
-	 * 아이디 중복 체크
-	 * 
-	 * @param id
-	 * @return
-	 */
+	@Operation(summary="아이디 중복 체크", description="사용 가능한 아이디인지 확인합니다.")
+	@ApiResponse(responseCode = "200", description="사용 가능한 아이디")
 	@GetMapping("/check/id")
 	public ResponseEntity<?> checkIdDuplicate(@RequestParam String id){
 		userService.isIdDuplicated(id);
@@ -75,12 +68,8 @@ public class UserController {
 	}
 	
 	
-	/**
-	 * 유저 검색
-	 * 
-	 * @param email
-	 * @return
-	 */
+	@Operation(summary="사용자 검색", description="이메일 기반으로 사용자 정보(아이디, 닉네임)를 조회합니다.")
+	@ApiResponse(responseCode = "200", description="사용자 조회 성공")
 	@GetMapping("/search")
 	public ResponseEntity<?> searchUserByEmail(@RequestParam String email){
 		SearchUserResponseDto targetUser = userService.searchUserByEmail(email);
@@ -93,7 +82,7 @@ public class UserController {
 	@PostMapping("/change/password")
 	public ResponseEntity<?> changePassword(
 			@AuthenticationPrincipal UserDetails userDetails, 
-			@RequestBody EditPasswordRequestDto editPasswordRequest){
+			@Valid @RequestBody EditPasswordRequestDto editPasswordRequest){
 		String targetId = userDetails.getUsername();
 		editPasswordRequest.setId(targetId);
 		
@@ -106,7 +95,7 @@ public class UserController {
 	@PutMapping 
 	public ResponseEntity<?> changeUserInfo(
 			@AuthenticationPrincipal UserDetails userDetails, 
-			@RequestBody EditUserInfoRequestDto editUserInfoRequest){
+			@Valid @RequestBody EditUserInfoRequestDto editUserInfoRequest){
 		String targetId = userDetails.getUsername();
 		editUserInfoRequest.setId(targetId);
 		
@@ -115,12 +104,8 @@ public class UserController {
 	}
 	
 	
-	/**
-	 * 회원 탈퇴
-	 * 
-	 * @param token
-	 * @return
-	 */
+	@Operation(summary="사용자 탈퇴", description="사용자를 비활성화 상태로 변경합니다.")
+	@ApiResponse(responseCode = "200", description="사용자 탈퇴 성공")
 	@DeleteMapping
 	public ResponseEntity<?> deactivateUser(@AuthenticationPrincipal UserDetails userDetails){
 		String myId = userDetails.getUsername();
@@ -130,6 +115,8 @@ public class UserController {
 	}
 	
 	
+	@Operation(summary="사용자 그룹 조회", description="사용자가 속한 그룹 리스트를 반환합니다.")
+	@ApiResponse(responseCode = "200", description="사용자 그룹 조회 성공")
 	@GetMapping("/groups")
 	public ResponseEntity<?> getMyGroupList(@AuthenticationPrincipal UserDetails userDetails){
 		String myId = userDetails.getUsername();
