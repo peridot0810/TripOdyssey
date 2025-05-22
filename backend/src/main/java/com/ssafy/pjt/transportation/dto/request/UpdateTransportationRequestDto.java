@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 public class UpdateTransportationRequestDto {
 	
-	@Schema(description="수정할 교통편 아이디")
+	@Schema(description="수정할 교통편 아이디", accessMode=Schema.AccessMode.READ_ONLY)
 	private Integer transportationId;
 	
 	@Schema(description="교통편 타입 아이디 "
