@@ -13,12 +13,8 @@
       <!-- Center Column: Slightly wider for main content -->
       <v-col cols="12" md="5" class="center-panel">
         <div class="panel-content">
-          <h2 class="text-h6 font-weight-bold mb-3">일정 계획</h2>
-          <v-divider class="mb-4"></v-divider>
-          <div class="placeholder-content d-flex flex-column align-center justify-center">
-            <v-icon size="64" color="grey-lighten-1">mdi-calendar-text</v-icon>
-            <p class="text-body-1 text-grey mt-3">일정 계획 영역</p>
-            <p class="text-caption text-grey-darken-1">여기에 선택된 장소들의 일정이 표시됩니다</p>
+          <div class="official-schedule-container">
+            <ScheduleListOfficial />
           </div>
         </div>
       </v-col>
@@ -26,12 +22,10 @@
       <!-- Right Column: Additional Information/Map -->
       <v-col cols="12" md="4" class="right-panel">
         <div class="panel-content">
-          <h2 class="text-h6 font-weight-bold mb-3">지도 보기</h2>
+          <h2 class="text-h6 font-weight-bold mb-3">일정 후보</h2>
           <v-divider class="mb-4"></v-divider>
-          <div class="placeholder-content d-flex flex-column align-center justify-center">
-            <v-icon size="64" color="grey-lighten-1">mdi-map</v-icon>
-            <p class="text-body-1 text-grey mt-3">지도 영역</p>
-            <p class="text-caption text-grey-darken-1">여기에 선택된 장소들의 위치가 표시됩니다</p>
+          <div class="schedule-list-container">
+            <ScheduleEditList />
           </div>
         </div>
       </v-col>
@@ -40,7 +34,9 @@
 </template>
 
 <script setup>
-import ProposalList from '@/components/schedule/ProposalList.vue';
+import ProposalList from '@/components/schedule/ProposalList.vue'
+import ScheduleEditList from '@/components/schedule/ScheduleEditList.vue'
+import ScheduleListOfficial from '@/components/schedule/ScheduleListOfficial.vue'
 </script>
 
 <style scoped>
@@ -49,7 +45,9 @@ import ProposalList from '@/components/schedule/ProposalList.vue';
   overflow: hidden;
 }
 
-.left-panel, .center-panel, .right-panel {
+.left-panel,
+.center-panel,
+.right-panel {
   height: 100%;
   border-right: 1px solid #e0e0e0;
   overflow-y: auto;
@@ -71,23 +69,36 @@ import ProposalList from '@/components/schedule/ProposalList.vue';
   margin-top: 16px;
 }
 
+.schedule-list-container,
+.official-schedule-container {
+  margin-top: 16px;
+  height: calc(100% - 120px);
+  overflow-y: auto;
+}
+
 /* Make scrollbars prettier */
 .left-panel::-webkit-scrollbar,
 .center-panel::-webkit-scrollbar,
-.right-panel::-webkit-scrollbar {
+.right-panel::-webkit-scrollbar,
+.schedule-list-container::-webkit-scrollbar,
+.official-schedule-container::-webkit-scrollbar {
   width: 6px;
 }
 
 .left-panel::-webkit-scrollbar-thumb,
 .center-panel::-webkit-scrollbar-thumb,
-.right-panel::-webkit-scrollbar-thumb {
+.right-panel::-webkit-scrollbar-thumb,
+.schedule-list-container::-webkit-scrollbar-thumb,
+.official-schedule-container::-webkit-scrollbar-thumb {
   background-color: #bdbdbd;
   border-radius: 3px;
 }
 
 .left-panel::-webkit-scrollbar-track,
 .center-panel::-webkit-scrollbar-track,
-.right-panel::-webkit-scrollbar-track {
+.right-panel::-webkit-scrollbar-track,
+.schedule-list-container::-webkit-scrollbar-track,
+.official-schedule-container::-webkit-scrollbar-track {
   background-color: #f5f5f5;
 }
 
@@ -98,7 +109,9 @@ import ProposalList from '@/components/schedule/ProposalList.vue';
     overflow: visible;
   }
 
-  .left-panel, .center-panel, .right-panel {
+  .left-panel,
+  .center-panel,
+  .right-panel {
     height: auto;
     overflow-y: visible;
     border-right: none;
@@ -108,6 +121,12 @@ import ProposalList from '@/components/schedule/ProposalList.vue';
 
   .right-panel {
     border-bottom: none;
+  }
+
+  .schedule-list-container,
+  .official-schedule-container {
+    height: auto;
+    overflow-y: visible;
   }
 }
 </style>
