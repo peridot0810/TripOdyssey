@@ -60,12 +60,14 @@ const sendMessage = async () => {
 
   try {
     const response = await axios.post(
-      'http://localhost:8080/ai/advised',
+      'http://localhost:8080/ai/simple',
       { message: text },
       { headers: { 'Content-Type': 'application/json' } },
     )
 
     const reply = response?.data?.data?.message || '[No response]'
+    console.log('AI REPLY: ')
+    console.log(response?.data?.data)
     messages.value.push({ sender: 'bot', text: reply })
   } catch (err) {
     console.error(err)
