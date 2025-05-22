@@ -8,6 +8,7 @@ import com.ssafy.pjt.post.dto.request.CreateCommentRequestDto;
 import com.ssafy.pjt.post.dto.request.CreatePostRequestDto;
 import com.ssafy.pjt.post.dto.request.DeletePostRequestDto;
 import com.ssafy.pjt.post.dto.request.EditPostRequestDto;
+import com.ssafy.pjt.post.dto.request.GetPostRequestDto;
 import com.ssafy.pjt.post.dto.request.LikePostRequestDto;
 import com.ssafy.pjt.post.dto.request.PostFilterDto;
 import com.ssafy.pjt.post.dto.response.GetPostResponseDto;
@@ -21,7 +22,7 @@ public interface PostMapper {
 	
 	// get
 	List<GetPostResponseDto> getPostList(PostFilterDto searchCondition);
-	GetPostResponseDto getPost(Integer postId);
+	GetPostResponseDto getPost(GetPostRequestDto getPostRequest);
 	List<Comment> getComments(Integer postId);
 	
 	// put
@@ -32,4 +33,5 @@ public interface PostMapper {
 	
 	// like
 	void likePost(LikePostRequestDto likePostRequest);
+	void unlikePost(LikePostRequestDto likePostRequest);
 }

@@ -12,14 +12,33 @@
 	
 	
 	<select id="getPost">
-		SELECT post_id, title, content, views, created_at, author, likes, category_id, category_name
-		FROM post
+		SELECT 
+				post_id, 
+				title, 
+				content, 
+				views, 
+				created_at, 
+				author, 
+				IFNULL(pl.likes, 0) AS likes, 
+				category_id, 
+				category_name,
+				
+				CASE 
+			        WHEN EXISTS (
+			            SELECT 1 
+			            FROM post_like pl2 
+			            WHERE pl2.post_id = p.post_id AND pl2.user_id = #{userId}
+			        )
+			        THEN true
+			        ELSE false
+			    END AS user_liked
+				
+		FROM post p
 			LEFT JOIN(
 				SELECT post_id, COUNT(*) AS likes
 				FROM post_like
 				GROUP BY post_id
-			)AS pl
-			USING(post_id)
+			)AS pl USING(post_id)
 			JOIN post_category USING (category_id)
 		WHERE post_id=#{postId}
 	</select>
@@ -27,8 +46,27 @@
 	
 	
 	<select id="getPostList">
-		SELECT post_id, title, views, created_at, author, likes, category_id, category_name
-		FROM post
+		SELECT 
+				post_id, 
+				title, 
+				views, 
+				created_at, 
+				author, 
+				IFNULL(pl.likes, 0) AS likes, 
+				category_id, 
+				category_name,
+				
+				CASE 
+			        WHEN EXISTS (
+			            SELECT 1 
+			            FROM post_like pl2 
+			            WHERE pl2.post_id = p.post_id AND pl2.user_id = #{userId}
+			        )
+			        THEN true
+			        ELSE false
+			    END AS user_liked
+			    
+		FROM post p
 			LEFT JOIN(
 				SELECT post_id, COUNT(*) AS likes
 				FROM post_like
@@ -80,6 +118,11 @@
 		INSERT INTO post_like(post_id, user_id)
 		VALUES(#{postId}, #{userId})
 	</insert>
+	
+	<delete id="unlikePost">
+		DELETE FROM post_like
+		WHERE user_id=#{userId} AND post_id=#{postId}
+	</delete>
 	
 	<insert id="createComment" useGeneratedKeys="true" keyProperty="commentId">
 		INSERT INTO comment(post_id, content, writer)

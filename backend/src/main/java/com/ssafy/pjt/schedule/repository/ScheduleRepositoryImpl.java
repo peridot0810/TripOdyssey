@@ -7,6 +7,8 @@ import org.springframework.stereotype.Repository;
 import com.ssafy.pjt.schedule.dto.request.AddContentRequestDto;
 import com.ssafy.pjt.schedule.dto.request.AddProposalRequestDto;
 import com.ssafy.pjt.schedule.dto.request.AddScheduleRequestDto;
+import com.ssafy.pjt.schedule.dto.request.GetAttractionListRequestDto;
+import com.ssafy.pjt.schedule.dto.request.GetProposalRequestDto;
 import com.ssafy.pjt.schedule.dto.request.LikeProposalRequestDto;
 import com.ssafy.pjt.schedule.dto.request.ModifiedOfficialScheduleRequestDto;
 import com.ssafy.pjt.schedule.dto.request.NewOfficialScheduleRequestDto;
@@ -31,13 +33,18 @@ public class ScheduleRepositoryImpl implements ScheduleRepository{
 	}
 	
 	@Override
-	public List<GetProposalResponseDto> getProposalList(Integer groupId) {
-		return scheduleMapper.getProposalList(groupId);
+	public List<GetProposalResponseDto> getProposalList(GetProposalRequestDto getProposalRequest) {
+		return scheduleMapper.getProposalList(getProposalRequest);
 	}
 	
 	@Override
 	public void likeProposal(LikeProposalRequestDto likeProposalRequest) {
 		scheduleMapper.likeProposal(likeProposalRequest);
+	}
+	
+	@Override
+	public void unlikeProposal(LikeProposalRequestDto likeProposalRequest) {
+		scheduleMapper.unlikeProposal(likeProposalRequest);
 	}
 	
 	@Override
@@ -68,6 +75,11 @@ public class ScheduleRepositoryImpl implements ScheduleRepository{
 	@Override
 	public GetAttractionResponseDto getAttractionInfo(Integer attractionNo) {
 		return scheduleMapper.getAttractionInfo(attractionNo);
+	}
+	
+	@Override
+	public List<GetAttractionResponseDto> getAttractionList(GetAttractionListRequestDto searchCondition) {
+		return scheduleMapper.getAttractionList(searchCondition);
 	}
 	
 	@Override

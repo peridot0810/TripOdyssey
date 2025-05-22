@@ -13,7 +13,7 @@ public interface ScheduleService {
 	// Proposal
 	Integer addScheduleProposal(String userId, Integer groupId, Integer attractionNo);
 	List<GetProposalResponseDto> getProposalList(String userId, Integer groupId);
-	void likeProposal(String userId, Integer groupId, Integer proposalId);
+	Boolean likeProposal(String userId, Integer groupId, Integer proposalId);
 	
 	// Content
 	Integer addContent(String userId, Integer groupId, AddContentRequestDto addContentRequest);
