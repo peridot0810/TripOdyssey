@@ -126,7 +126,7 @@ CREATE TABLE IF NOT EXISTS `tripsaga`.`accommodation` (
   `name` VARCHAR(100) NULL DEFAULT NULL,
   `check_in_time` DATETIME NULL DEFAULT NULL,
   `check_out_time` DATETIME NULL DEFAULT NULL,
-  `attractions_no` INT NOT NULL,
+  `attractions_no` INT NULL,
   PRIMARY KEY (`accommodation_id`),
   INDEX `group_id` (`group_id` ASC) VISIBLE,
   INDEX `fk_accommodation_attractions1_idx` (`attractions_no` ASC) VISIBLE,
