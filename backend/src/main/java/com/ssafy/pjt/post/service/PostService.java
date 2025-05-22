@@ -12,8 +12,8 @@ public interface PostService {
 	Integer createComment(String userId, Integer postId, String content);
 	
 	// get
-	List<GetPostResponseDto> getPostList(Integer categoryId, Integer page, Integer perPage, String keyword, String author);
-	GetPostResponseDto getPostDetail(Integer postId);
+	List<GetPostResponseDto> getPostList(String userId, Integer categoryId, Integer page, Integer perPage, String keyword, String author);
+	GetPostResponseDto getPostDetail(String userId, Integer postId);
 	
 	// put
 	void editPost(String userId, Integer postId, String title, String content);
@@ -22,5 +22,5 @@ public interface PostService {
 	void deletePost(String userId, Integer postId);
 	
 	// like
-	void likePost(String userId, Integer postId);
+	Boolean likePost(String userId, Integer postId);
 }

@@ -8,6 +8,7 @@ import com.ssafy.pjt.post.dto.request.CreateCommentRequestDto;
 import com.ssafy.pjt.post.dto.request.CreatePostRequestDto;
 import com.ssafy.pjt.post.dto.request.DeletePostRequestDto;
 import com.ssafy.pjt.post.dto.request.EditPostRequestDto;
+import com.ssafy.pjt.post.dto.request.GetPostRequestDto;
 import com.ssafy.pjt.post.dto.request.LikePostRequestDto;
 import com.ssafy.pjt.post.dto.request.PostFilterDto;
 import com.ssafy.pjt.post.dto.response.GetPostResponseDto;
@@ -38,8 +39,8 @@ public class PostRepositoryImpl implements PostRepository{
 	}
 	
 	@Override
-	public GetPostResponseDto getPost(Integer postId) {
-		return postMapper.getPost(postId);
+	public GetPostResponseDto getPost(GetPostRequestDto getPostRequest) {
+		return postMapper.getPost(getPostRequest);
 	}
 	
 	@Override
@@ -58,7 +59,14 @@ public class PostRepositoryImpl implements PostRepository{
 	}
 	
 	@Override
+	public void unlikePost(LikePostRequestDto likePostRequest) {
+		postMapper.unlikePost(likePostRequest);
+	}
+	
+	@Override
 	public void createComment(CreateCommentRequestDto createCommentRequest) {
 		postMapper.createComment(createCommentRequest);
 	}
+	
+	
 }

@@ -9,6 +9,7 @@ import com.ssafy.pjt.post.dto.request.CreateCommentRequestDto;
 import com.ssafy.pjt.post.dto.request.CreatePostRequestDto;
 import com.ssafy.pjt.post.dto.request.DeletePostRequestDto;
 import com.ssafy.pjt.post.dto.request.EditPostRequestDto;
+import com.ssafy.pjt.post.dto.request.GetPostRequestDto;
 import com.ssafy.pjt.post.dto.request.LikePostRequestDto;
 import com.ssafy.pjt.post.dto.request.PostFilterDto;
 import com.ssafy.pjt.post.dto.response.GetPostResponseDto;
@@ -35,7 +36,7 @@ public class PostServiceImpl implements PostService{
 	}
 	
 	@Override
-	public List<GetPostResponseDto> getPostList(Integer categoryId, Integer page, Integer perPage,
+	public List<GetPostResponseDto> getPostList(String userId, Integer categoryId, Integer page, Integer perPage,
 			String keyword, String author) {
 
 		// 값 세팅
@@ -45,16 +46,20 @@ public class PostServiceImpl implements PostService{
 											.offset((page-1) * perPage)
 											.keyword(keyword)
 											.author(author)
+											.userId(userId)
 											.build();
 		
 		return postRepository.getPostList(filter);
 	}
 	
 	@Override
-	public GetPostResponseDto getPostDetail(Integer postId) {
+	public GetPostResponseDto getPostDetail(String userId, Integer postId) {
 		
 		// 게시글 정보 가져오기 
-		GetPostResponseDto post = postRepository.getPost(postId);
+		GetPostResponseDto post = postRepository.getPost(GetPostRequestDto.builder()
+				.userId(userId)
+				.postId(postId)
+				.build());
 		
 		if(post == null) {
 			throw new PostNotFoundException("존재하지 않는 게시물입니다.");
@@ -98,16 +103,21 @@ public class PostServiceImpl implements PostService{
 	}
 	
 	@Override
-	public void likePost(String userId, Integer postId) {
+	public Boolean likePost(String userId, Integer postId) {
+		
+		LikePostRequestDto likePostRequest = LikePostRequestDto.builder()
+				.userId(userId)
+				.postId(postId)
+				.build();
 		
 		try {
 			// 좋아요 누르기 
-			postRepository.likePost(LikePostRequestDto.builder()
-					.userId(userId)
-					.postId(postId)
-					.build());
+			postRepository.likePost(likePostRequest);
+			return true;
 		} catch (DuplicateKeyException e) {
-			throw new LikePostFailedException("이미 좋아요를 누른 게시글입니다.");
+			// 좋아요 취소하기
+			postRepository.unlikePost(likePostRequest);
+			return false;
 		}
 	}
 	

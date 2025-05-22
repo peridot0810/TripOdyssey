@@ -51,20 +51,23 @@ public class PostController {
 	@ApiResponse(responseCode = "200", description="게시글 목록 조회 성공")
 	@GetMapping
 	public ResponseEntity<?> getPostList(
+			@AuthenticationPrincipal UserDetails userDetails,
 			@RequestParam(required = true) Integer categoryId,
 			@RequestParam(required = false, defaultValue = "1") Integer page,
 			@RequestParam(required = false, defaultValue = "5") Integer perPage,
 			@RequestParam(required = false, defaultValue = "") String keyword,
 			@RequestParam(required = false, defaultValue = "") String author) {
-		List<GetPostResponseDto> postList = postService.getPostList(categoryId, page, perPage, keyword, author);
+		List<GetPostResponseDto> postList = postService.getPostList(userDetails.getUsername(), categoryId, page, perPage, keyword, author);
 		return ResponseEntity.ok(new CommonResponse<>(true, "게시글 목록 조회에 성공했습니다.", postList));
 	}
 
 	@Operation(summary="게시글 상세 조회", description="게시글 ID로 상세 내용을 조회합니다.")
 	@ApiResponse(responseCode = "200", description="게시글 상세 조회 성공")
 	@GetMapping("/{postId}")
-	public ResponseEntity<?> getPostDetail(@PathVariable Integer postId) {
-		GetPostResponseDto postDetail = postService.getPostDetail(postId);
+	public ResponseEntity<?> getPostDetail(
+			@AuthenticationPrincipal UserDetails userDetails,
+			@PathVariable Integer postId) {
+		GetPostResponseDto postDetail = postService.getPostDetail(userDetails.getUsername(), postId);
 		return ResponseEntity.ok(new CommonResponse<>(true, "게시글 상세 조회에 성공했습니다.", postDetail));
 	}
 
@@ -91,15 +94,19 @@ public class PostController {
 		return ResponseEntity.ok(new CommonResponse<>(true, "게시글 삭제에 성공했습니다.", null));
 	}
 
-	@Operation(summary="게시글 좋아요", description="게시글에 좋아요를 누릅니다.")
-	@ApiResponse(responseCode = "200", description="게시글 좋아요 성공")
+	@Operation(summary="게시글 좋아요 토글", description="게시글에 좋아요를 누르지 않은 상태라면 누르고, 누른 상태라면 취소합니다.")
+	@ApiResponse(responseCode = "200", description="게시글 좋아요 토글 성공")
 	@PostMapping("/{postId}/like")
 	public ResponseEntity<?> likePost(
 			@AuthenticationPrincipal UserDetails userDetails,
 			@PathVariable Integer postId) {
 		String userId = userDetails.getUsername();
-		postService.likePost(userId, postId);
-		return ResponseEntity.ok(new CommonResponse<>(true, "게시글 좋아요에 성공했습니다.", null));
+		
+		if(postService.likePost(userId, postId)) {
+			return ResponseEntity.ok(new CommonResponse<>(true, "게시글 좋아요에 성공했습니다.", null));
+		}else {
+			return ResponseEntity.ok(new CommonResponse<>(true, "게시글 좋아요 취소에 성공했습니다.", null));
+		}
 	}
 
 	@Operation(summary="게시글 댓글 작성", description="게시글에 댓글을 작성합니다.")
