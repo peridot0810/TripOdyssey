@@ -30,7 +30,7 @@
 		        description = #{description},
 		    </if>
 		    <if test="attractionNo != null">
-		        attraction_no = #{attractionNo},
+		        attractions_no = #{attractionNo},
 		    </if>
 		</set>
 		WHERE content_id = #{contentId}

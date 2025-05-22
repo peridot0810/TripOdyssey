@@ -19,6 +19,9 @@ import com.ssafy.pjt.user.exception.LoginFailedException;
 import com.ssafy.pjt.user.service.UserService;
 import com.ssafy.pjt.util.JwtUtil;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,14 +35,10 @@ public class AuthController {
 	private final AuthenticationManager authenticationManager;
 	private final JwtUtil jwtUtil;
 	
-	/**
-	 * 로그인 
-	 * 
-	 * @param loginRequest
-	 * @return
-	 */
+	@Operation(summary="로그인 요청", description="로그인 후 액세스 토큰을 발급합니다.")
+	@ApiResponse(responseCode = "200", description="로그인 성공")
 	@PostMapping("/login")
-	public ResponseEntity<?> login(@RequestBody LoginRequestDto loginRequest){
+	public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDto loginRequest){
 		try {
 			// 인증을 위한 Token 생성 (principal, credential)
 			UsernamePasswordAuthenticationToken authenticationToken =
@@ -72,14 +71,10 @@ public class AuthController {
 	}
 	
 	
-	/**
-	 * 회원가입 
-	 * 
-	 * @param signupRequest
-	 * @return
-	 */
+	@Operation(summary="회원가입 요청", description="회원 가입을 요청합니다.")
+	@ApiResponse(responseCode = "200", description="회원가입 성공")
 	@PostMapping("/signup")
-	public ResponseEntity<?> signup(@RequestBody SignUpRequestDto signupRequest){
+	public ResponseEntity<?> signup(@Valid @RequestBody SignUpRequestDto signupRequest){
 		log.debug("signupRequest : {}", signupRequest);
 		
 		userService.signup(signupRequest);
