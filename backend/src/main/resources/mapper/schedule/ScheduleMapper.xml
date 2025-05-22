@@ -15,6 +15,12 @@
 		VALUES(#{userId}, #{proposalId})
 	</insert>
 	
+	<delete id="unlikeProposal">
+		DELETE FROM proposal_like
+		WHERE proposal_id=#{proposalId} AND user_id=#{userId}
+	</delete>
+	
+	
 	<insert id="addContent" useGeneratedKeys="true" keyProperty="contentId">
 		INSERT INTO content(name, description, attractions_no)
 		VALUES(#{name}, #{description}, #{attractionNo})
@@ -62,7 +68,18 @@
 				addr2, 
 				homepage, 
 				overview,
-				likes
+				likes,
+				
+				CASE 
+			        WHEN EXISTS (
+			            SELECT 1 
+			            FROM proposal_like pl2 
+			            WHERE pl2.proposal_id = sp.proposal_id AND pl2.user_id = #{userId}
+			        )
+			        THEN true
+			        ELSE false
+			    END AS user_liked
+				
 		FROM schedule_proposal sp
 			JOIN attractions a ON (sp.attractions_no = a.no)
 			JOIN contenttypes c USING (content_type_id)

@@ -20,4 +20,6 @@ public class GetProposalResponseDto {
 	private String addr2; 
 	private String homepage; 
 	private String overview;
+	
+	private Boolean userLiked;
 }
