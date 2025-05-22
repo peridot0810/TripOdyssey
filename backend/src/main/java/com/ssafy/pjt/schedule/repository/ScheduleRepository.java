@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 import com.ssafy.pjt.schedule.dto.request.AddContentRequestDto;
 import com.ssafy.pjt.schedule.dto.request.AddProposalRequestDto;
 import com.ssafy.pjt.schedule.dto.request.AddScheduleRequestDto;
+import com.ssafy.pjt.schedule.dto.request.GetAttractionListRequestDto;
 import com.ssafy.pjt.schedule.dto.request.GetProposalRequestDto;
 import com.ssafy.pjt.schedule.dto.request.LikeProposalRequestDto;
 import com.ssafy.pjt.schedule.dto.request.ModifiedOfficialScheduleRequestDto;
@@ -39,4 +40,5 @@ public interface ScheduleRepository {
 	
 	// Attraction
 	GetAttractionResponseDto getAttractionInfo(Integer attractionNo);
+	List<GetAttractionResponseDto> getAttractionList(GetAttractionListRequestDto searchCondition);
 }
