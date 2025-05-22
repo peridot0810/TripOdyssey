@@ -49,3 +49,8 @@ backend/.vscode/
 
 # 기타 메타 정보
 /.metadata/
+.DS_Store
+.classpath
+.factorypath
+.project
+.settings/
