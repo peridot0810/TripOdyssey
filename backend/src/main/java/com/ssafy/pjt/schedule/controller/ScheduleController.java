@@ -51,8 +51,8 @@ public class ScheduleController {
 		return ResponseEntity.ok(new CommonResponse<>(true, "추천된 장소 리스트 조회에 성공했습니다.", proposalList));
 	}
 	
-	@Operation(summary="추천된 장소 좋아요 누르기", description="추천되어있는 장소에 좋아요를 누릅니다.")
-	@ApiResponse(responseCode = "200", description="추천 장소 좋아요 성공")
+	@Operation(summary="추천된 장소 좋아요 토글", description="추천되어있는 장소에 좋아요를 누르지 않은 상태라면 좋아요, 누른 상태라면 좋아요 취소.")
+	@ApiResponse(responseCode = "200", description="추천 장소 좋아요 토글 성공")
 	@PostMapping("/recommended/like")
 	public ResponseEntity<?> likeProposal(
 			@AuthenticationPrincipal UserDetails userDetails,
@@ -61,8 +61,13 @@ public class ScheduleController {
 
 		String userId = userDetails.getUsername();
 		
-		scheduleService.likeProposal(userId, groupId, proposalId);
-		return ResponseEntity.ok(new CommonResponse<>(true, "추천된 장소 좋아요 누르기에 성공했습니다.", null));
+		if(scheduleService.likeProposal(userId, groupId, proposalId)) {
+			return ResponseEntity.ok(new CommonResponse<>(true, "추천된 장소 좋아요 누르기에 성공했습니다.", null));
+		}else {
+			return ResponseEntity.ok(new CommonResponse<>(true, "추천된 장소 좋아요 취소에 성공했습니다.", null));
+		}
+		
+		
 	}
 	
 	@Operation(summary="장소 추천", description="새로운 장소를 추천합니다.")

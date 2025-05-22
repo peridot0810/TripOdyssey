@@ -17,6 +17,7 @@ public class GetPostResponseDto {
 	private Integer views;
 	private Integer likes;
 	private String author;
+	private Boolean userLiked;
 	
 	private List<Comment> commentList;
 }

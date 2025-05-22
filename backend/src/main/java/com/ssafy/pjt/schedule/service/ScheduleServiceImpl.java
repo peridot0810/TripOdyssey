@@ -2,6 +2,7 @@ package com.ssafy.pjt.schedule.service;
 
 import java.util.List;
 
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import com.ssafy.pjt.common.entity.MemberRole;
@@ -11,6 +12,7 @@ import com.ssafy.pjt.common.service.UserValidationService;
 import com.ssafy.pjt.schedule.dto.request.AddContentRequestDto;
 import com.ssafy.pjt.schedule.dto.request.AddProposalRequestDto;
 import com.ssafy.pjt.schedule.dto.request.AddScheduleRequestDto;
+import com.ssafy.pjt.schedule.dto.request.GetProposalRequestDto;
 import com.ssafy.pjt.schedule.dto.request.LikeProposalRequestDto;
 import com.ssafy.pjt.schedule.dto.request.UpdateContentRequestDto;
 import com.ssafy.pjt.schedule.dto.request.UpdateScheduleRequestWrapperDto;
@@ -53,22 +55,36 @@ public class ScheduleServiceImpl implements ScheduleService{
 		}
 		
 		// 비즈니스 로직
-		List<GetProposalResponseDto> proposalList = scheduleRepository.getProposalList(groupId);
+		List<GetProposalResponseDto> proposalList = scheduleRepository.getProposalList(GetProposalRequestDto.builder()
+				.userId(userId)
+				.groupId(groupId)
+				.build());
 		return proposalList;
 	}
 	
 	@Override
-	public void likeProposal(String userId, Integer groupId, Integer proposalId) {
+	public Boolean likeProposal(String userId, Integer groupId, Integer proposalId) {
 		// 유저가 그룹원이 맞는지 확인
 		if(!userValidationService.isUserInGroup(userId, groupId)) {
 			throw new UserNotInGroupException("그룹원만 요청할 수 있는 기능입니다.");
 		}
 		
 		// 비즈니스 로직
-		scheduleRepository.likeProposal(LikeProposalRequestDto.builder()
-			.userId(userId)
-			.proposalId(proposalId)
-			.build());
+		LikeProposalRequestDto likeProposalRequest = LikeProposalRequestDto.builder()
+				.userId(userId)
+				.proposalId(proposalId)
+				.build();
+		
+		try {
+			// 좋아요 누르기 
+			scheduleRepository.likeProposal(likeProposalRequest);
+			return true;
+		} catch (DuplicateKeyException e) {
+			// 좋아요 취소하기
+			scheduleRepository.unlikeProposal(likeProposalRequest);
+			return false;
+		}
+		
 	}
 	
 	@Override
