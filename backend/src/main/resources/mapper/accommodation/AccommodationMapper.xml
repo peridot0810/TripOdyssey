@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.ssafy.pjt.accommodation.mapper.AccommodationMapper">
+
+<insert id="addAccommodation" useGeneratedKeys="true" keyProperty="accommodationId">
+	INSERT INTO accommodation(group_id, name, check_in_time, check_out_time, attractions_no)
+	VALUES(#{groupId}, #{name},#{checkInTime},#{checkOutTime},#{attractionNo})
+</insert>
+
+<update id="updateAccommodation">
+	UPDATE accommodation
+	<set>
+		<if test="name != null and name != ''">
+			name=#{name},
+		</if>
+		<if test="checkIn != null and checkIn != ''">
+			check_in_time=#{checkIn},
+		</if>
+		<if test="checkOut != null and checkOut != ''">
+			check_out_time=#{checkOut},
+		</if>
+		<if test="attractionNo != null">
+			attractions_no=#{attractionNo},
+		</if>
+	</set>
+	WHERE accommodation_id=#{accommodationId}
+</update>
+
+<select id="getAccommodation">
+	SELECT accommodation_id, group_id, name, check_in_time, check_out_time, attractions_no
+	FROM accommodation
+	WHERE accommodation_id=#{accommodationId}
+</select>
+
+<select id="getAccommodationList">
+	SELECT accommodation_id, group_id, name, check_in_time, check_out_time, attractions_no
+	FROM accommodation
+	WHERE group_id=#{groupId}
+</select>
+
+
+
+<delete id="deleteAccommodation">
+	DELETE FROM accommodation
+	WHERE accommodation_id=#{accommodationId}
+</delete>
+
+
+</mapper>
