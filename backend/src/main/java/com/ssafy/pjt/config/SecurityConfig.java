@@ -38,6 +38,7 @@ public class SecurityConfig {
 					.requestMatchers(
 							"/auth/login", 
 							"/auth/signup",
+							"/user/check/**",
 							"/v3/api-docs/**",            // OpenAPI 문서 JSON
 							"/swagger-ui/**",             // Swagger UI 정적 파일
 							"/swagger-ui.html",            // 리디렉션 경로
