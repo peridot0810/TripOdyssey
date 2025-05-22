@@ -79,8 +79,8 @@ public class ScheduleServiceImpl implements ScheduleService{
 		}
 		
 		// 유저의 역할 확인
-		if(!userValidationService.isUserRoleValid(userId, groupId, MemberRole.LOGISTICS.getId())) {
-			throw new UnauthorizedRoleAccessException("교통/숙소 담당자만 요청할 수 있는 기능입니다.");
+		if(!userValidationService.isUserRoleValid(userId, groupId, MemberRole.SCHEDULE.getId())) {
+			throw new UnauthorizedRoleAccessException("일정 담당자만 요청할 수 있는 기능입니다.");
 		}
 		
 		// 비즈니스 로직
@@ -104,8 +104,8 @@ public class ScheduleServiceImpl implements ScheduleService{
 		}
 		
 		// 유저의 역할 확인
-		if(!userValidationService.isUserRoleValid(userId, groupId, MemberRole.LOGISTICS.getId())) {
-			throw new UnauthorizedRoleAccessException("교통/숙소 담당자만 요청할 수 있는 기능입니다.");
+		if(!userValidationService.isUserRoleValid(userId, groupId, MemberRole.SCHEDULE.getId())) {
+			throw new UnauthorizedRoleAccessException("일정 담당자만 요청할 수 있는 기능입니다.");
 		}
 		
 		// 비즈니스 로직
@@ -120,8 +120,8 @@ public class ScheduleServiceImpl implements ScheduleService{
 		}
 		
 		// 유저의 역할 확인
-		if(!userValidationService.isUserRoleValid(userId, groupId, MemberRole.LOGISTICS.getId())) {
-			throw new UnauthorizedRoleAccessException("교통/숙소 담당자만 요청할 수 있는 기능입니다.");
+		if(!userValidationService.isUserRoleValid(userId, groupId, MemberRole.SCHEDULE.getId())) {
+			throw new UnauthorizedRoleAccessException("일정 담당자만 요청할 수 있는 기능입니다.");
 		}
 		
 		// 비즈니스 로직
@@ -154,8 +154,8 @@ public class ScheduleServiceImpl implements ScheduleService{
 		}
 		
 		// 유저의 역할 확인
-		if(!userValidationService.isUserRoleValid(userId, groupId, MemberRole.LOGISTICS.getId())) {
-			throw new UnauthorizedRoleAccessException("교통/숙소 담당자만 요청할 수 있는 기능입니다.");
+		if(!userValidationService.isUserRoleValid(userId, groupId, MemberRole.SCHEDULE.getId())) {
+			throw new UnauthorizedRoleAccessException("일정 담당자만 요청할 수 있는 기능입니다.");
 		}
 		
 		// 비즈니스 로직
