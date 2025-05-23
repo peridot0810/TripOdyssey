@@ -42,6 +42,7 @@ public class ExpenseTrackerServiceImpl implements ExpenseTrackerService{
 					.amount(expense.getAmount())
 					.categoryName(expense.getCategoryName())
 					.contentName(expense.getContentName())
+					.contentId(expense.getContentId())
 					.build()
 					);
 		}

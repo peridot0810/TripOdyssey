@@ -13,4 +13,5 @@ public class ExpenseInfoResponseDto {
 	private Integer amount;
 	private String categoryName;
 	private String contentName;
+	private Integer contentId;
 }
