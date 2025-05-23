@@ -1,5 +1,9 @@
 package com.ssafy.pjt.group.service;
 
+import java.io.IOException;
+
+import org.springframework.web.multipart.MultipartFile;
+
 import com.ssafy.pjt.common.dto.response.CommonResponse;
 import com.ssafy.pjt.group.dto.request.TravelGroupPostRequest;
 import com.ssafy.pjt.group.dto.request.TravelGroupUpdateRequest;
@@ -10,4 +14,6 @@ public interface TravelGroupService {
 	public CommonResponse<TravelGroupPostResponse> createTravelGroup(TravelGroupPostRequest travelGroupPostRequest, String userId);
 	public CommonResponse<Void> updateTravelGroup(TravelGroupUpdateRequest travelGroupUpdateRequest);
 	public CommonResponse<TravelGroupInfoResponse> getTravelGroupInfo(Integer groupId);
+	
+	public String uploadImage(Integer groupId,MultipartFile file) throws IOException;
 }

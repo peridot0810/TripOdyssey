@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS `tripsaga`.`travel_group` (
   `status` ENUM('planning', 'onGoing', 'finished', 'canceled') NOT NULL,
   `start_date` DATE NULL DEFAULT NULL,
   `end_date` DATE NULL DEFAULT NULL,
+  `profile_image` VARCHAR(255) NULL,
   PRIMARY KEY (`group_id`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;

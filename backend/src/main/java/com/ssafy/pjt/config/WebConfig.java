@@ -31,11 +31,11 @@ public class WebConfig {
             @Override
             public void addResourceHandlers(ResourceHandlerRegistry registry) {
                 // 실제 저장 위치: ${user.home}/uploads/profile/
-                String uploadDir = "file:" + userHome + "/uploads/profile/";
+                String uploadDir = "file:" + userHome + "/uploads/";
 
-                registry.addResourceHandler("/uploads/profile/**") // 클라이언트 요청 경로
+                registry.addResourceHandler("/uploads/**") // 클라이언트 요청 경로
                         .addResourceLocations(uploadDir) // 실제 파일 위치
-                        .setCachePeriod(3600); // 1시간 캐시 (선택)
+                        .setCachePeriod(3600); // 1시간 캐시 
             }
         };
     }

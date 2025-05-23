@@ -1,6 +1,11 @@
 package com.ssafy.pjt.group.controller;
 
+import java.io.IOException;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,9 +14,13 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ssafy.pjt.common.dto.response.CommonResponse;
 import com.ssafy.pjt.common.entity.MemberRole;
+import com.ssafy.pjt.common.exception.FileUploadIllegalArgumentException;
+import com.ssafy.pjt.common.exception.UserNotInGroupException;
 import com.ssafy.pjt.common.service.UserValidationService;
 import com.ssafy.pjt.group.dto.request.TravelGroupPostRequest;
 import com.ssafy.pjt.group.dto.request.TravelGroupUpdateRequest;
@@ -71,6 +80,35 @@ public class TravelGroupController {
 			return ResponseEntity.ok(responseData);
 		} else {
 		    return ResponseEntity.ok(new CommonResponse<Void>(false, "해당 아이디의 그룹이 없거나 그룹원이 아닙니다", null));	
+		}
+	}
+	
+	@PostMapping("/{groupId}/upload-group-image")
+	public ResponseEntity<?> updateGroupImage(
+			@AuthenticationPrincipal UserDetails userDetails,
+			@PathVariable Integer groupId,
+			@RequestParam("file") MultipartFile file
+			){
+		
+		String userId = userDetails.getUsername();
+		if(!userValidationService.isUserInGroup(userId, groupId)) {
+			throw new UserNotInGroupException("그룹원만 요청할 수 있는 기능입니다.");
+		}
+		if(userValidationService.isUserRoleValid(userId, groupId, MemberRole.NORMAL.getId())) {
+			throw new UserNotInGroupException("일반 그룹원은 그룹 이미지를 변경할 수 없습니다.");
+		}
+		
+		if(file == null || file.isEmpty()) {
+			throw new FileUploadIllegalArgumentException("파일이 없습니다.");
+		}
+		
+		try {
+			
+			String imageUrl = travelGroupService.uploadImage(groupId, file);
+			return ResponseEntity.ok(new CommonResponse<>(true, "그룹 이미지 업로드에 성공했습니다.", imageUrl));
+			
+		} catch (IOException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new CommonResponse<>(false, "파일 업로드에 실패했습니다.", null));
 		}
 	}
 	

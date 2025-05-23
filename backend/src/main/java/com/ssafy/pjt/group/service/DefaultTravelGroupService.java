@@ -1,14 +1,23 @@
 package com.ssafy.pjt.group.service;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ssafy.pjt.common.dto.response.CommonResponse;
 import com.ssafy.pjt.common.entity.MemberRole;
+import com.ssafy.pjt.common.exception.FileUploadIllegalArgumentException;
 import com.ssafy.pjt.group.dto.request.TravelGroupPostRequest;
 import com.ssafy.pjt.group.dto.request.TravelGroupUpdateRequest;
 import com.ssafy.pjt.group.dto.response.TravelGroupInfoResponse;
@@ -21,14 +30,24 @@ import com.ssafy.pjt.group.mapper.TravelGroupMapper;
 import com.ssafy.pjt.user.entity.GroupUserInfo2;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class DefaultTravelGroupService implements TravelGroupService {
 	
 	private final TravelGroupMapper travelGroupMapper;
 	
 	private final Map<String, Integer> roleIdCache = new ConcurrentHashMap<>();
+	
+	private final List<String> allowedExtensions = Arrays.asList(".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp");
+	
+	@Value("${spring.servlet.multipart.location}")
+	private String IMG_UPLOAD_DIR;
+	
+	@Value("${group.img.get-url-prefix}")
+	private String GROUP_IMG_PATH_PREFIX;
 	
 	public CommonResponse<TravelGroupPostResponse> createTravelGroup(TravelGroupPostRequest travelGroupPostRequest, String userId){
 		
@@ -161,5 +180,51 @@ public class DefaultTravelGroupService implements TravelGroupService {
 		return new CommonResponse<TravelGroupInfoResponse>(true, "그룹 조회 성공", groupInfo);
 	}
 
+	
+	@Override
+	public String uploadImage(Integer groupId, MultipartFile file) throws IOException {
+
+		// 저장 경로 설정
+		File dir = new File(IMG_UPLOAD_DIR+GROUP_IMG_PATH_PREFIX);
+		if(!dir.exists()) {
+			dir.mkdirs();
+		}
+		
+		// 파일 이름 생성 및 검증 
+		String originalFileName = file.getOriginalFilename();
+		if (originalFileName == null || originalFileName.trim().isEmpty()) {
+	        throw new FileUploadIllegalArgumentException("파일 이름이 유효하지 않습니다.");
+	    }
+		
+		// 파일 확장자 추출 및 검증 
+		String extension = originalFileName.substring(originalFileName.lastIndexOf(".")).toLowerCase();
+		if (!allowedExtensions.contains(extension)) {
+	        throw new FileUploadIllegalArgumentException("허용되지 않는 파일 확장자입니다: " + extension);
+	    }
+		
+		// 저장 파일명 생성
+	    String baseName = originalFileName.substring(0, originalFileName.lastIndexOf(".")).replaceAll("[^a-zA-Z0-9]", "_");
+	    String savedFileName = UUID.randomUUID() + "_" + baseName + extension;
+		
+		log.debug("original file name : {}", originalFileName);
+		log.debug("extension : {}", extension);
+		log.debug("savedFileName : {}", savedFileName);
+		
+		// 실제 파일 저장
+		Path filePath = Paths.get(IMG_UPLOAD_DIR+GROUP_IMG_PATH_PREFIX, savedFileName);
+		file.transferTo(filePath.toFile());
+		
+		// 로깅 
+		log.debug("Uploaded file: {}, Saved as: {}", originalFileName, savedFileName);
+
+		
+		// 접근 경로 생성
+		String imageUrl = GROUP_IMG_PATH_PREFIX + savedFileName;
+		
+		// DB에 이미지 경로 저장 
+		travelGroupMapper.updateGroupImage(groupId, imageUrl);
+		
+		return imageUrl;
+	}
 	
 }

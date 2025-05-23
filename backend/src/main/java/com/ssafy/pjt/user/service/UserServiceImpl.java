@@ -49,10 +49,10 @@ public class UserServiceImpl implements UserService{
 	private final List<String> allowedExtensions = Arrays.asList(".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp");
 	
 	@Value("${spring.servlet.multipart.location}")
-	private String PROFILE_IMG_UPLOAD_DIR;
+	private String IMG_UPLOAD_DIR;
 	
 	@Value("${user.profile-img.get-url-prefix}")
-	private String PROFILE_IMG_GET_PATH_PREFIX;
+	private String PROFILE_IMG_PATH_PREFIX;
 	
 	@Override
 	public LoginResponseDto login(LoginRequestDto loginUser) {
@@ -209,7 +209,7 @@ public class UserServiceImpl implements UserService{
 	public String handleProfileImageUpload(String userId, MultipartFile file) throws IOException {
 
 		// 저장 경로 설정
-		File dir = new File(PROFILE_IMG_UPLOAD_DIR);
+		File dir = new File(IMG_UPLOAD_DIR+PROFILE_IMG_PATH_PREFIX);
 		if(!dir.exists()) {
 			dir.mkdirs();
 		}
@@ -235,7 +235,7 @@ public class UserServiceImpl implements UserService{
 		log.debug("savedFileName : {}", savedFileName);
 		
 		// 실제 파일 저장
-		Path filePath = Paths.get(PROFILE_IMG_UPLOAD_DIR, savedFileName);
+		Path filePath = Paths.get(IMG_UPLOAD_DIR+PROFILE_IMG_PATH_PREFIX, savedFileName);
 		file.transferTo(filePath.toFile());
 		
 		// 로깅 
@@ -243,7 +243,7 @@ public class UserServiceImpl implements UserService{
 
 		
 		// 접근 경로 생성
-		String imageUrl = PROFILE_IMG_GET_PATH_PREFIX + savedFileName;
+		String imageUrl = PROFILE_IMG_PATH_PREFIX + savedFileName;
 		
 		// DB에 이미지 경로 저장 
 		userRepository.updateProfileImage(userId, imageUrl);
