@@ -4,7 +4,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import LoginView from '@/views/LoginView.vue'
 import CommunityView from '@/views/CommunityView.vue'
-import UserPageView from '@/views/UserPageView.vue'
+import UserInfoView from '@/views/UserInfoView.vue'
 
 // Group Layout and Views
 import GroupLayout from '@/views/group/GroupLayout.vue'
@@ -15,6 +15,7 @@ import MapView from '@/views/group/MapView.vue'
 import MeetingView from '@/views/group/MeetingView.vue'
 import ScheduleView from '@/views/group/ScheduleView.vue'
 import ChatView from '@/views/group/ChatView.vue'
+import RoleSelectView from '@/views/group/RoleSelectView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -22,7 +23,7 @@ const router = createRouter({
     { path: '/login', name: 'login', component: LoginView },
     { path: '/', name: 'home', component: HomeView },
     { path: '/community', name: 'community', component: CommunityView },
-    { path: '/user-info', name: 'user-info', component: UserPageView },
+    { path: '/user-info', name: 'user-info', component: UserInfoView },
 
     {
       path: '/group/:groupId',
@@ -35,6 +36,7 @@ const router = createRouter({
         { path: 'meeting', name: 'group-meeting', component: MeetingView },
         { path: 'schedule', name: 'group-schedule', component: ScheduleView },
         { path: 'chat', name: 'group-chat', component: ChatView },
+        { path: 'role', name: 'role', component: RoleSelectView },
       ],
     },
   ],

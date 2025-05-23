@@ -31,6 +31,7 @@ const links = [
   { label: '교통/숙소', path: 'logistics', icon: 'mdi-truck' },
   { label: '재무', path: 'finance', icon: 'mdi-cash' },
   { label: '채팅', path: 'chat', icon: 'mdi-chat' },
+  { label: '역할', path: 'role', icon: 'mdi-role' },
 ]
 </script>
 
