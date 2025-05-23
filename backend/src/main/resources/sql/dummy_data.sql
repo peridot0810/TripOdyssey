@@ -30,8 +30,8 @@ INSERT INTO post_category(category_name) VALUES
 INSERT INTO `role` (`name`) VALUES
 ('master'), ('schedule'), ('finance'), ('logistics'), ('normal');
 
-INSERT INTO `travel_group` (`name`, `created_at`, `status`, `start_date`, `end_date`) 
-VALUES ('제주도 우정여행', NOW(), 'planning', '2025-07-01', '2025-07-10');
+INSERT INTO `travel_group` (`name`, `created_at`, `status`, `start_date`, `end_date`, `profile_image`) 
+VALUES ('제주도 우정여행', NOW(), 'planning', '2025-07-01', '2025-07-10', null);
 
 -- 여행 그룹 Progress 더미 데이터 
 INSERT INTO `group_progress` (`group_id`)

@@ -64,5 +64,10 @@
 	  WHERE group_id = #{groupId}
 	</select>
   
+  	<update id="updateGroupImage">
+  		UPDATE travel_group
+  		SET profile_image=#{imgUrl}
+  		WHERE group_id=#{groupId}
+  	</update>
 
 </mapper>

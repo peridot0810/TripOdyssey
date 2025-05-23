@@ -123,5 +123,10 @@
     	WHERE group_id=#{groupId}
     </select>
     
+	<update id="updateProfileImage">
+		UPDATE user
+		SET profile_image = #{imageUrl}
+		WHERE id=#{userId}
+	</update>
 	
 </mapper>

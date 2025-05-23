@@ -1,6 +1,9 @@
 package com.ssafy.pjt.user.service;
 
+import java.io.IOException;
 import java.util.List;
+
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ssafy.pjt.user.dto.request.EditPasswordRequestDto;
 import com.ssafy.pjt.user.dto.request.EditUserInfoRequestDto;
@@ -36,6 +39,9 @@ public interface UserService {
 	
 	// 그룹 조회
 	public List<GroupResponseDto> getGroupList(String userId);
+	
+	// 프로필 이미지 업로드
+	public String handleProfileImageUpload(String userId, MultipartFile file) throws IOException;
 	
 	
 }
