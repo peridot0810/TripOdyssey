@@ -45,9 +45,10 @@ public class SecurityConfig {
 							"/auth/login", 
 							"/auth/signup",
 							"/ai/**",
-							"/v3/api-docs/**",
-							"/swagger-ui/**",
-							"/swagger-ui.html",
+							"/user/check/**",
+							"/v3/api-docs/**",            // OpenAPI 문서 JSON
+							"/swagger-ui/**",             // Swagger UI 정적 파일
+							"/swagger-ui.html",           // 리디렉션 경로
 							"/favicon.ico"
 						).permitAll()
 					.anyRequest().authenticated()
