@@ -33,4 +33,6 @@ public interface TravelGroupMapper {
     TravelGroup selectTravelGroupById(Integer groupId);
     
     List<GroupRoleLimit> selectGroupRoleLimits(Integer groupId);
+
+    void updateGroupImage(Integer groupId, String imgUrl);
 }
