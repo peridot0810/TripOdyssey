@@ -138,7 +138,7 @@ public class UserController {
 		
 		String userId = userDetails.getUsername();
 		
-		if(file.isEmpty()) {
+		if(file==null || file.isEmpty()) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("파일이 없습니다.");
 		}
 		

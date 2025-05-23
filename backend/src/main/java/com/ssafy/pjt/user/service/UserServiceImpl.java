@@ -2,16 +2,21 @@ package com.ssafy.pjt.user.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ssafy.pjt.common.exception.FileUploadIllegalArgumentException;
 import com.ssafy.pjt.user.dto.request.EditPasswordRequestDto;
 import com.ssafy.pjt.user.dto.request.EditUserInfoRequestDto;
 import com.ssafy.pjt.user.dto.request.GetMyRoleInGroupRequestDto;
@@ -41,8 +46,13 @@ public class UserServiceImpl implements UserService{
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
 	
-	private final String PROFILE_IMG_UPLOAD_DIR = "src/main/resources/static/uploads/profile/";
-	private final String PROFILE_IMG_GET_PATH_PREFIX = "/uploads/profile/";
+	private final List<String> allowedExtensions = Arrays.asList(".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp");
+	
+	@Value("${spring.servlet.multipart.location}")
+	private String PROFILE_IMG_UPLOAD_DIR;
+	
+	@Value("${user.profile-img.get-url-prefix}")
+	private String PROFILE_IMG_GET_PATH_PREFIX;
 	
 	@Override
 	public LoginResponseDto login(LoginRequestDto loginUser) {
@@ -204,21 +214,33 @@ public class UserServiceImpl implements UserService{
 			dir.mkdirs();
 		}
 		
-		// 파일 이름 생성
+		// 파일 이름 생성 및 검증 
 		String originalFileName = file.getOriginalFilename();
-		String extension = originalFileName.substring(originalFileName.lastIndexOf("."));
-		String savedFileName = UUID.randomUUID().toString() + extension;
+		if (originalFileName == null || originalFileName.trim().isEmpty()) {
+	        throw new FileUploadIllegalArgumentException("파일 이름이 유효하지 않습니다.");
+	    }
+		
+		// 파일 확장자 추출 및 검증 
+		String extension = originalFileName.substring(originalFileName.lastIndexOf(".")).toLowerCase();
+		if (!allowedExtensions.contains(extension)) {
+	        throw new FileUploadIllegalArgumentException("허용되지 않는 파일 확장자입니다: " + extension);
+	    }
+		
+		// 저장 파일명 생성
+	    String baseName = originalFileName.substring(0, originalFileName.lastIndexOf(".")).replaceAll("[^a-zA-Z0-9]", "_");
+	    String savedFileName = UUID.randomUUID() + "_" + baseName + extension;
 		
 		log.debug("original file name : {}", originalFileName);
 		log.debug("extension : {}", extension);
 		log.debug("savedFileName : {}", savedFileName);
 		
 		// 실제 파일 저장
-		File savedFile = new File(PROFILE_IMG_UPLOAD_DIR +savedFileName);
-		log.debug("필요한 파일 객체 생성");
+		Path filePath = Paths.get(PROFILE_IMG_UPLOAD_DIR, savedFileName);
+		file.transferTo(filePath.toFile());
 		
-		file.transferTo(savedFile);
-		log.debug("savedFile : {}", savedFile);
+		// 로깅 
+		log.debug("Uploaded file: {}, Saved as: {}", originalFileName, savedFileName);
+
 		
 		// 접근 경로 생성
 		String imageUrl = PROFILE_IMG_GET_PATH_PREFIX + savedFileName;

@@ -25,4 +25,10 @@ public class CommonExceptionHandler {
 		// 주어진 역할로는 불가능한 요청 처리
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new CommonResponse<>(false, e.getMessage(), null));
 	}
+	
+	@ExceptionHandler(FileUploadIllegalArgumentException.class)
+	public ResponseEntity<?> handleFileUploadIllegalArgument(FileUploadIllegalArgumentException e){
+		// 유효하지 않은 형식의 파일 업로드 요청 처리
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new CommonResponse<>(false, e.getMessage(), null));
+	}
 }
