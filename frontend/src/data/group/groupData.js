@@ -44,3 +44,115 @@ export const groupData = [
     },
   },
 ]
+
+export const groupMembers = [
+  {
+    userId: 'jihun',
+    nickName: '지훈',
+    roleName: 'master',
+  },
+  {
+    userId: 'junheok',
+    nickName: '준혁',
+    roleName: 'schedule',
+  },
+  {
+    userId: 'hyeonjin',
+    nickName: '현진',
+    roleName: 'finance',
+  },
+  {
+    userId: 'minjun',
+    nickName: '민준',
+    roleName: 'logistics',
+  },
+  {
+    userId: 'soyeon',
+    nickName: '소연',
+    roleName: 'normal',
+  },
+  {
+    userId: 'taehyun',
+    nickName: '태현',
+    roleName: 'normal',
+  },
+  {
+    userId: 'yujin',
+    nickName: '유진',
+    roleName: 'normal',
+  },
+  {
+    userId: 'seungho',
+    nickName: '승호',
+    roleName: 'normal',
+  },
+]
+
+export const groupInformation = {
+  groupInfo: {
+    groupId: 14,
+    name: '-------수정2222--------',
+    description: '...',
+    status: 'planning',
+    createdAt: '2025-05-14T17:35:58',
+    startDate: '3025-08-15',
+    endDate: '3025-08-18',
+    roleLimits: {
+      finance: 10,
+      schedule: 10,
+      logistics: 10,
+    },
+  },
+
+  progress: [
+    { scheduleCoordination: true },
+    { roleAssignment: true },
+    { tripPlanning: false },
+    { onTrip: false },
+    { settlement: false },
+    { finished: false },
+  ],
+
+  memberList: [
+    {
+      userId: 'jihun',
+      nickName: '지훈',
+      roleName: 'master',
+    },
+    {
+      userId: 'junheok',
+      nickName: '준혁',
+      roleName: 'schedule',
+    },
+    {
+      userId: 'hyeonjin',
+      nickName: '현진',
+      roleName: 'finance',
+    },
+    {
+      userId: 'minjun',
+      nickName: '민준',
+      roleName: 'logistics',
+    },
+    {
+      userId: 'soyeon',
+      nickName: '소연',
+      roleName: 'normal',
+    },
+    {
+      userId: 'taehyun',
+      nickName: '태현',
+      roleName: 'normal',
+    },
+    {
+      userId: 'yujin',
+      nickName: '유진',
+      roleName: 'normal',
+    },
+    {
+      userId: 'seungho',
+      nickName: '승호',
+      roleName: 'normal',
+    },
+  ],
+}
