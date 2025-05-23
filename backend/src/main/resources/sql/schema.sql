@@ -152,6 +152,7 @@ CREATE TABLE IF NOT EXISTS `tripsaga`.`user` (
   `age` INT UNSIGNED NOT NULL,
   `role` VARCHAR(45) NOT NULL DEFAULT 'USER',
   `activated` TINYINT(1) NOT NULL DEFAULT '1',
+  `profile_image` VARCHAR(255) NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE)
 ENGINE = InnoDB

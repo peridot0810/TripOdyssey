@@ -1,12 +1,16 @@
 package com.ssafy.pjt.user.service;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ssafy.pjt.user.dto.request.EditPasswordRequestDto;
 import com.ssafy.pjt.user.dto.request.EditUserInfoRequestDto;
@@ -36,6 +40,9 @@ public class UserServiceImpl implements UserService{
 
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
+	
+	private final String PROFILE_IMG_UPLOAD_DIR = "src/main/resources/static/uploads/profile/";
+	private final String PROFILE_IMG_GET_PATH_PREFIX = "/uploads/profile/";
 	
 	@Override
 	public LoginResponseDto login(LoginRequestDto loginUser) {
@@ -186,5 +193,39 @@ public class UserServiceImpl implements UserService{
 		}
 		
 		return retList;
+	}
+	
+	@Override
+	public String handleProfileImageUpload(String userId, MultipartFile file) throws IOException {
+
+		// 저장 경로 설정
+		File dir = new File(PROFILE_IMG_UPLOAD_DIR);
+		if(!dir.exists()) {
+			dir.mkdirs();
+		}
+		
+		// 파일 이름 생성
+		String originalFileName = file.getOriginalFilename();
+		String extension = originalFileName.substring(originalFileName.lastIndexOf("."));
+		String savedFileName = UUID.randomUUID().toString() + extension;
+		
+		log.debug("original file name : {}", originalFileName);
+		log.debug("extension : {}", extension);
+		log.debug("savedFileName : {}", savedFileName);
+		
+		// 실제 파일 저장
+		File savedFile = new File(PROFILE_IMG_UPLOAD_DIR +savedFileName);
+		log.debug("필요한 파일 객체 생성");
+		
+		file.transferTo(savedFile);
+		log.debug("savedFile : {}", savedFile);
+		
+		// 접근 경로 생성
+		String imageUrl = PROFILE_IMG_GET_PATH_PREFIX + savedFileName;
+		
+		// DB에 이미지 경로 저장 
+		userRepository.updateProfileImage(userId, imageUrl);
+		
+		return imageUrl;
 	}
 }

@@ -42,4 +42,7 @@ public interface UserRepository {
 	public GroupProgressResponseDto getGroupProgress(String groupId);
 	public String getMyRoleInGroup(GetMyRoleInGroupRequestDto myRoleRequest);
 	public Integer getMemberCntInGroup(String groupId);
+	
+	// 프로필 이미지
+	void updateProfileImage(String userId, String imageUrl);
 }

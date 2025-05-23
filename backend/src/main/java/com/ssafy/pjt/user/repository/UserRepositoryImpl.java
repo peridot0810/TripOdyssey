@@ -101,4 +101,9 @@ public class UserRepositoryImpl implements UserRepository{
 	public Integer getMemberCntInGroup(String groupId) {
 		return userMapper.getMemberCntInGroup(groupId);
 	}
+	
+	@Override
+	public void updateProfileImage(String userId, String imageUrl) {
+		userMapper.updateProfileImage(userId, imageUrl);
+	}
 }

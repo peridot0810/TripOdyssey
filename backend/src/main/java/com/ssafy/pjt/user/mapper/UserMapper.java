@@ -46,4 +46,7 @@ public interface UserMapper {
 	String getMyRoleInGroup(GetMyRoleInGroupRequestDto myRoleRequest);
 	Integer getMemberCntInGroup(String groupId);
 	
+	// 프로필 이미지
+	void updateProfileImage(String userId, String imageUrl);
+	
 }
