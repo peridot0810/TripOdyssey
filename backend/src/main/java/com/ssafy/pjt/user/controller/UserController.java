@@ -131,6 +131,8 @@ public class UserController {
 	}
 	
 	
+	@Operation(summary="사용자 프로필 이미지 업로드", description="사용자의 프로필 이미지를 업로드합니다.")
+	@ApiResponse(responseCode = "200", description="사용자 프로필 이미지 업로드 성공")
 	@PostMapping("/upload-profile")
 	public ResponseEntity<?> uploadProfileImage(
 			@AuthenticationPrincipal UserDetails userDetails,
