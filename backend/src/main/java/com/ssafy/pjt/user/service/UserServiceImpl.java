@@ -24,6 +24,7 @@ import com.ssafy.pjt.user.dto.request.LoginRequestDto;
 import com.ssafy.pjt.user.dto.request.SignUpRequestDto;
 import com.ssafy.pjt.user.dto.response.GroupProgressResponseDto;
 import com.ssafy.pjt.user.dto.response.GroupResponseDto;
+import com.ssafy.pjt.user.dto.response.InvitationResponseDto;
 import com.ssafy.pjt.user.dto.response.LoginResponseDto;
 import com.ssafy.pjt.user.dto.response.SearchUserResponseDto;
 import com.ssafy.pjt.user.dto.response.UserInfoResponseDto;
@@ -204,6 +205,15 @@ public class UserServiceImpl implements UserService{
 		
 		return retList;
 	}
+	
+	
+	@Override
+	public List<InvitationResponseDto> getInvitationInfo(String userId) {
+	
+		return userRepository.getInvitaionInfo(userId);
+	}
+	
+	
 	
 	@Override
 	public String handleProfileImageUpload(String userId, MultipartFile file) throws IOException {

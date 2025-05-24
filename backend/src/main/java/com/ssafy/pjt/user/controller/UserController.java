@@ -22,6 +22,7 @@ import com.ssafy.pjt.common.dto.response.CommonResponse;
 import com.ssafy.pjt.user.dto.request.EditPasswordRequestDto;
 import com.ssafy.pjt.user.dto.request.EditUserInfoRequestDto;
 import com.ssafy.pjt.user.dto.response.GroupResponseDto;
+import com.ssafy.pjt.user.dto.response.InvitationResponseDto;
 import com.ssafy.pjt.user.dto.response.SearchUserResponseDto;
 import com.ssafy.pjt.user.dto.response.UserInfoResponseDto;
 import com.ssafy.pjt.user.entity.CustomUserDetails;
@@ -150,6 +151,18 @@ public class UserController {
 		} catch (IOException e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("파일 업로드에 실패했습니다. : " + e.getMessage());
 		}
+	}
+	
+	
+	@Operation(summary="초대 받은 데이터 조회", description="받은 초대 건수들을 조회합니다.")
+	@ApiResponse(responseCode = "200", description="초대 데이터 조회에 성공했습니다.")
+	@GetMapping("/invited")
+	public ResponseEntity<?> getInvitedInfo(
+			@AuthenticationPrincipal UserDetails userDetails){
+		
+		String userId = userDetails.getUsername();
+		List<InvitationResponseDto> invitationInfoList = userService.getInvitationInfo(userId);
+		return ResponseEntity.ok(new CommonResponse<>(true, "초대 받은 정보 조회에 성공했습니다.", invitationInfoList));
 	}
 
 }

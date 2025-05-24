@@ -5,6 +5,12 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.ssafy.pjt.common.dto.response.CommonResponse;
+import com.ssafy.pjt.common.entity.MemberRole;
+import com.ssafy.pjt.common.exception.UnauthorizedRoleAccessException;
+import com.ssafy.pjt.common.exception.UserNotInGroupException;
+import com.ssafy.pjt.common.service.UserValidationService;
+import com.ssafy.pjt.config.OpenApiConfig;
+import com.ssafy.pjt.financial.dto.request.MemberInviteRequestDto;
 import com.ssafy.pjt.group.entity.GroupMemberInfo;
 import com.ssafy.pjt.group.mapper.TravelGroupMemberMapper;
 
@@ -15,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 public class DefaultTravelGroupMemberService implements TravelGroupMemberService {
 	
 	private final TravelGroupMemberMapper memberMapper;
+	private final UserValidationService userValidationService;
 
 	@Override
 	public CommonResponse<Void> inviteMember(Integer groupId, String userEmail) {
@@ -39,5 +46,25 @@ public class DefaultTravelGroupMemberService implements TravelGroupMemberService
 	public CommonResponse<List<GroupMemberInfo>> getAllMembers(Integer groupId) {
 		List<GroupMemberInfo> members = memberMapper.selectAllGroupUserInfo(groupId);
 		return new CommonResponse<>(true, "그룹 멤버 리스트 조회 완료", members);
+	}
+	
+	@Override
+	public CommonResponse<Void> memberInvite(Integer groupId, String userId,
+			MemberInviteRequestDto memberInviteRequest) {
+		
+		// 유저 확인
+		if(!userValidationService.isUserInGroup(userId, groupId)) {
+			throw new UserNotInGroupException("속하지 않은 그룹의 정보를 요청하였습니다.");
+		}
+		if(userValidationService.isUserRoleValid(userId, groupId, MemberRole.NORMAL.getId())) {
+			throw new UnauthorizedRoleAccessException("일반 그룹원은 다른 그룹원을 초대할 수 없습니다.");
+		}
+		
+		
+		// 비즈니스 로직
+		memberInviteRequest.setGroupId(groupId);
+		memberInviteRequest.setSenderId(userId);
+		memberMapper.memberInvite(memberInviteRequest);
+		return null;
 	}
 }

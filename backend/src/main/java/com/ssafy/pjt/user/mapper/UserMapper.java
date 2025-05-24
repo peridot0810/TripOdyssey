@@ -9,6 +9,7 @@ import com.ssafy.pjt.user.dto.request.EditPasswordRequestDto;
 import com.ssafy.pjt.user.dto.request.EditUserInfoRequestDto;
 import com.ssafy.pjt.user.dto.request.GetMyRoleInGroupRequestDto;
 import com.ssafy.pjt.user.dto.response.GroupProgressResponseDto;
+import com.ssafy.pjt.user.dto.response.InvitationResponseDto;
 import com.ssafy.pjt.user.dto.response.UserInfoResponseDto;
 import com.ssafy.pjt.user.entity.User;
 import com.ssafy.pjt.user.entity.Group;
@@ -48,5 +49,8 @@ public interface UserMapper {
 	
 	// 프로필 이미지
 	void updateProfileImage(String userId, String imageUrl);
+	
+	// 초대 정보 조회
+	List<InvitationResponseDto> getInvitationList(String userId);
 	
 }

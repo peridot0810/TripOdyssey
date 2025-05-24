@@ -9,6 +9,7 @@ import com.ssafy.pjt.user.dto.request.EditPasswordRequestDto;
 import com.ssafy.pjt.user.dto.request.EditUserInfoRequestDto;
 import com.ssafy.pjt.user.dto.request.GetMyRoleInGroupRequestDto;
 import com.ssafy.pjt.user.dto.response.GroupProgressResponseDto;
+import com.ssafy.pjt.user.dto.response.InvitationResponseDto;
 import com.ssafy.pjt.user.dto.response.UserInfoResponseDto;
 import com.ssafy.pjt.user.entity.Group;
 import com.ssafy.pjt.user.entity.User;
@@ -105,5 +106,10 @@ public class UserRepositoryImpl implements UserRepository{
 	@Override
 	public void updateProfileImage(String userId, String imageUrl) {
 		userMapper.updateProfileImage(userId, imageUrl);
+	}
+	
+	@Override
+	public List<InvitationResponseDto> getInvitaionInfo(String userId) {
+		return userMapper.getInvitationList(userId);
 	}
 }

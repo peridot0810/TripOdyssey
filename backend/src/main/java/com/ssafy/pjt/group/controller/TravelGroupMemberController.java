@@ -3,14 +3,19 @@ package com.ssafy.pjt.group.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import com.ssafy.pjt.common.dto.response.CommonResponse;
+import com.ssafy.pjt.financial.dto.request.MemberInviteRequestDto;
 import com.ssafy.pjt.group.entity.GroupMemberInfo;
 import com.ssafy.pjt.group.service.TravelGroupMemberService;
 import com.ssafy.pjt.util.JwtUtil;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -68,4 +73,25 @@ public class TravelGroupMemberController {
 		CommonResponse<Void> response = memberService.assignMemberRole(groupId, userId, roleId);
 		return ResponseEntity.ok(response);
 	}
+	
+	// 5. 그룹원 초대
+	@Operation(summary = "그룹원 초대", description = "함께할 그룹원을 초대합니다.")
+	@ApiResponse(responseCode = "200", description = "그룹원 초대 성공")
+	@PostMapping("/{groupId}/member/invite")
+	public ResponseEntity<?> inviteMember(
+			@AuthenticationPrincipal UserDetails userDetails,
+			@PathVariable Integer groupId,
+			@RequestBody MemberInviteRequestDto memberInviteRequest){
+		
+		String userId = userDetails.getUsername();
+		
+		// 본인을 초대할 수는 없음
+		if(userId.equals(memberInviteRequest.getReceiverId())) {
+			return ResponseEntity.badRequest().body(new CommonResponse<>(false, "자기 자신을 초대할 수는 없습니다.", null));
+		}
+		
+		memberService.memberInvite(groupId, userId, memberInviteRequest);
+		return ResponseEntity.ok(new CommonResponse<>(true, "그룹원 초대에 성공했습니다.", null));
+	}
+	
 }
