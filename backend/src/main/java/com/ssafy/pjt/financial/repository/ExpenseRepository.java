@@ -15,5 +15,5 @@ public interface ExpenseRepository {
 	
 	// 공통 기능 
 	Boolean checkUserInGroup(UserGroupRequestDto checkUserInGroupRequest);
-	Integer getUserRole(UserGroupRequestDto userRoleRequest);
+	List<Integer> getUserRole(UserGroupRequestDto userRoleRequest);
 }
