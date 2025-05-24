@@ -32,13 +32,33 @@ public class DefaultTravelGroupMemberService implements TravelGroupMemberService
 	}
 
 	@Override
-	public CommonResponse<Void> removeMember(Integer groupId, String userId) {
+	public CommonResponse<Void> removeMember(String requesterId, Integer groupId, String userId) {
+		
+		// 유저 확인
+		if(!userValidationService.isUserInGroup(requesterId, groupId)) {
+			throw new UserNotInGroupException("속하지 않은 그룹의 정보를 요청하였습니다.");
+		}
+		if(!userValidationService.isUserRoleValid(requesterId, groupId, MemberRole.MASTER.getId())) {
+			throw new UnauthorizedRoleAccessException("멤버 강퇴는 방장만 요청 가능합니다.");
+		}
+		
+		// 비즈니스 로직 
 		memberMapper.deleteUserFromGroup(groupId, userId);
 		return new CommonResponse<>(true, "그룹에서 멤버를 제거 완료", null);
 	}
 
 	@Override
-	public CommonResponse<Void> assignMemberRole(Integer groupId, String userId, Integer roleId) {
+	public CommonResponse<Void> assignMemberRole(String requesterId, Integer groupId, String userId, Integer roleId) {
+		
+		// 유저 확인
+		if(!userValidationService.isUserInGroup(requesterId, groupId)) {
+			throw new UserNotInGroupException("속하지 않은 그룹의 정보를 요청하였습니다.");
+		}
+		if(!userValidationService.isUserRoleValid(requesterId, groupId, MemberRole.MASTER.getId())) {
+			throw new UnauthorizedRoleAccessException("멤버 역할 임명은 방장만 요청 가능합니다.");
+		}
+		
+		// 비즈니스 로직
 		memberMapper.updateGroupUserRole(groupId, userId, roleId);
 		return new CommonResponse<>(true, "그룹 멤버 역할 변경 완료", null);
 	}

@@ -59,7 +59,7 @@ public class TravelGroupMemberController {
 			@RequestHeader("Authorization") String token) {
 		String requesterId = jwtUtil.extractUserId(token);
 		// (optional) check permission
-		CommonResponse<Void> response = memberService.removeMember(groupId, userId);
+		CommonResponse<Void> response = memberService.removeMember(requesterId, groupId, userId);
 		return ResponseEntity.ok(response);
 	}
 
@@ -72,7 +72,7 @@ public class TravelGroupMemberController {
 			@RequestHeader("Authorization") String token) {
 		String requesterId = jwtUtil.extractUserId(token);
 		// (optional) check permission
-		CommonResponse<Void> response = memberService.assignMemberRole(groupId, userId, roleId);
+		CommonResponse<Void> response = memberService.assignMemberRole(requesterId, groupId, userId, roleId);
 		return ResponseEntity.ok(response);
 	}
 	
