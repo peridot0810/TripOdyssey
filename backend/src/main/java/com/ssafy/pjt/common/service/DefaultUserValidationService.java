@@ -1,9 +1,12 @@
 package com.ssafy.pjt.common.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.ssafy.pjt.common.dto.request.UserGroupRequestDto;
 import com.ssafy.pjt.common.entity.GroupUserInfo;
+import com.ssafy.pjt.common.entity.MemberRole;
 import com.ssafy.pjt.common.mapper.CommonMapper;
 import com.ssafy.pjt.user.entity.GroupUserInfo2;
 
@@ -13,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DefaultUserValidationService implements UserValidationService {
 	private final CommonMapper commonMapper;
+	
+	private final Integer ROLE_COUNT = 5;	// 현재 역할 개수 5개
 	
 	public boolean isUserRoleValid(String userId, Integer groupId, Integer roleId) {
 		GroupUserInfo groupUserInfo = GroupUserInfo.builder()
@@ -31,4 +36,18 @@ public class DefaultUserValidationService implements UserValidationService {
 				.groupId(groupId)
 				.build());
 	};
+	
+	@Override
+	public boolean[] getUserRoles(String userId, Integer groupId) {
+		List<Integer> roleList = commonMapper.getUserRoleInGroup(UserGroupRequestDto.builder()
+				.userId(userId)
+				.groupId(groupId)
+				.build());
+		
+		boolean[] retList = new boolean[ROLE_COUNT];
+		for(Integer roleId : roleList) {
+			retList[roleId - 1] = true;
+		}
+		return retList;
+	}
 }

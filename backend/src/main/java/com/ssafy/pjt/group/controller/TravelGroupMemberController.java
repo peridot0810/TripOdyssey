@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import com.ssafy.pjt.common.dto.response.CommonResponse;
+import com.ssafy.pjt.common.service.UserValidationService;
 import com.ssafy.pjt.financial.dto.request.MemberInviteRequestDto;
 import com.ssafy.pjt.group.entity.GroupMemberInfo;
 import com.ssafy.pjt.group.service.TravelGroupMemberService;
@@ -24,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 public class TravelGroupMemberController {
 
 	private final TravelGroupMemberService memberService;
+	private final UserValidationService userValidationService;
 	private final JwtUtil jwtUtil;
 
 	// 1. 그룹원 전체 조회
@@ -105,6 +107,19 @@ public class TravelGroupMemberController {
 		String userId = userDetails.getUsername();
 		List<?> invitedList = memberService.getInvitedMemberList(groupId, userId);
 		return ResponseEntity.ok(new CommonResponse<>(true, "초대 목록 조회에 성공했습니다.", invitedList));
+	}
+	
+	// 7. 그룹원의 역할 목록 조회
+	@Operation(summary = "요청 유저의 역할 목록 조회", description = "유저의 해당 그룹에서의 역할 목록을 boolean 배열 형태로 반환합니다.")
+	@ApiResponse(responseCode = "200", description = "유저의 역할 목록 조회 성공")
+	@GetMapping("/{groupId}/member/roles")
+	public ResponseEntity<?> getMemberRoles(
+			@AuthenticationPrincipal UserDetails userDetails,
+			@PathVariable Integer groupId){
+		
+		String userId = userDetails.getUsername();
+		boolean[] myRoles = userValidationService.getUserRoles(userId, groupId);
+		return ResponseEntity.ok(new CommonResponse<>(true, "유저 역할 목록 조회에 성공했습니다.", myRoles));
 	}
 	
 }
