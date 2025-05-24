@@ -1,10 +1,7 @@
 package com.ssafy.pjt.ai.controller;
 
 import java.util.Map;
-import java.util.function.Consumer;
 
-import org.springframework.ai.chat.client.ChatClient.AdvisorSpec;
-import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

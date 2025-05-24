@@ -136,6 +136,17 @@ INSERT INTO expense_tracker (group_id, content_id, category_id, datetime, descri
 (1, 30, 6, '2025-07-03 13:50:00', '기념품 구매', 15000),
 (1, 11, 4, '2025-07-03 15:20:00', '유람선 탑승 요금', 38000);
 
+-- member_expense_info에 더미 데이터 추가
+INSERT INTO member_expense_info(user_id, group_id)
+VALUES("user01", 1),
+("user02", 1),
+("user03", 1),
+("user04", 1),
+("user05", 1);
+
+
+
+
 -- transportation에 더미 데이터 추가
 INSERT INTO transportation (type_id, group_id, departure, arrival, `from`, `to`, description) VALUES
 (1, 1, '2025-06-01 09:00:00', '2025-06-01 12:00:00', 'Seoul', 'Jeju', '비행기로 제주도 이동'),

@@ -29,5 +29,14 @@
     	FROM member_expense_info
     	WHERE group_id=#{groupId}
     </select>
+    
+    <select id="getMemberExpenseInfo">
+    	SELECT user_id, expense_to_pay, paid_amount
+    	FROM member_expense_info
+    	WHERE group_id=#{groupId}
+    	<if test="userId != null and userId != ''">
+    		AND user_id=#{userId}
+    	</if>
+    </select>
 	
 </mapper>
