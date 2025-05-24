@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.ssafy.pjt.common.dto.response.CommonResponse;
 import com.ssafy.pjt.user.dto.request.EditPasswordRequestDto;
 import com.ssafy.pjt.user.dto.request.EditUserInfoRequestDto;
+import com.ssafy.pjt.user.dto.request.HandleInvitationRequestDto;
 import com.ssafy.pjt.user.dto.response.GroupResponseDto;
 import com.ssafy.pjt.user.dto.response.InvitationResponseDto;
 import com.ssafy.pjt.user.dto.response.SearchUserResponseDto;
@@ -163,6 +164,18 @@ public class UserController {
 		String userId = userDetails.getUsername();
 		List<InvitationResponseDto> invitationInfoList = userService.getInvitationInfo(userId);
 		return ResponseEntity.ok(new CommonResponse<>(true, "초대 받은 정보 조회에 성공했습니다.", invitationInfoList));
+	}
+	
+	@Operation(summary="초대 수락/거절", description="초대를 수락 또는 거절합니다.")
+	@ApiResponse(responseCode = "200", description="초대 수락/거절에 성공했습니다.")
+	@PutMapping("/invited")
+	public ResponseEntity<?> handleInvitation(
+			@AuthenticationPrincipal UserDetails userDetails,
+			@RequestBody HandleInvitationRequestDto requestDto){
+		
+		String userId = userDetails.getUsername();
+		userService.handleInvitation(userId, requestDto);
+		return ResponseEntity.ok(new CommonResponse<>(true, "초대 수락/거절에 성공했습니다.", null));
 	}
 
 }
