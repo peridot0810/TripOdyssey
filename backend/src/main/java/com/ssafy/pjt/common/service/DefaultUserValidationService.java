@@ -38,13 +38,13 @@ public class DefaultUserValidationService implements UserValidationService {
 	};
 	
 	@Override
-	public boolean[] getUserRoles(String userId, Integer groupId) {
+	public Boolean[] getUserRoles(String userId, Integer groupId) {
 		List<Integer> roleList = commonMapper.getUserRoleInGroup(UserGroupRequestDto.builder()
 				.userId(userId)
 				.groupId(groupId)
 				.build());
 		
-		boolean[] retList = new boolean[ROLE_COUNT];
+		Boolean[] retList = new Boolean[ROLE_COUNT];
 		for(Integer roleId : roleList) {
 			retList[roleId - 1] = true;
 		}

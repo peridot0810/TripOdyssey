@@ -167,14 +167,14 @@ CREATE TABLE `tripsaga`.`invitation` (
 	`id` INT AUTO_INCREMENT PRIMARY KEY,
     `group_id` INT NOT NULL,
     `sender_id` VARCHAR(100) NOT NULL,
-    `receiver_id` VARCHAR(100) NOT NULL,
+    `receiver_email` VARCHAR(100) NOT NULL,
     `status` VARCHAR(20) NOT NULL DEFAULT 'PENDING',
     `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
     `responded_at` DATETIME DEFAULT NULL,
     FOREIGN KEY (`group_id`) REFERENCES `travel_group`(`group_id`) ON DELETE CASCADE,
     FOREIGN KEY (`sender_id`) REFERENCES `user`(`id`) ON DELETE CASCADE,
-    FOREIGN KEY (`receiver_id`) REFERENCES `user`(`id`) ON DELETE CASCADE,
-    UNIQUE KEY `unique_invite` (`group_id`, `receiver_id`)
+    FOREIGN KEY (`receiver_email`) REFERENCES `user`(`email`) ON DELETE CASCADE,
+    UNIQUE KEY `unique_invite` (`group_id`, `receiver_email`)
 )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;

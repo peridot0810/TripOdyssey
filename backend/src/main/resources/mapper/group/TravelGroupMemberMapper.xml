@@ -25,30 +25,29 @@
 
   <select id="selectAllGroupUserInfo" resultType="com.ssafy.pjt.group.entity.GroupMemberInfo">
     SELECT
-      gui.user_id AS userId,
-      u.nickname AS nickName,
-      r.name AS roleName
-    FROM group_user_info gui
-    JOIN user u ON gui.user_id = u.id
-    JOIN role r ON gui.role_id = r.role_id
-    WHERE gui.group_id = #{groupId}
+	  gui.user_id AS userId,
+	  u.nickname AS nickName
+	FROM group_user_info gui
+		JOIN user u ON gui.user_id = u.id
+	WHERE gui.group_id = #{groupId}
+	GROUP BY userId
   </select>
   
   <insert id="memberInvite">
-  	INSERT INTO invitation(group_id, sender_id, receiver_id)
-  	VALUES(#{groupId},#{senderId},#{receiverId})
+  	INSERT INTO invitation(group_id, sender_id, receiver_email)
+  	VALUES(#{groupId},#{senderId},#{receiverEmail})
   </insert>
   
   <select id="getInvitedMemberList">
   	SELECT 
         inv.id AS invitation_id,
-        inv.receiver_id AS receiver_id,
+        inv.receiver_email AS receiver_email,
         u.nickname AS receiver_nickname,
         inv.status AS status,
         inv.created_at AS created_at,
         inv.responded_at AS responded_at
     FROM invitation inv
-        JOIN user u ON inv.receiver_id = u.id
+        JOIN user u ON inv.receiver_email = u.email
     WHERE inv.group_id = #{groupId}
   </select>
   

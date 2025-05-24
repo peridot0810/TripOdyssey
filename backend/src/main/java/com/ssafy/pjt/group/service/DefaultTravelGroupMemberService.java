@@ -82,6 +82,11 @@ public class DefaultTravelGroupMemberService implements TravelGroupMemberService
 		
 		// 비즈니스 로직
 		List<GroupMemberInfo> members = memberMapper.selectAllGroupUserInfo(groupId);
+		
+		for(GroupMemberInfo member :members) {
+			member.setRoles(userValidationService.getUserRoles(member.getUserId(), groupId));
+		}
+		
 		return new CommonResponse<>(true, "그룹 멤버 리스트 조회 완료", members);
 	}
 	

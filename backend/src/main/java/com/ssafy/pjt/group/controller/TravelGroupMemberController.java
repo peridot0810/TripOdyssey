@@ -27,10 +27,10 @@ public class TravelGroupMemberController {
 	private final TravelGroupMemberService memberService;
 	private final UserValidationService userValidationService;
 
-	// 1. 그룹원 전체 조회 -> deprecated
-//	@Operation(summary = "그룹원 전체 조회", description = "전체 그룹원 목록을 조회합니다.")
-//	@ApiResponse(responseCode = "200", description = "그룹원 목록 조회 성공")
-//	@GetMapping("/{groupId}/members")
+	// 1. 그룹원 전체 조회 
+	@Operation(summary = "그룹원 전체 조회", description = "전체 그룹원 목록을 조회합니다.")
+	@ApiResponse(responseCode = "200", description = "그룹원 목록 조회 성공")
+	@GetMapping("/{groupId}/members")
 	public ResponseEntity<CommonResponse<List<GroupMemberInfo>>> getAllGroupMembers(
 			@PathVariable Integer groupId,
 			@AuthenticationPrincipal UserDetails userDetails) {
@@ -39,10 +39,10 @@ public class TravelGroupMemberController {
 		return ResponseEntity.ok(response);
 	}
 
-	// 2. 그룹원 초대
-	@Operation(summary = "이메일로 그룹원 초대", description = "함께할 그룹원을 이메일로 초대합니다.")
-	@ApiResponse(responseCode = "200", description = "그룹원 초대 성공")
-	@PostMapping("/{groupId}/member")
+	// 2. 그룹원 초대 -> deprecated
+//	@Operation(summary = "이메일로 그룹원 초대", description = "함께할 그룹원을 이메일로 초대합니다.")
+//	@ApiResponse(responseCode = "200", description = "그룹원 초대 성공")
+//	@PostMapping("/{groupId}/member")
 	public ResponseEntity<CommonResponse<Void>> inviteMember(
 			@PathVariable Integer groupId,
 			@RequestParam String email, // 이메일로 초대
@@ -80,7 +80,7 @@ public class TravelGroupMemberController {
 	}
 	
 	// 5. 그룹원 초대
-	@Operation(summary = "아이디로 그룹원 초대", description = "함께할 그룹원을 아이디로 초대합니다.")
+	@Operation(summary = "그룹원 초대", description = "함께할 그룹원을 초대합니다.")
 	@ApiResponse(responseCode = "200", description = "그룹원 초대 성공")
 	@PostMapping("/{groupId}/member/invite")
 	public ResponseEntity<?> inviteMember(
@@ -89,11 +89,6 @@ public class TravelGroupMemberController {
 			@RequestBody MemberInviteRequestDto memberInviteRequest){
 		
 		String userId = userDetails.getUsername();
-		
-		// 본인을 초대할 수는 없음
-		if(userId.equals(memberInviteRequest.getReceiverId())) {
-			return ResponseEntity.badRequest().body(new CommonResponse<>(false, "자기 자신을 초대할 수는 없습니다.", null));
-		}
 		
 		memberService.memberInvite(groupId, userId, memberInviteRequest);
 		return ResponseEntity.ok(new CommonResponse<>(true, "그룹원 초대에 성공했습니다.", null));
@@ -121,7 +116,7 @@ public class TravelGroupMemberController {
 			@PathVariable Integer groupId){
 		
 		String userId = userDetails.getUsername();
-		boolean[] myRoles = userValidationService.getUserRoles(userId, groupId);
+		Boolean[] myRoles = userValidationService.getUserRoles(userId, groupId);
 		return ResponseEntity.ok(new CommonResponse<>(true, "유저 역할 목록 조회에 성공했습니다.", myRoles));
 	}
 	
