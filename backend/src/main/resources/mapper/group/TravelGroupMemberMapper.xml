@@ -34,5 +34,11 @@
     JOIN role r ON gui.role_id = r.role_id
     WHERE gui.group_id = #{groupId}
   </select>
+  
+  <insert id="memberInvite">
+  	INSERT INTO invitation(group_id, sender_id, receiver_id)
+  	VALUES(#{groupId},#{senderId},#{receiverId})
+  	
+  </insert>
 
 </mapper>

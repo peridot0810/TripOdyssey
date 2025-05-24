@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import com.ssafy.pjt.financial.dto.request.MemberInviteRequestDto;
 import com.ssafy.pjt.group.entity.GroupMemberInfo;
 
 @Mapper
@@ -24,4 +25,6 @@ public interface TravelGroupMemberMapper {
 			@Param("roleId") Integer roleId);
 	
 	public List<GroupMemberInfo> selectAllGroupUserInfo(Integer groupId);
+	
+	public void memberInvite(MemberInviteRequestDto memberInviteRequest);
 }
