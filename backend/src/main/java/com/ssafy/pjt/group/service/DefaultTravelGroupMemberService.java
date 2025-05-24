@@ -16,29 +16,46 @@ import com.ssafy.pjt.group.entity.GroupMemberInfo;
 import com.ssafy.pjt.group.mapper.TravelGroupMemberMapper;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DefaultTravelGroupMemberService implements TravelGroupMemberService {
 	
 	private final TravelGroupMemberMapper memberMapper;
 	private final UserValidationService userValidationService;
-
-	// -> deprecated 
+ 
 	@Override
-	public CommonResponse<Void> inviteMember(String inviterId, Integer groupId, String userEmail) {
+	public CommonResponse<Void> insertMember(String inviterId, Integer groupId, String userId) {
+		
+		log.debug("inserMember : inviterId {}, groupId {} ", inviterId, groupId);
 		
 		// 유저 확인
 		if(!userValidationService.isUserInGroup(inviterId, groupId)) {
 			throw new UserNotInGroupException("속하지 않은 그룹의 정보를 요청하였습니다.");
 		}
 		if(userValidationService.isUserRoleValid(inviterId, groupId, MemberRole.NORMAL.getId())) {
-			throw new UnauthorizedRoleAccessException("일반 그룹원은 다른 그룹원을 초대할 수 없습니다.");
+			throw new UnauthorizedRoleAccessException("일반 그룹원은 다른 그룹원을 추가할 수 없습니다.");
 		}
 		
-		memberMapper.insertUserToGroup(groupId, userEmail);
+		memberMapper.insertUserToGroup(groupId, userId);
 		// member not found exception 처리 필요
-		return new CommonResponse<>(true, "사용자를 그룹 멤버로 초대 완료", null);
+		return new CommonResponse<>(true, "사용자를 그룹 멤버로 추가 완료", null);
+	}
+	
+	@Override
+	public CommonResponse<Void> insertMemberExpenseInfo(String inviterId, Integer groupId, String userId) {
+		// 유저 확인
+		if(!userValidationService.isUserInGroup(inviterId, groupId)) {
+			throw new UserNotInGroupException("속하지 않은 그룹의 정보를 요청하였습니다.");
+		}
+		if(userValidationService.isUserRoleValid(inviterId, groupId, MemberRole.NORMAL.getId())) {
+			throw new UnauthorizedRoleAccessException("일반 그룹원은 다른 그룹원을 추가할 수 없습니다.");
+		}
+		
+		memberMapper.insertMemberExpenseInfo(groupId, userId);
+		return null;
 	}
 
 	@Override

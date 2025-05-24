@@ -143,7 +143,7 @@
 	    FROM invitation inv
 	        JOIN travel_group tg USING (group_id)
 	        JOIN user u ON inv.sender_id = u.id
-	    WHERE inv.receiver_id = #{userId}
+	    WHERE inv.receiver_email = #{userEmail}
 	</select>
 	
 	<update id="handleInvitation">
@@ -155,7 +155,7 @@
 					<otherwise>'REJECTED'</otherwise>
 				</choose>,
 			responded_at = NOW()
-		WHERE receiver_id=#{receiverId}
+		WHERE receiver_email=#{receiverEmail}
 			AND group_id = #{groupId}
 	</update>
 	

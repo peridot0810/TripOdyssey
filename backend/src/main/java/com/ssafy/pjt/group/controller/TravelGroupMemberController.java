@@ -43,14 +43,14 @@ public class TravelGroupMemberController {
 //	@Operation(summary = "이메일로 그룹원 초대", description = "함께할 그룹원을 이메일로 초대합니다.")
 //	@ApiResponse(responseCode = "200", description = "그룹원 초대 성공")
 //	@PostMapping("/{groupId}/member")
-	public ResponseEntity<CommonResponse<Void>> inviteMember(
-			@PathVariable Integer groupId,
-			@RequestParam String email, // 이메일로 초대
-			@AuthenticationPrincipal UserDetails userDetails) {
-		String inviterId = userDetails.getUsername();
-		CommonResponse<Void> response = memberService.inviteMember(inviterId, groupId, email);
-		return ResponseEntity.ok(response);
-	}
+//	public ResponseEntity<CommonResponse<Void>> inviteMember(
+//			@PathVariable Integer groupId,
+//			@RequestParam String email, // 이메일로 초대
+//			@AuthenticationPrincipal UserDetails userDetails) {
+//		String inviterId = userDetails.getUsername();
+//		CommonResponse<Void> response = memberService.inviteMember(inviterId, groupId, email);
+//		return ResponseEntity.ok(response);
+//	}
 
 	// 3. 그룹원 강퇴
 	@Operation(summary = "그룹원 강퇴", description = "그룹원을 강퇴합니다.")

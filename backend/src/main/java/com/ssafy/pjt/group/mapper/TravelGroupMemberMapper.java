@@ -14,7 +14,11 @@ public interface TravelGroupMemberMapper {
 	
 	public void insertUserToGroup(
 			@Param("groupId") Integer groupId, 
-			@Param("userEmail") String userEmail);
+			@Param("userId") String userId);
+	
+	public void insertMemberExpenseInfo(
+			@Param("groupId") Integer groupId, 
+			@Param("userId") String userId);
 	
 	public void deleteUserFromGroup(
 			@Param("groupId") Integer groupId, 

@@ -7,9 +7,12 @@
 
 	<insert id="insertUserToGroup">
 	    INSERT INTO group_user_info (group_id, user_id)
-	    SELECT #{groupId}, u.id
-	    FROM user u
-	    WHERE u.email = #{userEmail}
+	    VALUES(#{groupId},#{userId})
+	</insert>
+	
+	<insert id="insertMemberExpenseInfo">
+		INSERT INTO member_expense_info(group_id, user_id)
+		VALUES(#{groupId},#{userId})
 	</insert>
 
 	  <delete id="deleteUserFromGroup">

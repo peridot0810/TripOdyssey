@@ -9,8 +9,9 @@ import lombok.Data;
 public class HandleInvitationRequestDto {
 	
 	@Schema(accessMode=Schema.AccessMode.READ_ONLY)
-	private String receiverId;
+	private String receiverEmail;
 	
+	private String senderId;
 	private Integer groupId;
 	private Boolean accept;
 }
