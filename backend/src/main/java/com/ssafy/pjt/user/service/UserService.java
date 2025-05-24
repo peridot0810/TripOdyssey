@@ -7,6 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.ssafy.pjt.user.dto.request.EditPasswordRequestDto;
 import com.ssafy.pjt.user.dto.request.EditUserInfoRequestDto;
+import com.ssafy.pjt.user.dto.request.HandleInvitationRequestDto;
 import com.ssafy.pjt.user.dto.request.LoginRequestDto;
 import com.ssafy.pjt.user.dto.request.SignUpRequestDto;
 import com.ssafy.pjt.user.dto.response.GroupResponseDto;
@@ -46,4 +47,5 @@ public interface UserService {
 	
 	// 초대 정보 조회
 	public List<InvitationResponseDto> getInvitationInfo(String userId);
+	public void handleInvitation(String userId, HandleInvitationRequestDto request);
 }

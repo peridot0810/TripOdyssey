@@ -146,4 +146,22 @@
 	    WHERE inv.receiver_id = #{userId}
 	</select>
 	
+	<update id="handleInvitation">
+		UPDATE invitation
+		SET
+			status= 
+				<choose>
+					<when test="accept==true">'ACCEPTED'</when>
+					<otherwise>'REJECTED'</otherwise>
+				</choose>,
+			responded_at = NOW()
+		WHERE receiver_id=#{receiverId}
+			AND group_id = #{groupId}
+	</update>
+	
+	
+	
+	
+	
+	
 </mapper>

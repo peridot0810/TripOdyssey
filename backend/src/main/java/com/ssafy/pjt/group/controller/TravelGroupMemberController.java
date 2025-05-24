@@ -94,4 +94,17 @@ public class TravelGroupMemberController {
 		return ResponseEntity.ok(new CommonResponse<>(true, "그룹원 초대에 성공했습니다.", null));
 	}
 	
+	// 6. 초대한 사람 목록 조회
+	@Operation(summary = "초대한 그룹원 목록 조회", description = "초대한 멤버 목록을 조회합니다.")
+	@ApiResponse(responseCode = "200", description = "초대 목록 조회 성공")
+	@GetMapping("/{groupId}/member/invited-list")
+	public ResponseEntity<?> getInvitedList(
+			@AuthenticationPrincipal UserDetails userDetails,
+			@PathVariable Integer groupId){
+		
+		String userId = userDetails.getUsername();
+		List<?> invitedList = memberService.getInvitedMemberList(groupId, userId);
+		return ResponseEntity.ok(new CommonResponse<>(true, "초대 목록 조회에 성공했습니다.", invitedList));
+	}
+	
 }

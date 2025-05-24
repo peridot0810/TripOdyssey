@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import com.ssafy.pjt.financial.dto.request.MemberInviteRequestDto;
+import com.ssafy.pjt.group.dto.response.InvitedMemberResponseDto;
 import com.ssafy.pjt.group.entity.GroupMemberInfo;
 
 @Mapper
@@ -27,4 +28,5 @@ public interface TravelGroupMemberMapper {
 	public List<GroupMemberInfo> selectAllGroupUserInfo(Integer groupId);
 	
 	public void memberInvite(MemberInviteRequestDto memberInviteRequest);
+	public List<InvitedMemberResponseDto> getInvitedMemberList(Integer groupId);
 }

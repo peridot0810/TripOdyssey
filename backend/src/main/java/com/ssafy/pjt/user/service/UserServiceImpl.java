@@ -20,6 +20,7 @@ import com.ssafy.pjt.common.exception.FileUploadIllegalArgumentException;
 import com.ssafy.pjt.user.dto.request.EditPasswordRequestDto;
 import com.ssafy.pjt.user.dto.request.EditUserInfoRequestDto;
 import com.ssafy.pjt.user.dto.request.GetMyRoleInGroupRequestDto;
+import com.ssafy.pjt.user.dto.request.HandleInvitationRequestDto;
 import com.ssafy.pjt.user.dto.request.LoginRequestDto;
 import com.ssafy.pjt.user.dto.request.SignUpRequestDto;
 import com.ssafy.pjt.user.dto.response.GroupProgressResponseDto;
@@ -211,6 +212,22 @@ public class UserServiceImpl implements UserService{
 	public List<InvitationResponseDto> getInvitationInfo(String userId) {
 	
 		return userRepository.getInvitaionInfo(userId);
+	}
+	
+	@Override
+	public void handleInvitation(String userId, HandleInvitationRequestDto request) {
+		request.setReceiverId(userId);
+		userRepository.handleInvitation(request);
+		
+		if(request.getAccept()) {
+			// 초대 수락
+			
+			// group_user_info 추가
+			
+			// member_expense_info 추가
+			
+			
+		}
 	}
 	
 	

@@ -38,7 +38,20 @@
   <insert id="memberInvite">
   	INSERT INTO invitation(group_id, sender_id, receiver_id)
   	VALUES(#{groupId},#{senderId},#{receiverId})
-  	
   </insert>
+  
+  <select id="getInvitedMemberList">
+  	SELECT 
+        inv.id AS invitation_id,
+        inv.receiver_id AS receiver_id,
+        u.nickname AS receiver_nickname,
+        inv.status AS status,
+        inv.created_at AS created_at,
+        inv.responded_at AS responded_at
+    FROM invitation inv
+        JOIN user u ON inv.receiver_id = u.id
+    WHERE inv.group_id = #{groupId}
+  </select>
+  
 
 </mapper>
