@@ -7,30 +7,26 @@
 
     <!-- Bottom: Location Container Component -->
     <div class="location-section">
-      <LocationContainer :location="selectedLocation" />
+      <LocationContainer />
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { useAttractionStore } from '@/stores/attraction'
 import SearchCondition from '@/components/map/SearchCondition.vue'
 import LocationContainer from '@/components/map/LocationContainer.vue'
 
-// State for selected location
-const selectedLocation = ref(null)
+// Store
+const attractionStore = useAttractionStore()
 
 // Handle search from SearchCondition component
 const handleSearch = (searchParams) => {
-  console.log('Search parameters:', searchParams)
+  console.log('Search parameters received in panel:', searchParams)
 
-  // Here you would typically:
-  // 1. Make API call with search parameters
-  // 2. Update map with search results
-  // 3. Reset selected location
-  selectedLocation.value = null
-
-  // Emit search event to parent (map page) if needed
+  // The actual search is now handled by the SearchCondition component
+  // which calls the store directly. We just emit to parent for any
+  // additional coordination (like map updates)
   emit('search', searchParams)
 }
 
@@ -39,13 +35,29 @@ const emit = defineEmits(['search', 'locationSelected'])
 
 // Methods to be called from parent components
 const setSelectedLocation = (location) => {
-  selectedLocation.value = location
+  // Use the store to set selected attraction
+  attractionStore.setSelectedAttraction(location)
   emit('locationSelected', location)
+}
+
+const clearSelection = () => {
+  attractionStore.clearSelectedAttraction()
+}
+
+const getAttractions = () => {
+  return attractionStore.attractions
+}
+
+const getSelectedAttraction = () => {
+  return attractionStore.selectedAttraction
 }
 
 // Expose methods for parent components
 defineExpose({
   setSelectedLocation,
+  clearSelection,
+  getAttractions,
+  getSelectedAttraction
 })
 </script>
 
