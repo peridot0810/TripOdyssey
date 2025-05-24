@@ -12,17 +12,16 @@
 	    WHERE u.email = #{userEmail}
 	</insert>
 
-  <delete id="deleteUserFromGroup">
-    DELETE FROM group_user_info
-    WHERE group_id = #{groupId}
-      AND user_id = #{userId}
-  </delete>
+	  <delete id="deleteUserFromGroup">
+	    DELETE FROM group_user_info
+	    WHERE group_id = #{groupId}
+	      AND user_id = #{userId}
+	  </delete>
 
-	<update id="updateGroupUserRole">
-	  UPDATE group_user_info
-	  SET role_id = #{roleId}
-	  WHERE user_id = #{userId} AND group_id = #{groupId}
-	</update>
+	<insert id="addGroupUserRole">
+		INSERT INTO group_user_info(user_id, group_id, role_id)
+		VALUES(#{userId},#{groupId},#{roleId})
+	</insert>
 
   <select id="selectAllGroupUserInfo" resultType="com.ssafy.pjt.group.entity.GroupMemberInfo">
     SELECT

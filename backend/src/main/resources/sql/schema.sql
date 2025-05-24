@@ -376,8 +376,8 @@ DEFAULT CHARACTER SET = utf8mb3;
 CREATE TABLE IF NOT EXISTS `tripsaga`.`group_user_info` (
   `user_id` VARCHAR(100) NOT NULL,
   `group_id` INT NOT NULL,
-  `role_id` INT UNSIGNED NULL DEFAULT '5',
-  PRIMARY KEY (`user_id`, `group_id`),
+  `role_id` INT UNSIGNED NOT NULL DEFAULT '5',
+  PRIMARY KEY (`user_id`, `group_id`, `role_id`),
   INDEX `group_id` (`group_id` ASC) VISIBLE,
   INDEX `role_id` (`role_id` ASC) VISIBLE,
   CONSTRAINT `group_user_info_ibfk_1`

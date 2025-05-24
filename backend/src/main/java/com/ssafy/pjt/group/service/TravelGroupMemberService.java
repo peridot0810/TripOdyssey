@@ -8,10 +8,10 @@ import com.ssafy.pjt.group.dto.response.InvitedMemberResponseDto;
 import com.ssafy.pjt.group.entity.GroupMemberInfo;
 
 public interface TravelGroupMemberService {
-	public CommonResponse<Void> inviteMember(Integer groupId, String userId);
+	public CommonResponse<Void> inviteMember(String inviterId, Integer groupId, String userId);
 	public CommonResponse<Void> removeMember(String requesterId, Integer groupId, String userId);
 	public CommonResponse<Void> assignMemberRole(String requesterId, Integer groupId, String userId, Integer roleId);
-	public CommonResponse<List<GroupMemberInfo>> getAllMembers(Integer groupId);
+	public CommonResponse<List<GroupMemberInfo>> getAllMembers(String userId, Integer groupId);
 	public CommonResponse<Void> memberInvite(Integer groupId, String userId, MemberInviteRequestDto memberInviteRequest);
 	public List<InvitedMemberResponseDto> getInvitedMemberList(Integer groupId, String userId);
 }

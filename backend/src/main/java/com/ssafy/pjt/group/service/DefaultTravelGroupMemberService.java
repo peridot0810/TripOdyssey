@@ -24,8 +24,18 @@ public class DefaultTravelGroupMemberService implements TravelGroupMemberService
 	private final TravelGroupMemberMapper memberMapper;
 	private final UserValidationService userValidationService;
 
+	// -> deprecated 
 	@Override
-	public CommonResponse<Void> inviteMember(Integer groupId, String userEmail) {
+	public CommonResponse<Void> inviteMember(String inviterId, Integer groupId, String userEmail) {
+		
+		// 유저 확인
+		if(!userValidationService.isUserInGroup(inviterId, groupId)) {
+			throw new UserNotInGroupException("속하지 않은 그룹의 정보를 요청하였습니다.");
+		}
+		if(userValidationService.isUserRoleValid(inviterId, groupId, MemberRole.NORMAL.getId())) {
+			throw new UnauthorizedRoleAccessException("일반 그룹원은 다른 그룹원을 초대할 수 없습니다.");
+		}
+		
 		memberMapper.insertUserToGroup(groupId, userEmail);
 		// member not found exception 처리 필요
 		return new CommonResponse<>(true, "사용자를 그룹 멤버로 초대 완료", null);
@@ -59,12 +69,18 @@ public class DefaultTravelGroupMemberService implements TravelGroupMemberService
 		}
 		
 		// 비즈니스 로직
-		memberMapper.updateGroupUserRole(groupId, userId, roleId);
+		memberMapper.addGroupUserRole(groupId, userId, roleId);
 		return new CommonResponse<>(true, "그룹 멤버 역할 변경 완료", null);
 	}
 
 	@Override
-	public CommonResponse<List<GroupMemberInfo>> getAllMembers(Integer groupId) {
+	public CommonResponse<List<GroupMemberInfo>> getAllMembers(String userId, Integer groupId) {
+		// 유저 확인
+		if(!userValidationService.isUserInGroup(userId, groupId)) {
+			throw new UserNotInGroupException("속하지 않은 그룹의 정보를 요청하였습니다.");
+		}
+		
+		// 비즈니스 로직
 		List<GroupMemberInfo> members = memberMapper.selectAllGroupUserInfo(groupId);
 		return new CommonResponse<>(true, "그룹 멤버 리스트 조회 완료", members);
 	}
