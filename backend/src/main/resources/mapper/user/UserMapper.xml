@@ -129,4 +129,21 @@
 		WHERE id=#{userId}
 	</update>
 	
+	
+	<select id="getInvitationList">
+	    SELECT 
+	        inv.id AS invitation_id,
+	        tg.group_id AS group_id,
+	        tg.name AS groupName,
+	        inv.sender_id AS sender_id,
+	        u.nickname AS sender_nickname,
+	        inv.status AS status,
+	        inv.created_at AS created_at,
+	        inv.responded_at AS responded_at
+	    FROM invitation inv
+	        JOIN travel_group tg USING (group_id)
+	        JOIN user u ON inv.sender_id = u.id
+	    WHERE inv.receiver_id = #{userId}
+	</select>
+	
 </mapper>

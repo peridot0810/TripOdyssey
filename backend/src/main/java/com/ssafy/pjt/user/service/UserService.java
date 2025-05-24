@@ -10,6 +10,7 @@ import com.ssafy.pjt.user.dto.request.EditUserInfoRequestDto;
 import com.ssafy.pjt.user.dto.request.LoginRequestDto;
 import com.ssafy.pjt.user.dto.request.SignUpRequestDto;
 import com.ssafy.pjt.user.dto.response.GroupResponseDto;
+import com.ssafy.pjt.user.dto.response.InvitationResponseDto;
 import com.ssafy.pjt.user.dto.response.LoginResponseDto;
 import com.ssafy.pjt.user.dto.response.SearchUserResponseDto;
 import com.ssafy.pjt.user.dto.response.UserInfoResponseDto;
@@ -43,5 +44,6 @@ public interface UserService {
 	// 프로필 이미지 업로드
 	public String handleProfileImageUpload(String userId, MultipartFile file) throws IOException;
 	
-	
+	// 초대 정보 조회
+	public List<InvitationResponseDto> getInvitationInfo(String userId);
 }
