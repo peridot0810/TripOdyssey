@@ -18,7 +18,9 @@ import com.ssafy.pjt.common.dto.request.PayAmountRequestDto;
 import com.ssafy.pjt.common.dto.response.CommonResponse;
 import com.ssafy.pjt.financial.dto.request.SetFeeRequestDto;
 import com.ssafy.pjt.financial.dto.request.UpdateFeeRequestDto;
+import com.ssafy.pjt.financial.dto.response.MemberExpenseInfoResponseDto;
 import com.ssafy.pjt.financial.dto.response.TotalAmountResponseDto;
+import com.ssafy.pjt.financial.repository.FinancialRepository;
 import com.ssafy.pjt.financial.service.FinancialService;
 import com.ssafy.pjt.user.service.CustomUserDetailService;
 import com.ssafy.pjt.util.JwtUtil;
@@ -41,7 +43,7 @@ public class FinancialController {
 	@PostMapping("/budget")
 	public ResponseEntity<?> setFee(
 			@AuthenticationPrincipal UserDetails userDetails,
-	        @Parameter(description = "그룹 ID", example = "101") @PathVariable Integer groupId,
+	        @Parameter(description = "그룹 ID", example = "1") @PathVariable Integer groupId,
 	        @RequestBody SetFeeRequestDto setFeeRequest) {
 
 		String userId = userDetails.getUsername();
@@ -54,7 +56,7 @@ public class FinancialController {
 	@PutMapping("/budget")
 	public ResponseEntity<?> updateFee(
 			@AuthenticationPrincipal UserDetails userDetails,
-	        @Parameter(description = "그룹 ID", example = "101") @PathVariable Integer groupId,
+	        @Parameter(description = "그룹 ID", example = "1") @PathVariable Integer groupId,
 	        @RequestBody List<UpdateFeeRequestDto> updateFeeRequestList) {
 
 		String userId = userDetails.getUsername();
@@ -67,7 +69,7 @@ public class FinancialController {
 	@PutMapping("/budget/pay")
 	public ResponseEntity<?> payAmount(
 			@AuthenticationPrincipal UserDetails userDetails,
-	        @Parameter(description = "그룹 ID", example = "101") @PathVariable Integer groupId,
+	        @Parameter(description = "그룹 ID", example = "1") @PathVariable Integer groupId,
 	        @RequestBody PayAmountRequestDto payAmountRequest) {
 
 		String userId = userDetails.getUsername();
@@ -80,10 +82,40 @@ public class FinancialController {
 	@GetMapping("/budget")
 	public ResponseEntity<?> getTotalAmount(
 			@AuthenticationPrincipal UserDetails userDetails,
-	        @Parameter(description = "그룹 ID", example = "101") @PathVariable Integer groupId) {
+	        @Parameter(description = "그룹 ID", example = "1") @PathVariable Integer groupId) {
 
 		String userId = userDetails.getUsername();
 		TotalAmountResponseDto totalAmount = financialService.getTotalAmount(userId, groupId);
 		return ResponseEntity.ok(new CommonResponse<>(true, "회비 총합 조회에 성공했습니다.", totalAmount));
 	}
+	
+	
+	
+	@Operation(summary = "그룹원 별 회비/지불 금액 조회", description = "각 그룹원들이 얼마를 내야 하고, 현재까지 얼마를 냈는지 조회합니다.")
+	@ApiResponse(responseCode = "200", description = "그룹원 별 회비/지불 금액 조회 성공")
+	@GetMapping("/member-list")
+	public ResponseEntity<?> getMemberList(
+			@AuthenticationPrincipal UserDetails userDetails,
+			@Parameter(description = "그룹 ID", example = "1") @PathVariable Integer groupId){
+	
+		String userId = userDetails.getUsername();
+		List<MemberExpenseInfoResponseDto> memberExpenseInfo = financialService.getMemberExpenseInfoList(userId, groupId);
+		return ResponseEntity.ok(new CommonResponse<>(true, "멤버별 회비 목록 조회에 성공했습니다.", memberExpenseInfo));
+	}
+	
+	
+	
+	@Operation(summary = "요청한 유저의 회비/지불 금액 조회", description = "요청 유저가 내야할 회비와 현재까지 지불한 회비를 조회합니다.")
+	@ApiResponse(responseCode = "200", description = "회비/지불 금액 조회 성공")
+	@GetMapping("/member")
+	public ResponseEntity<?> getExpenseInfo(
+			@AuthenticationPrincipal UserDetails userDetails,
+			@Parameter(description = "그룹 ID", example = "1") @PathVariable Integer groupId){
+		
+		String userId = userDetails.getUsername();
+		MemberExpenseInfoResponseDto memberExpenseInfo = financialService.getMemberExpenseInfo(userId, groupId);
+		return ResponseEntity.ok(new CommonResponse<>(true, "유저의 회비/지불 금액 조회에 성공했습니다.", memberExpenseInfo));
+	}
+	
+	
 }
