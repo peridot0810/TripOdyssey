@@ -68,21 +68,17 @@ public class DefaultTravelGroupService implements TravelGroupService {
 		int groupId = travelGroup.getGroupId();
 		
 		// 그룹 진척도 데이터 추가
-		
+		travelGroupMapper.insertGroupProgress(groupId);
 		
 		// 인원 제한 설정 
-		
-		
-		
-		// -------------------------
-		
-		
-		
 		// get role limits
 		RoleLimits roleLimits = travelGroupPostRequest.getRoleLimits();
 		
 		saveRoleLimits(groupId, roleLimits, true);
-	    
+		
+		// -------------------------
+		
+		
 	    // 그룹을 생성한 유저를 해당 그룹의 방장으로 설정
 	    GroupUserInfo2 groupUserInfo = GroupUserInfo2.builder()
 	    		.userId(userId)

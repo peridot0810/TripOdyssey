@@ -17,6 +17,11 @@
   	INSERT INTO group_user_info (user_id, group_id, role_id)
   	VALUES(#{userId}, #{groupId}, #{roleId})
   </insert>
+  
+  <insert id="insertGroupProgress">
+  	INSERT INTO group_progress (group_id)
+  	VALUES(#{groupId})
+  </insert>
 
   <!-- Insert Group Role Limit -->
   <insert id="insertGroupRoleLimits">

@@ -19,6 +19,8 @@ public interface TravelGroupMapper {
 
     Integer getRoleIdByRoleName(String roleName);
     
+    void insertGroupProgress(Integer groupId);
+    
     void insertUserRole(GroupUserInfo2 groupUserIndo);
     
     int updateTravelGroup(
