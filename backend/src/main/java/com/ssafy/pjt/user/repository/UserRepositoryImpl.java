@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import com.ssafy.pjt.user.dto.request.EditPasswordRequestDto;
 import com.ssafy.pjt.user.dto.request.EditUserInfoRequestDto;
 import com.ssafy.pjt.user.dto.request.GetMyRoleInGroupRequestDto;
+import com.ssafy.pjt.user.dto.request.HandleInvitationRequestDto;
 import com.ssafy.pjt.user.dto.response.GroupProgressResponseDto;
 import com.ssafy.pjt.user.dto.response.InvitationResponseDto;
 import com.ssafy.pjt.user.dto.response.UserInfoResponseDto;
@@ -111,5 +112,10 @@ public class UserRepositoryImpl implements UserRepository{
 	@Override
 	public List<InvitationResponseDto> getInvitaionInfo(String userId) {
 		return userMapper.getInvitationList(userId);
+	}
+	
+	@Override
+	public void handleInvitation(HandleInvitationRequestDto handleInvitationRequest) {
+		userMapper.handleInvitation(handleInvitationRequest);
 	}
 }
