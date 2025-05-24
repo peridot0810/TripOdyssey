@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ssafy.pjt.common.exception.FileUploadIllegalArgumentException;
+import com.ssafy.pjt.group.service.TravelGroupMemberService;
 import com.ssafy.pjt.user.dto.request.EditPasswordRequestDto;
 import com.ssafy.pjt.user.dto.request.EditUserInfoRequestDto;
 import com.ssafy.pjt.user.dto.request.GetMyRoleInGroupRequestDto;
@@ -47,6 +48,7 @@ public class UserServiceImpl implements UserService{
 
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
+	private final TravelGroupMemberService travelGroupMemberService;
 	
 	private final List<String> allowedExtensions = Arrays.asList(".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp");
 	
@@ -210,23 +212,32 @@ public class UserServiceImpl implements UserService{
 	
 	@Override
 	public List<InvitationResponseDto> getInvitationInfo(String userId) {
-	
-		return userRepository.getInvitaionInfo(userId);
+		
+		String userEmail = this.getUserInfo(userId).getEmail();
+		
+		return userRepository.getInvitaionInfo(userEmail);
 	}
 	
 	@Override
 	public void handleInvitation(String userId, HandleInvitationRequestDto request) {
-		request.setReceiverId(userId);
+		
+		String userEmail = this.getUserInfo(userId).getEmail();
+		
+		request.setReceiverEmail(userEmail);
 		userRepository.handleInvitation(request);
 		
 		if(request.getAccept()) {
 			// 초대 수락
 			
+			// ---------------transaction---------------
+			
 			// group_user_info 추가
+			travelGroupMemberService.insertMember(request.getSenderId(), request.getGroupId(), userId);
 			
 			// member_expense_info 추가
-			
-			
+			travelGroupMemberService.insertMemberExpenseInfo(request.getSenderId(), request.getGroupId(), userId);
+
+			// -----------------------------------------
 		}
 	}
 	

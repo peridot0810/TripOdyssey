@@ -29,6 +29,8 @@ import com.ssafy.pjt.group.dto.response.TravelGroupPostResponse;
 import com.ssafy.pjt.group.service.TravelGroupService;
 import com.ssafy.pjt.util.JwtUtil;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -39,13 +41,13 @@ public class TravelGroupController {
 	private final TravelGroupService travelGroupService;
 	private final UserValidationService userValidationService;
 	
-	private final JwtUtil jwtUtil;
-	
 	@PostMapping
+	@Operation(summary = "여행 그룹 생성", description = "새로운 여행 그룹을 생성합니다.")
+	@ApiResponse(responseCode = "200", description = "여행 그룹 생성 성공")
 	public ResponseEntity<CommonResponse<TravelGroupPostResponse>> createTravelGroup(
-			@RequestHeader("Authorization") String token,
+			@AuthenticationPrincipal UserDetails userDetails,
 			@RequestBody TravelGroupPostRequest travelGroupPostRequest){
-		String userId = jwtUtil.extractUserId(token);
+		String userId = userDetails.getUsername();
 		
 		CommonResponse<TravelGroupPostResponse> responseData = travelGroupService.createTravelGroup(travelGroupPostRequest, userId);
 		
@@ -53,11 +55,13 @@ public class TravelGroupController {
 	}
 	
 	@PutMapping("/{groupId}")
+	@Operation(summary = "여행 그룹 수정", description = "여행 그룹의 정보를 수정합니다. MASTER 권한 필요.")
+	@ApiResponse(responseCode = "200", description = "여행 그룹 수정 성공 또는 권한 오류 반환")
 	public ResponseEntity<CommonResponse<Void>> updateTravelGroup(
 			@RequestBody TravelGroupUpdateRequest updateRequest,
-			@RequestHeader("Authorization") String token,
+			@AuthenticationPrincipal UserDetails userDetails,
 			@PathVariable Integer groupId){
-		String userId = jwtUtil.extractUserId(token);
+		String userId = userDetails.getUsername();
 		
 		boolean isUserMaster = userValidationService.isUserRoleValid(userId, groupId, MemberRole.MASTER.getId());
 		
@@ -70,10 +74,12 @@ public class TravelGroupController {
 	}
 	
 	@GetMapping("/{groupId}")
+	@Operation(summary = "여행 그룹 정보 조회", description = "여행 그룹의 정보를 조회합니다. 그룹원만 접근 가능합니다.")
+	@ApiResponse(responseCode = "200", description = "그룹 정보 조회 성공 또는 권한 오류 반환")
 	public ResponseEntity<?> getTravelGroupInfo(
 			@PathVariable Integer groupId,
-			@RequestHeader("Authorization") String token){
-		String userId = jwtUtil.extractUserId(token);
+			@AuthenticationPrincipal UserDetails userDetails){
+		String userId = userDetails.getUsername();
 		boolean isUserInGroup = userValidationService.isUserInGroup(userId, groupId);
 		if(isUserInGroup) {
 			CommonResponse<TravelGroupInfoResponse> responseData = travelGroupService.getTravelGroupInfo(groupId);
@@ -84,11 +90,12 @@ public class TravelGroupController {
 	}
 	
 	@PostMapping("/{groupId}/upload-group-image")
+	@Operation(summary = "그룹 이미지 업로드", description = "그룹 대표 이미지를 업로드합니다. MASTER 또는 MANAGER만 가능.")
+	@ApiResponse(responseCode = "200", description = "그룹 이미지 업로드 성공 또는 예외 처리 메시지 반환")
 	public ResponseEntity<?> updateGroupImage(
 			@AuthenticationPrincipal UserDetails userDetails,
 			@PathVariable Integer groupId,
-			@RequestParam("file") MultipartFile file
-			){
+			@RequestParam("file") MultipartFile file){
 		
 		String userId = userDetails.getUsername();
 		if(!userValidationService.isUserInGroup(userId, groupId)) {
@@ -103,7 +110,6 @@ public class TravelGroupController {
 		}
 		
 		try {
-			
 			String imageUrl = travelGroupService.uploadImage(groupId, file);
 			return ResponseEntity.ok(new CommonResponse<>(true, "그룹 이미지 업로드에 성공했습니다.", imageUrl));
 			
@@ -111,5 +117,4 @@ public class TravelGroupController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new CommonResponse<>(false, "파일 업로드에 실패했습니다.", null));
 		}
 	}
-	
 }

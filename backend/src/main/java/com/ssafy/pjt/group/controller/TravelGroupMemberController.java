@@ -26,53 +26,56 @@ public class TravelGroupMemberController {
 
 	private final TravelGroupMemberService memberService;
 	private final UserValidationService userValidationService;
-	private final JwtUtil jwtUtil;
 
-	// 1. 그룹원 전체 조회
+	// 1. 그룹원 전체 조회 
+	@Operation(summary = "그룹원 전체 조회", description = "전체 그룹원 목록을 조회합니다.")
+	@ApiResponse(responseCode = "200", description = "그룹원 목록 조회 성공")
 	@GetMapping("/{groupId}/members")
 	public ResponseEntity<CommonResponse<List<GroupMemberInfo>>> getAllGroupMembers(
 			@PathVariable Integer groupId,
-			@RequestHeader("Authorization") String token) {
-		String userId = jwtUtil.extractUserId(token);
-		// (optional) check permission here
-		CommonResponse<List<GroupMemberInfo>> response = memberService.getAllMembers(groupId);
+			@AuthenticationPrincipal UserDetails userDetails) {
+		String userId = userDetails.getUsername();
+		CommonResponse<List<GroupMemberInfo>> response = memberService.getAllMembers(userId, groupId);
 		return ResponseEntity.ok(response);
 	}
 
-	// 2. 그룹원 초대
-	@PostMapping("/{groupId}/member")
-	public ResponseEntity<CommonResponse<Void>> inviteMember(
-			@PathVariable Integer groupId,
-			@RequestParam String email, // 이메일로 초대
-			@RequestHeader("Authorization") String token) {
-		String inviterId = jwtUtil.extractUserId(token);
-		// (optional) check inviter permission
-		CommonResponse<Void> response = memberService.inviteMember(groupId, email);
-		return ResponseEntity.ok(response);
-	}
+	// 2. 그룹원 초대 -> deprecated
+//	@Operation(summary = "이메일로 그룹원 초대", description = "함께할 그룹원을 이메일로 초대합니다.")
+//	@ApiResponse(responseCode = "200", description = "그룹원 초대 성공")
+//	@PostMapping("/{groupId}/member")
+//	public ResponseEntity<CommonResponse<Void>> inviteMember(
+//			@PathVariable Integer groupId,
+//			@RequestParam String email, // 이메일로 초대
+//			@AuthenticationPrincipal UserDetails userDetails) {
+//		String inviterId = userDetails.getUsername();
+//		CommonResponse<Void> response = memberService.inviteMember(inviterId, groupId, email);
+//		return ResponseEntity.ok(response);
+//	}
 
 	// 3. 그룹원 강퇴
+	@Operation(summary = "그룹원 강퇴", description = "그룹원을 강퇴합니다.")
+	@ApiResponse(responseCode = "200", description = "그룹원 강퇴 성공")
 	@DeleteMapping("/{groupId}/member/{userId}")
 	public ResponseEntity<CommonResponse<Void>> removeMember(
 			@PathVariable Integer groupId,
 			@PathVariable String userId,
-			@RequestHeader("Authorization") String token) {
-		String requesterId = jwtUtil.extractUserId(token);
-		// (optional) check permission
-		CommonResponse<Void> response = memberService.removeMember(groupId, userId);
+			@AuthenticationPrincipal UserDetails userDetails) {
+		String requesterId = userDetails.getUsername();
+		CommonResponse<Void> response = memberService.removeMember(requesterId, groupId, userId);
 		return ResponseEntity.ok(response);
 	}
 
 	// 4. 역할 임명
+	@Operation(summary = "그룹원 역할 임명", description = "그룹원의 역할을 임명합니다.")
+	@ApiResponse(responseCode = "200", description = "그룹원 역할 임명 성공")
 	@PostMapping("/{groupId}/member/{userId}/role")
 	public ResponseEntity<CommonResponse<Void>> assignMemberRole(
 			@PathVariable Integer groupId,
 			@PathVariable String userId,
 			@RequestParam Integer roleId,
-			@RequestHeader("Authorization") String token) {
-		String requesterId = jwtUtil.extractUserId(token);
-		// (optional) check permission
-		CommonResponse<Void> response = memberService.assignMemberRole(groupId, userId, roleId);
+			@AuthenticationPrincipal UserDetails userDetails) {
+		String requesterId = userDetails.getUsername();
+		CommonResponse<Void> response = memberService.assignMemberRole(requesterId, groupId, userId, roleId);
 		return ResponseEntity.ok(response);
 	}
 	
@@ -86,11 +89,6 @@ public class TravelGroupMemberController {
 			@RequestBody MemberInviteRequestDto memberInviteRequest){
 		
 		String userId = userDetails.getUsername();
-		
-		// 본인을 초대할 수는 없음
-		if(userId.equals(memberInviteRequest.getReceiverId())) {
-			return ResponseEntity.badRequest().body(new CommonResponse<>(false, "자기 자신을 초대할 수는 없습니다.", null));
-		}
 		
 		memberService.memberInvite(groupId, userId, memberInviteRequest);
 		return ResponseEntity.ok(new CommonResponse<>(true, "그룹원 초대에 성공했습니다.", null));
@@ -118,7 +116,7 @@ public class TravelGroupMemberController {
 			@PathVariable Integer groupId){
 		
 		String userId = userDetails.getUsername();
-		boolean[] myRoles = userValidationService.getUserRoles(userId, groupId);
+		Boolean[] myRoles = userValidationService.getUserRoles(userId, groupId);
 		return ResponseEntity.ok(new CommonResponse<>(true, "유저 역할 목록 조회에 성공했습니다.", myRoles));
 	}
 	

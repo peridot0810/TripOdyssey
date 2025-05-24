@@ -7,49 +7,50 @@
 
 	<insert id="insertUserToGroup">
 	    INSERT INTO group_user_info (group_id, user_id)
-	    SELECT #{groupId}, u.id
-	    FROM user u
-	    WHERE u.email = #{userEmail}
+	    VALUES(#{groupId},#{userId})
+	</insert>
+	
+	<insert id="insertMemberExpenseInfo">
+		INSERT INTO member_expense_info(group_id, user_id)
+		VALUES(#{groupId},#{userId})
 	</insert>
 
-  <delete id="deleteUserFromGroup">
-    DELETE FROM group_user_info
-    WHERE group_id = #{groupId}
-      AND user_id = #{userId}
-  </delete>
+	  <delete id="deleteUserFromGroup">
+	    DELETE FROM group_user_info
+	    WHERE group_id = #{groupId}
+	      AND user_id = #{userId}
+	  </delete>
 
-	<update id="updateGroupUserRole">
-	  UPDATE group_user_info
-	  SET role_id = #{roleId}
-	  WHERE user_id = #{userId} AND group_id = #{groupId}
-	</update>
+	<insert id="addGroupUserRole">
+		INSERT INTO group_user_info(user_id, group_id, role_id)
+		VALUES(#{userId},#{groupId},#{roleId})
+	</insert>
 
   <select id="selectAllGroupUserInfo" resultType="com.ssafy.pjt.group.entity.GroupMemberInfo">
     SELECT
-      gui.user_id AS userId,
-      u.nickname AS nickName,
-      r.name AS roleName
-    FROM group_user_info gui
-    JOIN user u ON gui.user_id = u.id
-    JOIN role r ON gui.role_id = r.role_id
-    WHERE gui.group_id = #{groupId}
+	  gui.user_id AS userId,
+	  u.nickname AS nickName
+	FROM group_user_info gui
+		JOIN user u ON gui.user_id = u.id
+	WHERE gui.group_id = #{groupId}
+	GROUP BY userId
   </select>
   
   <insert id="memberInvite">
-  	INSERT INTO invitation(group_id, sender_id, receiver_id)
-  	VALUES(#{groupId},#{senderId},#{receiverId})
+  	INSERT INTO invitation(group_id, sender_id, receiver_email)
+  	VALUES(#{groupId},#{senderId},#{receiverEmail})
   </insert>
   
   <select id="getInvitedMemberList">
   	SELECT 
         inv.id AS invitation_id,
-        inv.receiver_id AS receiver_id,
+        inv.receiver_email AS receiver_email,
         u.nickname AS receiver_nickname,
         inv.status AS status,
         inv.created_at AS created_at,
         inv.responded_at AS responded_at
     FROM invitation inv
-        JOIN user u ON inv.receiver_id = u.id
+        JOIN user u ON inv.receiver_email = u.email
     WHERE inv.group_id = #{groupId}
   </select>
   

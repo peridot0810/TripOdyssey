@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 public class GroupMemberInfo {
 	private String userId;
 	private String nickName;
-	private String roleName;
+	private Boolean[] roles;
 }
