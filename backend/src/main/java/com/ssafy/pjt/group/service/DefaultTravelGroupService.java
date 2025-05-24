@@ -67,10 +67,8 @@ public class DefaultTravelGroupService implements TravelGroupService {
 		// 이제 그룹 아이디가 생성됨
 		int groupId = travelGroup.getGroupId();
 		
-		// member_expense_info에 데이터 추가 
-		
-		
 		// 그룹 진척도 데이터 추가
+		
 		
 		// 인원 제한 설정 
 		

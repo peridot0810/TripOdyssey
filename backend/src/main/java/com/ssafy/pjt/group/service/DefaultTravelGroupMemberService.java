@@ -16,36 +16,94 @@ import com.ssafy.pjt.group.entity.GroupMemberInfo;
 import com.ssafy.pjt.group.mapper.TravelGroupMemberMapper;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DefaultTravelGroupMemberService implements TravelGroupMemberService {
 	
 	private final TravelGroupMemberMapper memberMapper;
 	private final UserValidationService userValidationService;
-
+ 
 	@Override
-	public CommonResponse<Void> inviteMember(Integer groupId, String userEmail) {
-		memberMapper.insertUserToGroup(groupId, userEmail);
+	public CommonResponse<Void> insertMember(String inviterId, Integer groupId, String userId) {
+		
+		log.debug("inserMember : inviterId {}, groupId {} ", inviterId, groupId);
+		
+		// 유저 확인
+		if(!userValidationService.isUserInGroup(inviterId, groupId)) {
+			throw new UserNotInGroupException("속하지 않은 그룹의 정보를 요청하였습니다.");
+		}
+		if(userValidationService.isUserRoleValid(inviterId, groupId, MemberRole.NORMAL.getId())) {
+			throw new UnauthorizedRoleAccessException("일반 그룹원은 다른 그룹원을 추가할 수 없습니다.");
+		}
+		
+		memberMapper.insertUserToGroup(groupId, userId);
 		// member not found exception 처리 필요
-		return new CommonResponse<>(true, "사용자를 그룹 멤버로 초대 완료", null);
+		return new CommonResponse<>(true, "사용자를 그룹 멤버로 추가 완료", null);
+	}
+	
+	@Override
+	public CommonResponse<Void> insertMemberExpenseInfo(String inviterId, Integer groupId, String userId) {
+		// 유저 확인
+		if(!userValidationService.isUserInGroup(inviterId, groupId)) {
+			throw new UserNotInGroupException("속하지 않은 그룹의 정보를 요청하였습니다.");
+		}
+		if(userValidationService.isUserRoleValid(inviterId, groupId, MemberRole.NORMAL.getId())) {
+			throw new UnauthorizedRoleAccessException("일반 그룹원은 다른 그룹원을 추가할 수 없습니다.");
+		}
+		
+		memberMapper.insertMemberExpenseInfo(groupId, userId);
+		return null;
 	}
 
 	@Override
-	public CommonResponse<Void> removeMember(Integer groupId, String userId) {
+	public CommonResponse<Void> removeMember(String requesterId, Integer groupId, String userId) {
+		
+		// 유저 확인
+		if(!userValidationService.isUserInGroup(requesterId, groupId)) {
+			throw new UserNotInGroupException("속하지 않은 그룹의 정보를 요청하였습니다.");
+		}
+		if(!userValidationService.isUserRoleValid(requesterId, groupId, MemberRole.MASTER.getId())) {
+			throw new UnauthorizedRoleAccessException("멤버 강퇴는 방장만 요청 가능합니다.");
+		}
+		
+		// 비즈니스 로직 
 		memberMapper.deleteUserFromGroup(groupId, userId);
 		return new CommonResponse<>(true, "그룹에서 멤버를 제거 완료", null);
 	}
 
 	@Override
-	public CommonResponse<Void> assignMemberRole(Integer groupId, String userId, Integer roleId) {
-		memberMapper.updateGroupUserRole(groupId, userId, roleId);
+	public CommonResponse<Void> assignMemberRole(String requesterId, Integer groupId, String userId, Integer roleId) {
+		
+		// 유저 확인
+		if(!userValidationService.isUserInGroup(requesterId, groupId)) {
+			throw new UserNotInGroupException("속하지 않은 그룹의 정보를 요청하였습니다.");
+		}
+		if(!userValidationService.isUserRoleValid(requesterId, groupId, MemberRole.MASTER.getId())) {
+			throw new UnauthorizedRoleAccessException("멤버 역할 임명은 방장만 요청 가능합니다.");
+		}
+		
+		// 비즈니스 로직
+		memberMapper.addGroupUserRole(groupId, userId, roleId);
 		return new CommonResponse<>(true, "그룹 멤버 역할 변경 완료", null);
 	}
 
 	@Override
-	public CommonResponse<List<GroupMemberInfo>> getAllMembers(Integer groupId) {
+	public CommonResponse<List<GroupMemberInfo>> getAllMembers(String userId, Integer groupId) {
+		// 유저 확인
+		if(!userValidationService.isUserInGroup(userId, groupId)) {
+			throw new UserNotInGroupException("속하지 않은 그룹의 정보를 요청하였습니다.");
+		}
+		
+		// 비즈니스 로직
 		List<GroupMemberInfo> members = memberMapper.selectAllGroupUserInfo(groupId);
+		
+		for(GroupMemberInfo member :members) {
+			member.setRoles(userValidationService.getUserRoles(member.getUserId(), groupId));
+		}
+		
 		return new CommonResponse<>(true, "그룹 멤버 리스트 조회 완료", members);
 	}
 	

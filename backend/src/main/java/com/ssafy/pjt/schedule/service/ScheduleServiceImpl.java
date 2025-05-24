@@ -21,7 +21,9 @@ import com.ssafy.pjt.schedule.dto.response.GetScheduleResponseDto;
 import com.ssafy.pjt.schedule.repository.ScheduleRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ScheduleServiceImpl implements ScheduleService{
@@ -175,10 +177,21 @@ public class ScheduleServiceImpl implements ScheduleService{
 		}
 		
 		// 비즈니스 로직
-		scheduleRepository.UpdateScheduleRemoved(updateScheduleRequest.getRemovedOfficialSchedules());
-		scheduleRepository.updateScheduleModified(updateScheduleRequest.getModifiedOfficialSchedules());
-		scheduleRepository.updateScheduleNew(updateScheduleRequest.getNewOfficialSchedules());
+		log.debug("removedOfficialSchedules :{}",updateScheduleRequest.getRemovedOfficialSchedules());
+		if(updateScheduleRequest.getRemovedOfficialSchedules() != null) {
+			scheduleRepository.UpdateScheduleRemoved(updateScheduleRequest.getRemovedOfficialSchedules());
+		}
 		
+		log.debug("modifiedOfficialSchedules :{}",updateScheduleRequest.getModifiedOfficialSchedules());
+		if(updateScheduleRequest.getModifiedOfficialSchedules() != null) {
+			scheduleRepository.updateScheduleModified(updateScheduleRequest.getModifiedOfficialSchedules());
+		}
+		
+		
+		log.debug("newOfficialSchedules :{}",updateScheduleRequest.getNewOfficialSchedules());
+		if(updateScheduleRequest.getNewOfficialSchedules() != null) {
+			scheduleRepository.updateScheduleNew(updateScheduleRequest.getNewOfficialSchedules());
+		}
 	}
 	
 }

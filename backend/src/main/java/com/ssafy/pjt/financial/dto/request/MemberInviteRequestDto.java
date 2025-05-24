@@ -17,5 +17,5 @@ public class MemberInviteRequestDto {
 	private String senderId;
 	
 	
-	private String receiverId;
+	private String receiverEmail;
 }
