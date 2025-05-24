@@ -36,7 +36,7 @@ public class ExpenseRepositoryImpl implements ExpenseRepository{
 	}
 	
 	@Override
-	public Integer getUserRole(UserGroupRequestDto userRoleRequest) {
+	public List<Integer> getUserRole(UserGroupRequestDto userRoleRequest) {
 		return commonMapper.getUserRoleInGroup(userRoleRequest);
 	}
 	

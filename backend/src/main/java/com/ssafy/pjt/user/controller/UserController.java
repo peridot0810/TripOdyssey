@@ -129,7 +129,6 @@ public class UserController {
 		
 		List<GroupResponseDto> myGroupList = userService.getGroupList(myId);
 		return ResponseEntity.ok(myGroupList);
-				
 	}
 	
 	
