@@ -33,22 +33,48 @@
 
         <span class="text-caption text-grey">{{ location.userId }}</span>
 
-        <div class="d-flex align-center">
-          <span class="heart-icon mr-1">❤</span>
+        <v-btn
+          size="small"
+          :color="location.userLiked ? 'red' : 'pink'"
+          variant="elevated"
+          class="like-button"
+          @click="handleLikeClick"
+          :loading="isLiking"
+        >
+          <v-icon size="small" class="mr-1">
+            {{ location.userLiked ? 'mdi-heart' : 'mdi-heart-outline' }}
+          </v-icon>
           <span class="text-caption">{{ location.likes || 0 }}</span>
-        </div>
+        </v-btn>
       </v-card-text>
     </v-card-item>
   </v-card>
 </template>
 
 <script setup>
-defineProps({
+import { ref } from 'vue'
+
+const props = defineProps({
   location: {
     type: Object,
     required: true
   }
-});
+})
+
+const emit = defineEmits(['toggle-like'])
+
+const isLiking = ref(false)
+
+const handleLikeClick = async () => {
+  if (isLiking.value) return
+
+  isLiking.value = true
+  try {
+    await emit('toggle-like', props.location.proposalId)
+  } finally {
+    isLiking.value = false
+  }
+}
 </script>
 
 <style scoped>
@@ -70,14 +96,24 @@ defineProps({
   overflow: hidden;
 }
 
-.heart-icon {
-  color: #FF0000;
-  font-size: 14px;
-}
-
 .no-image-placeholder {
   height: 180px;
   background-color: #f5f5f5;
   border-bottom: 1px solid #e0e0e0;
+}
+
+.like-button {
+  min-width: auto !important;
+  padding: 4px 12px !important;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.like-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+}
+
+.like-button .v-btn__content {
+  gap: 4px;
 }
 </style>

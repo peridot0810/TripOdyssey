@@ -20,7 +20,7 @@ public class WebConfig {
         	// ✅ 1. CORS 설정
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/ai/**") // or "/**" for all endpoints
+                registry.addMapping("/**") // or "/**" for all endpoints
                         .allowedOrigins("http://localhost:5173")
                         .allowedMethods("GET", "POST", "PUT", "DELETE")
                         .allowedHeaders("*")

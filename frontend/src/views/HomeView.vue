@@ -2,42 +2,78 @@
   <div class="home-container">
     <h1 class="page-title">My Groups</h1>
 
-    <!-- Group Cards Carousel -->
-    <div class="group-carousel-container">
-      <div class="carousel-wrapper">
-        <!-- Left Arrow -->
-        <v-btn
-          icon
-          variant="text"
-          class="carousel-arrow left-arrow"
-          @click="scrollLeft"
-          :disabled="currentIndex === 0"
-        >
-          <v-icon>mdi-chevron-left</v-icon>
-        </v-btn>
+    <!-- Loading State -->
+    <div v-if="groupStore.isLoading" class="loading-container">
+      <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
+      <p class="text-h6 mt-4">그룹 목록을 불러오는 중...</p>
+    </div>
 
-        <!-- Group Cards Container -->
-        <div class="group-cards-container" ref="carouselContainer">
-          <div
-            class="group-cards-track"
-            :style="{ transform: `translateX(-${currentIndex * cardWidth}px)` }"
+    <!-- Error State -->
+    <v-alert
+      v-else-if="groupStore.error"
+      type="error"
+      class="mb-6"
+      closable
+      @click:close="groupStore.clearError()"
+    >
+      {{ groupStore.error }}
+      <template #append>
+        <v-btn
+          variant="text"
+          size="small"
+          @click="loadGroups"
+        >
+          다시 시도
+        </v-btn>
+      </template>
+    </v-alert>
+
+    <!-- Groups Content -->
+    <div v-else>
+      <!-- Empty State -->
+      <div v-if="groupStore.groupCount === 0" class="empty-state">
+        <v-icon size="80" color="grey-lighten-2">mdi-account-group-outline</v-icon>
+        <h2 class="text-h5 mt-4 mb-2">아직 참여한 그룹이 없습니다</h2>
+        <p class="text-body-1 text-grey mb-6">새로운 그룹을 만들어 여행을 계획해보세요!</p>
+      </div>
+
+      <!-- Group Cards Carousel -->
+      <div v-else class="group-carousel-container">
+        <div class="carousel-wrapper">
+          <!-- Left Arrow -->
+          <v-btn
+            icon
+            variant="text"
+            class="carousel-arrow left-arrow"
+            @click="scrollLeft"
+            :disabled="currentIndex === 0"
           >
-            <div v-for="group in groups" :key="group.groupId" class="group-card-slot">
-              <GroupInfoCard :group="group" />
+            <v-icon>mdi-chevron-left</v-icon>
+          </v-btn>
+
+          <!-- Group Cards Container -->
+          <div class="group-cards-container" ref="carouselContainer">
+            <div
+              class="group-cards-track"
+              :style="{ transform: `translateX(-${currentIndex * cardWidth}px)` }"
+            >
+              <div v-for="group in groupStore.groups" :key="group.groupId" class="group-card-slot">
+                <GroupInfoCard :group="group" />
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Right Arrow -->
-        <v-btn
-          icon
-          variant="text"
-          class="carousel-arrow right-arrow"
-          @click="scrollRight"
-          :disabled="currentIndex >= maxIndex"
-        >
-          <v-icon>mdi-chevron-right</v-icon>
-        </v-btn>
+          <!-- Right Arrow -->
+          <v-btn
+            icon
+            variant="text"
+            class="carousel-arrow right-arrow"
+            @click="scrollRight"
+            :disabled="currentIndex >= maxIndex"
+          >
+            <v-icon>mdi-chevron-right</v-icon>
+          </v-btn>
+        </div>
       </div>
     </div>
 
@@ -62,11 +98,12 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { groupData } from '@/data/group/groupData'
+import { useGroupListStore } from '@/stores/groupList'
 import GroupInfoCard from '@/components/group/GroupInfoCard.vue'
 import CreateGroupDialog from '@/components/group/CreateGroupDialog.vue'
 
-const groups = ref([...groupData])
+const groupStore = useGroupListStore()
+
 const currentIndex = ref(0)
 const cardWidth = ref(380) // Width of each card + gap
 const carouselContainer = ref(null)
@@ -75,8 +112,16 @@ const showCreateDialog = ref(false)
 // Calculate maximum index for navigation
 const maxIndex = computed(() => {
   const visibleCards = Math.floor(window.innerWidth / cardWidth.value) || 3
-  return Math.max(0, groups.value.length - visibleCards)
+  return Math.max(0, groupStore.groupCount - visibleCards)
 })
+
+// Load groups from store
+const loadGroups = async () => {
+  const result = await groupStore.getUserGroupList()
+  if (!result.success) {
+    console.error('Failed to load groups:', result.error)
+  }
+}
 
 const scrollLeft = () => {
   if (currentIndex.value > 0) {
@@ -95,7 +140,7 @@ const openCreateGroupDialog = () => {
 }
 
 const handleGroupCreated = (newGroup) => {
-  groups.value.push(newGroup)
+  groupStore.addGroup(newGroup)
   showCreateDialog.value = false
 }
 
@@ -107,8 +152,10 @@ const handleResize = () => {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
   window.addEventListener('resize', handleResize)
+  // Load groups when component mounts
+  await loadGroups()
 })
 
 onUnmounted(() => {
@@ -132,6 +179,23 @@ onUnmounted(() => {
   font-weight: 600;
   margin-bottom: 48px;
   color: #333;
+  text-align: center;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 32px;
   text-align: center;
 }
 
@@ -221,6 +285,14 @@ onUnmounted(() => {
 
   .group-cards-track {
     gap: 16px;
+  }
+
+  .empty-state {
+    padding: 32px 16px;
+  }
+
+  .loading-container {
+    padding: 32px;
   }
 }
 </style>

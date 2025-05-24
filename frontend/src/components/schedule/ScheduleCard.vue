@@ -1,5 +1,18 @@
 <template>
   <v-card class="schedule-card" elevation="2">
+    <!-- Remove Button (top-right corner) -->
+    <v-btn
+      icon
+      size="x-small"
+      color="error"
+      variant="text"
+      class="remove-button"
+      @click="handleRemove"
+      :title="'일정 삭제'"
+    >
+      <v-icon size="small">mdi-close</v-icon>
+    </v-btn>
+
     <div class="card-content">
       <!-- Left side: Location Card -->
       <div class="location-section">
@@ -23,13 +36,28 @@
 
 <script setup>
 import LocationCard from './LocationCard.vue'
+import { useScheduleStore } from '@/stores/schedule'
 
-defineProps({
+const props = defineProps({
   schedule: {
     type: Object,
     required: true,
   },
 })
+
+const scheduleStore = useScheduleStore()
+
+const handleRemove = () => {
+  console.log('Removing schedule:', props.schedule.name)
+
+  const success = scheduleStore.deleteSchedule(props.schedule.contentId)
+
+  if (success) {
+    console.log(`Schedule "${props.schedule.name}" successfully removed!`)
+  } else {
+    console.error('Failed to remove schedule')
+  }
+}
 </script>
 
 <style scoped>
@@ -39,11 +67,30 @@ defineProps({
   transition:
     transform 0.2s,
     box-shadow 0.2s;
+  position: relative;
 }
 
 .schedule-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12) !important;
+}
+
+.schedule-card:hover .remove-button {
+  opacity: 1;
+}
+
+.remove-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.2s;
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+.remove-button:hover {
+  background-color: rgba(244, 67, 54, 0.1);
 }
 
 .card-content {

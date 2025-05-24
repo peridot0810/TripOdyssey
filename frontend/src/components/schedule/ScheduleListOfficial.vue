@@ -5,93 +5,200 @@
       확정된 일정
     </h2>
 
-    <!-- Day Selection Tabs -->
-    <div class="day-selector mb-4">
-      <v-chip-group v-model="selectedDay" active-class="primary" mandatory class="day-chips">
-        <v-chip
-          v-for="day in availableDays"
-          :key="day"
-          :value="day"
-          variant="outlined"
-          size="large"
-          class="day-chip"
+    <!-- Error Alert -->
+    <v-alert
+      v-if="scheduleStore.error || groupStore.error"
+      type="error"
+      class="mb-4"
+      closable
+      @click:close="clearErrors"
+    >
+      {{ scheduleStore.error || groupStore.error }}
+    </v-alert>
+
+    <!-- Loading State -->
+    <div v-if="scheduleStore.isLoading || groupStore.isLoading" class="loading-state text-center py-8">
+      <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
+      <p class="text-body-1 mt-3">일정을 불러오는 중...</p>
+    </div>
+
+    <!-- Day Selection Tabs (always show based on trip duration) -->
+    <div v-else-if="availableDays.length > 0">
+      <div class="day-selector mb-4">
+        <v-chip-group v-model="selectedDay" active-class="primary" mandatory class="day-chips">
+          <v-chip
+            v-for="day in availableDays"
+            :key="day"
+            :value="day"
+            variant="outlined"
+            size="large"
+            class="day-chip"
+          >
+            <v-icon start>mdi-calendar-today</v-icon>
+            {{ day }}일차
+          </v-chip>
+        </v-chip-group>
+      </div>
+
+      <!-- Schedule Cards for Selected Day -->
+      <div v-if="filteredSchedules.length === 0" class="empty-state text-center py-8">
+        <v-icon size="x-large" color="grey">mdi-calendar-blank</v-icon>
+        <p class="text-body-1 text-grey-darken-1 mt-3">{{ selectedDay }}일차 일정이 없습니다</p>
+        <p class="text-caption text-grey mt-2">일정 후보에서 일정을 추가해보세요</p>
+      </div>
+
+      <div v-else class="schedule-cards">
+        <div class="day-header mb-3">
+          <v-divider></v-divider>
+          <v-chip color="primary" variant="elevated" class="day-title-chip">
+            <v-icon start>mdi-calendar-star</v-icon>
+            {{ selectedDay }}일차 일정
+          </v-chip>
+          <v-divider></v-divider>
+        </div>
+
+        <div class="drag-info-hint mb-3">
+          <v-alert type="info" variant="tonal" density="compact" class="text-caption">
+            <v-icon start>mdi-drag</v-icon>
+            카드를 드래그하여 순서를 변경할 수 있습니다
+          </v-alert>
+        </div>
+
+        <div
+          v-for="(schedule, index) in filteredSchedules"
+          :key="schedule.contentId"
+          :draggable="true"
+          @dragstart="onDragStart($event, index)"
+          @dragover="onDragOver($event)"
+          @drop="onDrop($event, index)"
+          @dragend="onDragEnd"
+          class="draggable-schedule-card"
+          :class="{ dragging: draggedIndex === index, 'drag-over': dragOverIndex === index }"
         >
-          <v-icon start>mdi-calendar-today</v-icon>
-          {{ day }}일차
-        </v-chip>
-      </v-chip-group>
+          <ScheduleCard :schedule="schedule" class="schedule-card-with-order">
+            <template #order>
+              <div class="order-badge">
+                <v-chip size="small" color="secondary" variant="elevated">
+                  {{ index + 1 }}
+                  <v-icon end size="small">mdi-drag-vertical</v-icon>
+                </v-chip>
+              </div>
+            </template>
+          </ScheduleCard>
+        </div>
+      </div>
+
+      <!-- Save Changes Button -->
+      <div class="save-section mt-6">
+        <v-divider class="mb-4"></v-divider>
+        <div class="d-flex justify-center">
+          <v-btn
+            color="primary"
+            size="large"
+            variant="elevated"
+            :loading="isSaving"
+            :disabled="!hasChangesToSave"
+            @click="saveChangesToServer"
+            class="save-button"
+          >
+            <v-icon start>mdi-content-save</v-icon>
+            변경사항 저장 ({{ totalChanges }}개)
+          </v-btn>
+        </div>
+
+        <!-- Changes Summary -->
+        <div v-if="hasChangesToSave" class="changes-summary mt-3 text-center">
+          <v-chip
+            v-if="scheduleStore.newOfficialSchedules.length > 0"
+            size="small"
+            color="success"
+            variant="flat"
+            class="ma-1"
+          >
+            신규 확정: {{ scheduleStore.newOfficialSchedules.length }}개
+          </v-chip>
+          <v-chip
+            v-if="scheduleStore.modifiedOfficialSchedules.length > 0"
+            size="small"
+            color="warning"
+            variant="flat"
+            class="ma-1"
+          >
+            순서 변경: {{ scheduleStore.modifiedOfficialSchedules.length }}개
+          </v-chip>
+          <v-chip
+            v-if="scheduleStore.removedOfficialSchedules.length > 0"
+            size="small"
+            color="error"
+            variant="flat"
+            class="ma-1"
+          >
+            삭제: {{ scheduleStore.removedOfficialSchedules.length }}개
+          </v-chip>
+        </div>
+      </div>
     </div>
 
-    <!-- Schedule Cards for Selected Day -->
-    <div v-if="filteredSchedules.length === 0" class="empty-state text-center py-8">
-      <v-icon size="x-large" color="grey">mdi-calendar-blank</v-icon>
-      <p class="text-body-1 text-grey-darken-1 mt-3">{{ selectedDay }}일차 일정이 없습니다</p>
-    </div>
-
-    <div v-else class="schedule-cards">
-      <div class="day-header mb-3">
-        <v-divider></v-divider>
-        <v-chip color="primary" variant="elevated" class="day-title-chip">
-          <v-icon start>mdi-calendar-star</v-icon>
-          {{ selectedDay }}일차 일정
-        </v-chip>
-        <v-divider></v-divider>
-      </div>
-
-      <div class="drag-info-hint mb-3">
-        <v-alert type="info" variant="tonal" density="compact" class="text-caption">
-          <v-icon start>mdi-drag</v-icon>
-          카드를 드래그하여 순서를 변경할 수 있습니다
-        </v-alert>
-      </div>
-
-      <div
-        v-for="(schedule, index) in filteredSchedules"
-        :key="schedule.contentId"
-        :draggable="true"
-        @dragstart="onDragStart($event, index)"
-        @dragover="onDragOver($event)"
-        @drop="onDrop($event, index)"
-        @dragend="onDragEnd"
-        class="draggable-schedule-card"
-        :class="{ dragging: draggedIndex === index, 'drag-over': dragOverIndex === index }"
-      >
-        <ScheduleCard :schedule="schedule" class="schedule-card-with-order">
-          <template #order>
-            <div class="order-badge">
-              <v-chip size="small" color="secondary" variant="elevated">
-                {{ index + 1 }}
-                <v-icon end size="small">mdi-drag-vertical</v-icon>
-              </v-chip>
-            </div>
-          </template>
-        </ScheduleCard>
-      </div>
+    <!-- No Group Info State -->
+    <div v-else class="empty-state text-center py-8">
+      <v-icon size="x-large" color="grey">mdi-alert-circle</v-icon>
+      <p class="text-body-1 text-grey-darken-1 mt-3">그룹 정보를 불러올 수 없습니다</p>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import ScheduleCard from './ScheduleCard.vue'
-import { dummyScheduleData } from '@/data/schedule/dummyScheduleData.js'
+import { useScheduleStore } from '@/stores/schedule'
+import { useGroupStore } from '@/stores/group'
+import { apiClient } from '@/utils/apiClient'
 
-const schedules = ref([...dummyScheduleData]) // Create a copy for manipulation
-const selectedDay = ref(1)
+const route = useRoute()
+const scheduleStore = useScheduleStore()
+const groupStore = useGroupStore()
+
+// Get groupId from route params
+const groupId = route.params.groupId
+
 const draggedIndex = ref(null)
 const dragOverIndex = ref(null)
+const isSaving = ref(false)
 
-// Get all available days from the schedule data
+// Use selectedDay from store instead of local state
+const selectedDay = computed({
+  get: () => scheduleStore.selectedDay,
+  set: (value) => scheduleStore.setSelectedDay(value)
+})
+
+// Get only official schedules
+const officialSchedules = computed(() => {
+  return scheduleStore.getOfficialSchedules()
+})
+
+// Calculate available days based on group start and end dates
 const availableDays = computed(() => {
-  const days = [...new Set(schedules.value.map((schedule) => schedule.day))]
-  return days.sort((a, b) => a - b)
+  if (!groupStore.myGroup.startDate || !groupStore.myGroup.endDate) {
+    return [1] // Default to at least 1 day if dates are not available
+  }
+
+  const startDate = new Date(groupStore.myGroup.startDate)
+  const endDate = new Date(groupStore.myGroup.endDate)
+
+  // Calculate the difference in days
+  const timeDiff = endDate.getTime() - startDate.getTime()
+  const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1 // +1 to include both start and end days
+
+  // Create array of days [1, 2, 3, ..., daysDiff]
+  return Array.from({ length: Math.max(1, daysDiff) }, (_, i) => i + 1)
 })
 
 // Filter schedules by selected day and sort by order
 const filteredSchedules = computed(() => {
-  return schedules.value
+  return officialSchedules.value
     .filter((schedule) => schedule.day === selectedDay.value)
-    .sort((a, b) => a.order - b.order)
+    .sort((a, b) => (a.order || 0) - (b.order || 0))
 })
 
 // Drag and drop handlers
@@ -122,24 +229,125 @@ const onDrop = (event, dropIndex) => {
   draggedSchedule.order = droppedOnSchedule.order
   droppedOnSchedule.order = tempOrder
 
-  // Update the original schedules array
-  const draggedOriginalIndex = schedules.value.findIndex(
+  // Update the original schedules array in store
+  const draggedOriginalIndex = scheduleStore.schedules.findIndex(
     (s) => s.contentId === draggedSchedule.contentId,
   )
-  const droppedOriginalIndex = schedules.value.findIndex(
+  const droppedOriginalIndex = scheduleStore.schedules.findIndex(
     (s) => s.contentId === droppedOnSchedule.contentId,
   )
 
-  schedules.value[draggedOriginalIndex].order = draggedSchedule.order
-  schedules.value[droppedOriginalIndex].order = droppedOnSchedule.order
+  if (draggedOriginalIndex !== -1) {
+    scheduleStore.schedules[draggedOriginalIndex].order = draggedSchedule.order
+    // Track the modification
+    scheduleStore.trackOrderModification(
+      draggedSchedule.contentId,
+      draggedSchedule.day,
+      draggedSchedule.order
+    )
+  }
+  if (droppedOriginalIndex !== -1) {
+    scheduleStore.schedules[droppedOriginalIndex].order = droppedOnSchedule.order
+    // Track the modification
+    scheduleStore.trackOrderModification(
+      droppedOnSchedule.contentId,
+      droppedOnSchedule.day,
+      droppedOnSchedule.order
+    )
+  }
 
   dragOverIndex.value = null
+}
+
+// Check if there are any changes to save
+const hasChangesToSave = computed(() => {
+  return (
+    scheduleStore.newOfficialSchedules.length > 0 ||
+    scheduleStore.modifiedOfficialSchedules.length > 0 ||
+    scheduleStore.removedOfficialSchedules.length > 0
+  )
+})
+
+// Calculate total number of changes
+const totalChanges = computed(() => {
+  return (
+    scheduleStore.newOfficialSchedules.length +
+    scheduleStore.modifiedOfficialSchedules.length +
+    scheduleStore.removedOfficialSchedules.length
+  )
+})
+
+// Save changes to server
+const saveChangesToServer = async () => {
+  if (!hasChangesToSave.value) {
+    return
+  }
+
+  isSaving.value = true
+
+  try {
+    // Always include all three arrays (empty arrays if no changes)
+    const requestBody = {
+      newOfficialSchedules: scheduleStore.newOfficialSchedules,
+      modifiedOfficialSchedules: scheduleStore.modifiedOfficialSchedules,
+      removedOfficialSchedules: scheduleStore.removedOfficialSchedules  // Server expects this field name
+    }
+
+    console.log('Saving changes to server:', requestBody)
+
+    const response = await apiClient.post(`/schedule/${groupId}/update`, requestBody)
+
+    if (response.data.success) {
+      console.log('Changes saved successfully!')
+
+      // Clear tracking arrays after successful save
+      scheduleStore.clearTracking()
+
+      // Show success message (you can add a toast/snackbar here)
+      console.log('✅ All changes have been saved to the server')
+
+    } else {
+      throw new Error(response.data.message || 'Failed to save changes')
+    }
+
+  } catch (error) {
+    console.error('Failed to save changes:', error)
+    scheduleStore.error = error.response?.data?.message || error.message || 'Failed to save changes'
+  } finally {
+    isSaving.value = false
+  }
 }
 
 const onDragEnd = () => {
   draggedIndex.value = null
   dragOverIndex.value = null
 }
+
+// Clear errors from both stores
+const clearErrors = () => {
+  scheduleStore.clearError()
+  groupStore.clearError()
+}
+
+// Fetch data when component mounts
+onMounted(async () => {
+  console.log('ScheduleListOfficial mounted, groupId:', groupId)
+  if (groupId) {
+    // Only fetch group info if we don't already have it for this group
+    if (!groupStore.hasGroup || groupStore.myGroup.groupId !== parseInt(groupId)) {
+      console.log('Fetching group info for group:', groupId)
+      await groupStore.getGroupInfo(groupId)
+    } else {
+      console.log('Group info already available, skipping fetch')
+    }
+
+    // Then fetch schedules
+    console.log('Calling fetchSchedules for group:', groupId)
+    scheduleStore.fetchSchedules(groupId)
+  } else {
+    console.log('No groupId found in route params')
+  }
+})
 </script>
 
 <style scoped>
@@ -170,7 +378,8 @@ const onDragEnd = () => {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.empty-state {
+.empty-state,
+.loading-state {
   border-radius: 8px;
   background-color: #f5f5f5;
   margin-top: 20px;
@@ -231,6 +440,23 @@ const onDragEnd = () => {
 
 .drag-info-hint {
   margin-bottom: 12px;
+}
+
+.save-section {
+  border-top: 1px solid #e0e0e0;
+  background-color: #fafafa;
+  margin: 0 -20px -20px -20px;
+  padding: 20px;
+}
+
+.save-button {
+  min-width: 200px;
+  font-weight: bold;
+}
+
+.changes-summary {
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 /* Responsive adjustments */

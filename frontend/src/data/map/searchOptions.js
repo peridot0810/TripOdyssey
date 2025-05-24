@@ -30,7 +30,7 @@ export const sidoList = [
 ]
 
 export const gugunList = [
-  { code: '235', sidoCode: '1', name: '강남구' },
+  { code: '1', sidoCode: '1', name: '강남구' },
   { code: '236', sidoCode: '1', name: '강동구' },
   { code: '237', sidoCode: '1', name: '강북구' },
   { code: '238', sidoCode: '1', name: '강서구' },

@@ -50,7 +50,7 @@
       </div>
 
       <!-- 5. Phone Number -->
-      <div class="location-phone">
+      <div class="location-phone mb-3">
         <div class="info-row">
           <v-icon size="small" color="grey-darken-1" class="info-icon"> mdi-phone </v-icon>
           <div class="info-content">
@@ -66,24 +66,160 @@
       </div>
 
       <!-- Optional: Overview/Description -->
-      <div v-if="locationData.attractionInfo.overview" class="location-overview mt-4">
+      <div v-if="locationData.attractionInfo.overview" class="location-overview mb-4">
         <v-divider class="mb-3"></v-divider>
         <div class="info-label mb-2">상세 정보</div>
-        <p class="text-body-2 text-grey-darken-1">
+
+        <!-- Tooltip for full overview on hover -->
+        <v-tooltip
+          v-if="isOverviewTruncated"
+          :text="locationData.attractionInfo.overview"
+          location="bottom"
+          max-width="400"
+        >
+          <template v-slot:activator="{ props }">
+            <p
+              v-bind="props"
+              class="text-body-2 text-grey-darken-1 overview-text cursor-pointer"
+            >
+              {{ truncatedOverview }}...
+            </p>
+          </template>
+        </v-tooltip>
+
+        <!-- Show full overview if not truncated -->
+        <p
+          v-else
+          class="text-body-2 text-grey-darken-1 overview-text"
+        >
           {{ locationData.attractionInfo.overview }}
         </p>
       </div>
+
+      <!-- Recommend Button -->
+      <div class="recommend-section">
+        <v-btn
+          color="primary"
+          variant="elevated"
+          size="large"
+          block
+          class="recommend-btn"
+          prepend-icon="mdi-thumb-up"
+          :loading="isRecommending"
+          :disabled="isRecommending"
+          @click="handleRecommend"
+        >
+          {{ isRecommending ? '추천 중...' : '추천하기' }}
+        </v-btn>
+      </div>
     </v-card-item>
+
+    <!-- Success Notification Toast -->
+    <v-snackbar
+      v-model="showSuccessNotification"
+      location="bottom right"
+      color="success"
+      timeout="3000"
+      class="success-toast"
+    >
+      <div class="d-flex align-center">
+        <v-icon class="mr-2">mdi-check-circle</v-icon>
+        <div>
+          <div class="font-weight-medium">추천 완료!</div>
+          <div class="text-caption">제안 ID: {{ proposalId }}</div>
+        </div>
+      </div>
+    </v-snackbar>
   </v-card>
 </template>
 
 <script setup>
-defineProps({
+import { computed, ref } from 'vue'
+import { useRoute } from 'vue-router'
+import { apiClient } from '@/utils/apiClient'
+
+const props = defineProps({
   locationData: {
     type: Object,
     required: true,
   },
 })
+
+// Get current route to extract groupId from path params
+const route = useRoute()
+
+// Loading state for recommend button
+const isRecommending = ref(false)
+
+// Success notification state
+const showSuccessNotification = ref(false)
+const proposalId = ref(null)
+
+// Calculate truncated overview (50 words max)
+const truncatedOverview = computed(() => {
+  if (!props.locationData.attractionInfo.overview) return ''
+
+  const words = props.locationData.attractionInfo.overview.split(' ')
+  return words.slice(0, 50).join(' ')
+})
+
+// Check if overview is truncated
+const isOverviewTruncated = computed(() => {
+  if (!props.locationData.attractionInfo.overview) return false
+
+  const words = props.locationData.attractionInfo.overview.split(' ')
+  return words.length > 50
+})
+
+// Handle recommend button click
+const handleRecommend = async () => {
+  try {
+    isRecommending.value = true
+
+    // Get groupId from route params
+    const groupId = route.params.groupId
+    if (!groupId) {
+      console.error('No groupId found in route params')
+      return
+    }
+
+    console.log('Recommending attraction:', props.locationData.attractionInfo.no, 'for group:', groupId)
+
+    // Make API call to recommend the attraction
+    const response = await apiClient.post(`/schedule/${groupId}/recommend`,
+      props.locationData.attractionInfo.no, // Send attraction no directly as request body
+      {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    )
+
+    if (response.data.success) {
+      proposalId.value = response.data.data.proposalId
+      showSuccessNotification.value = true
+
+      console.log('Recommendation successful! Proposal ID:', proposalId.value)
+
+      // Hide notification after 3 seconds
+      setTimeout(() => {
+        showSuccessNotification.value = false
+        proposalId.value = null
+      }, 3000)
+    } else {
+      console.error('Recommendation failed:', response.data.message)
+    }
+
+  } catch (error) {
+    console.error('Error recommending attraction:', error)
+
+    // You could show an error notification here too
+    // For now, just log the error
+
+  } finally {
+    isRecommending.value = false
+  }
+}
 </script>
 
 <style scoped>
@@ -163,6 +299,47 @@ defineProps({
   padding-top: 16px;
 }
 
+.overview-text {
+  margin-bottom: 0;
+  line-height: 1.5;
+}
+
+.overview-text.cursor-pointer {
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.overview-text.cursor-pointer:hover {
+  color: #1976d2 !important;
+}
+
+.recommend-section {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.recommend-btn {
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: none;
+  transition: all 0.3s ease;
+}
+
+.recommend-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+.success-toast {
+  z-index: 9999;
+}
+
+.success-toast .v-snackbar__wrapper {
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
 /* Responsive adjustments */
 @media (max-width: 600px) {
   .location-details {
@@ -183,6 +360,10 @@ defineProps({
 
   .location-image {
     height: 150px;
+  }
+
+  .recommend-btn {
+    font-size: 14px;
   }
 }
 
