@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ssafy.pjt.ai.service.ExpenseTrackerAiChatService;
 import com.ssafy.pjt.common.dto.response.CommonResponse;
 import com.ssafy.pjt.financial.dto.request.AddExpenseRequestDto;
 import com.ssafy.pjt.financial.dto.response.ExpenseInfoResponseDto;
@@ -33,7 +34,7 @@ import lombok.RequiredArgsConstructor;
 public class ExpenseTrackerController {
 
 	private final ExpenseTrackerService expenseTrackerService;
-	private final JwtUtil jwtUtil;
+	private final ExpenseTrackerAiChatService expenseTrackerAiChatService;
 
 	@Operation(summary = "가계부 조회", description = "그룹의 모든 가계부 항목을 조회합니다.")
 	@ApiResponse(responseCode = "200", description = "가계부 조회 성공")
@@ -69,4 +70,19 @@ public class ExpenseTrackerController {
 		expenseTrackerService.deleteExpense(userId, groupId, expenseId);
 		return ResponseEntity.ok(new CommonResponse<>(true, "가계부 항목 삭제에 성공했습니다.", null));
 	}
+	
+	@Operation(summary = "AI 지출 분석 요청", description = "지출 내역을 기반으로 AI가 요약 분석 결과를 반환합니다.")
+	@ApiResponse(responseCode = "200", description = "지출 분석 성공")
+	@GetMapping("/summary")
+	public ResponseEntity<?> generateExpenseTrackerSummary(
+			@Parameter(hidden = true) @AuthenticationPrincipal UserDetails userDetails,
+			@Parameter(description = "그룹 ID", example = "101") @PathVariable Integer groupId,
+			@Parameter(description = "사용자 프롬프트", example = "지출 내역 분석해줘") @RequestParam(required=false) String userInput){
+		
+		String userId = userDetails.getUsername();
+		List<ExpenseInfoResponseDto> expenseTracker = expenseTrackerService.getExpenseTracker(userId, groupId);
+		String summary = expenseTrackerAiChatService.generateExpenseSummary(userInput, expenseTracker);
+		return ResponseEntity.ok(new CommonResponse<>(true, "지출 내역 분석에 성공했습니다.", summary));
+	}
+	
 }
