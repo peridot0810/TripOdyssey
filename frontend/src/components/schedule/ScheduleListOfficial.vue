@@ -277,7 +277,8 @@ const totalChanges = computed(() => {
   )
 })
 
-// Save changes to server
+
+
 const saveChangesToServer = async () => {
   if (!hasChangesToSave.value) {
     return
@@ -286,11 +287,20 @@ const saveChangesToServer = async () => {
   isSaving.value = true
 
   try {
-    // Always include all three arrays (empty arrays if no changes)
-    const requestBody = {
-      newOfficialSchedules: scheduleStore.newOfficialSchedules,
-      modifiedOfficialSchedules: scheduleStore.modifiedOfficialSchedules,
-      removedOfficialSchedules: scheduleStore.removedOfficialSchedules  // Server expects this field name
+    // Start with empty request body
+    const requestBody = {}
+
+    // Only include fields that have data (length > 0)
+    if (scheduleStore.newOfficialSchedules.length > 0) {
+      requestBody.newOfficialSchedules = scheduleStore.newOfficialSchedules
+    }
+
+    if (scheduleStore.modifiedOfficialSchedules.length > 0) {
+      requestBody.modifiedOfficialSchedules = scheduleStore.modifiedOfficialSchedules
+    }
+
+    if (scheduleStore.removedOfficialSchedules.length > 0) {
+      requestBody.removedOfficialSchedules = scheduleStore.removedOfficialSchedules
     }
 
     console.log('Saving changes to server:', requestBody)
@@ -299,13 +309,8 @@ const saveChangesToServer = async () => {
 
     if (response.data.success) {
       console.log('Changes saved successfully!')
-
-      // Clear tracking arrays after successful save
       scheduleStore.clearTracking()
-
-      // Show success message (you can add a toast/snackbar here)
       console.log('✅ All changes have been saved to the server')
-
     } else {
       throw new Error(response.data.message || 'Failed to save changes')
     }
