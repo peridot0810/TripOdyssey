@@ -3,20 +3,20 @@
     <h1 class="page-title">My Groups</h1>
 
     <!-- Loading State -->
-    <div v-if="groupStore.isLoading" class="loading-container">
+    <div v-if="isLoading" class="loading-container">
       <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
       <p class="text-h6 mt-4">그룹 목록을 불러오는 중...</p>
     </div>
 
     <!-- Error State -->
     <v-alert
-      v-else-if="groupStore.error"
+      v-else-if="error"
       type="error"
       class="mb-6"
       closable
-      @click:close="groupStore.clearError()"
+      @click:close="clearError"
     >
-      {{ groupStore.error }}
+      {{ error }}
       <template #append>
         <v-btn
           variant="text"
@@ -99,6 +99,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useGroupListStore } from '@/stores/groupList'
+import { apiClient } from '@/utils/apiClient'
 import GroupInfoCard from '@/components/group/GroupInfoCard.vue'
 import CreateGroupDialog from '@/components/group/CreateGroupDialog.vue'
 
@@ -109,18 +110,63 @@ const cardWidth = ref(380) // Width of each card + gap
 const carouselContainer = ref(null)
 const showCreateDialog = ref(false)
 
+// Local loading and error states for this component
+const isLoading = ref(false)
+const error = ref(null)
+
 // Calculate maximum index for navigation
 const maxIndex = computed(() => {
   const visibleCards = Math.floor(window.innerWidth / cardWidth.value) || 3
   return Math.max(0, groupStore.groupCount - visibleCards)
 })
 
-// Load groups from store
+// Load groups from API
 const loadGroups = async () => {
-  const result = await groupStore.getUserGroupList()
-  if (!result.success) {
-    console.error('Failed to load groups:', result.error)
+  isLoading.value = true
+  error.value = null
+
+  try {
+    const response = await apiClient.get('/user/groups')
+
+    // Transform API response to match expected format
+    const transformedGroups = response.data.map(group => ({
+      groupId: group.groupId,
+      name: group.name,
+      description: '', // API doesn't provide description, set empty
+      status: group.status,
+      startDate: group.startDate,
+      endDate: group.endDate,
+      memberCount: group.memberCount,
+      myRole: group.myRole,
+      progress: group.progress,
+      roleLimits: {
+        finance: 1, // Default values since API doesn't provide these
+        schedule: 1,
+        logistics: 1
+      }
+    }))
+
+    groupStore.setGroups(transformedGroups)
+
+  } catch (err) {
+    console.error('Failed to load groups:', err)
+
+    if (err.response?.status === 401) {
+      error.value = '로그인이 필요합니다.'
+    } else if (err.response?.status === 404) {
+      error.value = '그룹을 찾을 수 없습니다.'
+    } else if (err.response?.status >= 500) {
+      error.value = '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.'
+    } else {
+      error.value = '그룹 목록을 불러오는 중 오류가 발생했습니다.'
+    }
+  } finally {
+    isLoading.value = false
   }
+}
+
+const clearError = () => {
+  error.value = null
 }
 
 const scrollLeft = () => {

@@ -17,18 +17,10 @@
         </div>
       </v-col>
 
-      <!-- Right Column: Group Member List (2/10 width) -->
+      <!-- Right Column: Member Expense List (2/10 width) -->
       <v-col cols="12" md="4" class="right-panel">
         <div class="panel-content">
-          <h2 class="text-h6 font-weight-bold mb-3">그룹 멤버</h2>
-          <v-divider class="mb-4"></v-divider>
-
-          <!-- Temporary placeholder for group member component -->
-          <div class="placeholder-content d-flex flex-column align-center justify-center">
-            <v-icon size="64" color="grey-lighten-1">mdi-account-group</v-icon>
-            <p class="text-body-1 text-grey mt-3">그룹 멤버 목록</p>
-            <p class="text-caption text-grey-darken-1">여기에 멤버별 정산 금액이 표시됩니다</p>
-          </div>
+          <MemberExpenseList />
         </div>
       </v-col>
     </v-row>
@@ -38,6 +30,7 @@
 <script setup>
 import GroupSchedule from '@/components/group/GroupSchedule.vue'
 import FinanceCardList from '@/components/finance/FinanceCardList.vue'
+import MemberExpenseList from '@/components/finance/MemberExpenseList.vue';
 </script>
 
 <style scoped>
@@ -65,13 +58,6 @@ import FinanceCardList from '@/components/finance/FinanceCardList.vue'
   margin-top: 16px;
   height: calc(100% - 80px);
   overflow-y: auto;
-}
-
-.placeholder-content {
-  height: 400px;
-  background-color: #f5f5f5;
-  border-radius: 8px;
-  margin-top: 16px;
 }
 
 /* Make scrollbars prettier */

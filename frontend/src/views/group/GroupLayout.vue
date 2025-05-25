@@ -1,17 +1,17 @@
 <template>
   <!-- Loading State -->
-  <div v-if="groupStore.isLoading" class="loading-container">
+  <div v-if="isLoading" class="loading-container">
     <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
     <p class="text-h6 mt-4">그룹 정보를 불러오는 중...</p>
   </div>
 
   <!-- Error State -->
-  <div v-else-if="groupStore.error" class="error-container">
+  <div v-else-if="error" class="error-container">
     <v-alert
       type="error"
       variant="tonal"
       class="mb-4"
-      :text="groupStore.error"
+      :text="error"
     >
       <template #append>
         <v-btn
@@ -59,18 +59,22 @@
 </template>
 
 <script setup>
-import { onMounted, watch, onUnmounted } from 'vue'
+import { ref, onMounted, watch, onUnmounted } from 'vue'
 import { useRoute, useRouter, RouterView } from 'vue-router'
 import { useGroupStore } from '@/stores/group'
+import { apiClient } from '@/utils/apiClient'
 
 const route = useRoute()
 const router = useRouter()
 const groupStore = useGroupStore()
 
+const isLoading = ref(false)
+const error = ref(null)
 const groupId = route.params.groupId
 
 const links = [
   { label: '그룹 홈', path: '', icon: 'mdi-home' },
+  { label: '그룹 관리', path: 'master', icon: 'mdi' },
   { label: '일정 조율', path: 'meeting', icon: 'mdi-account-group' },
   { label: '장소 찾아보기', path: 'map', icon: 'mdi-map' },
   { label: '일정 계획', path: 'schedule', icon: 'mdi-calendar' },
@@ -82,11 +86,32 @@ const links = [
 
 // Load group information and store in pinia
 const loadGroupInfo = async () => {
-  const result = await groupStore.getGroupInfo(groupId)
+  const currentGroupId = route.params.groupId
+  if (!currentGroupId) return
 
-  if (!result.success) {
-    console.error('Failed to load group info:', result.error)
-    // Error is already set in the store, will be displayed in template
+  isLoading.value = true
+  error.value = null
+
+  try {
+    const response = await apiClient.get(`/group/${currentGroupId}`)
+
+    if (response.data.success) {
+      groupStore.setGroupData(response.data.data)
+    } else {
+      error.value = response.data.message || '그룹 정보를 불러올 수 없습니다.'
+    }
+  } catch (err) {
+    console.error('Error fetching group info:', err)
+
+    if (err.response?.status === 401) {
+      error.value = '로그인이 필요합니다.'
+    } else if (err.response?.status === 404) {
+      error.value = '그룹을 찾을 수 없습니다.'
+    } else {
+      error.value = '그룹 정보를 불러오는 중 오류가 발생했습니다.'
+    }
+  } finally {
+    isLoading.value = false
   }
 }
 

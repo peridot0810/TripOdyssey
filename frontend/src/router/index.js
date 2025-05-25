@@ -16,6 +16,7 @@ import MeetingView from '@/views/group/MeetingView.vue'
 import ScheduleView from '@/views/group/ScheduleView.vue'
 import ChatView from '@/views/group/ChatView.vue'
 import RoleSelectView from '@/views/group/RoleSelectView.vue'
+import MasterView from '@/views/group/MasterView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -37,6 +38,7 @@ const router = createRouter({
         { path: 'schedule', name: 'group-schedule', component: ScheduleView },
         { path: 'chat', name: 'group-chat', component: ChatView },
         { path: 'role', name: 'role', component: RoleSelectView },
+        { path: 'master', name: 'master', component: MasterView}
       ],
     },
   ],
