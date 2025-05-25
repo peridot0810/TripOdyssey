@@ -7,9 +7,23 @@
       <p class="text-center text-grey-darken-1">
         Darker colors indicate more team members are available
       </p>
+      <div v-if="when2MeetStore.isLoading" class="text-center mt-2">
+        <v-progress-circular indeterminate size="small" color="primary"></v-progress-circular>
+        <span class="ml-2 text-caption">Loading availability data...</span>
+      </div>
     </div>
 
-    <div class="year-calendar-grid">
+    <!-- No Data Message -->
+    <div v-if="!when2MeetStore.isLoading && availabilityData.length === 0" class="no-data-message">
+      <v-icon size="48" color="grey-lighten-1" class="mb-2">mdi-calendar-blank</v-icon>
+      <h3 class="text-h6 text-grey mb-2">No Availability Data</h3>
+      <p class="text-body-2 text-grey">
+        Team members haven't submitted their availability yet.
+      </p>
+    </div>
+
+    <!-- Calendar Grid -->
+    <div v-else class="year-calendar-grid">
       <div v-for="month in 12" :key="month" class="month-calendar">
         <div class="month-header">
           <h3 class="text-h6 font-weight-medium text-center">
@@ -44,7 +58,7 @@
     </div>
 
     <!-- Legend -->
-    <div class="legend mt-4">
+    <div v-if="availabilityData.length > 0" class="legend mt-4">
       <h4 class="text-subtitle-1 font-weight-medium mb-2">Availability Legend:</h4>
       <div class="legend-items">
         <div class="legend-item">
@@ -65,24 +79,45 @@
         </div>
       </div>
     </div>
+
+    <!-- Summary Stats -->
+    <div v-if="availabilityData.length > 0" class="summary-stats mt-4">
+      <v-row>
+        <v-col cols="4">
+          <div class="stat-card">
+            <div class="stat-number">{{ uniqueUsers }}</div>
+            <div class="stat-label">Team Members</div>
+          </div>
+        </v-col>
+        <v-col cols="4">
+          <div class="stat-card">
+            <div class="stat-number">{{ totalAvailabilityEntries }}</div>
+            <div class="stat-label">Total Entries</div>
+          </div>
+        </v-col>
+        <v-col cols="4">
+          <div class="stat-card">
+            <div class="stat-number">{{ daysWithAvailability }}</div>
+            <div class="stat-label">Available Days</div>
+          </div>
+        </v-col>
+      </v-row>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
+import { useWhen2MeetStore } from '@/stores/when2meet'
+
+// Store
+const when2MeetStore = useWhen2MeetStore()
 
 // Get current year
 const currentYear = new Date().getFullYear()
 
-// Dummy data - 6 availability entries
-const availabilityData = ref([
-  { id: 1, userId: 'user01', groupId: 20, startDate: '2025-07-10', endDate: '2025-07-15' },
-  { id: 2, userId: 'user02', groupId: 20, startDate: '2025-07-12', endDate: '2025-07-18' },
-  { id: 3, userId: 'user03', groupId: 20, startDate: '2025-08-05', endDate: '2025-08-10' },
-  { id: 4, userId: 'user04', groupId: 20, startDate: '2025-07-14', endDate: '2025-07-16' },
-  { id: 5, userId: 'user05', groupId: 20, startDate: '2025-09-20', endDate: '2025-09-25' },
-  { id: 6, userId: 'user06', groupId: 20, startDate: '2025-07-13', endDate: '2025-07-17' },
-])
+// Get availability data from store
+const availabilityData = computed(() => when2MeetStore.availabilityData || [])
 
 const weekDays = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 const monthNames = [
@@ -100,24 +135,22 @@ const monthNames = [
   'December',
 ]
 
-// Create a map of date strings to availability count
-const availabilityMap = computed(() => {
-  const map = new Map()
+// Use the availability map from the store
+const availabilityMap = computed(() => when2MeetStore.availabilityMap || new Map())
 
-  availabilityData.value.forEach((entry) => {
-    const startDate = new Date(entry.startDate)
-    const endDate = new Date(entry.endDate)
-
-    // Iterate through each date in the range
-    const currentDate = new Date(startDate)
-    while (currentDate <= endDate) {
-      const dateStr = currentDate.toISOString().split('T')[0]
-      map.set(dateStr, (map.get(dateStr) || 0) + 1)
-      currentDate.setDate(currentDate.getDate() + 1)
-    }
+// Summary statistics
+const uniqueUsers = computed(() => {
+  const users = new Set()
+  availabilityData.value.forEach(entry => {
+    if (entry.userId) users.add(entry.userId)
   })
+  return users.size
+})
 
-  return map
+const totalAvailabilityEntries = computed(() => availabilityData.value.length)
+
+const daysWithAvailability = computed(() => {
+  return availabilityMap.value.size
 })
 
 function getMonthName(monthIndex) {
@@ -136,7 +169,7 @@ function getDatesInMonth(monthIndex) {
 
 function getDateClass(monthIndex, date) {
   const dateStr = `${currentYear}-${String(monthIndex + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`
-  const count = availabilityMap.value.get(dateStr) || 0
+  const count = when2MeetStore.getAvailabilityCountForDate(dateStr)
 
   if (count === 0) return ''
   if (count === 1) return 'availability-1'
@@ -147,10 +180,13 @@ function getDateClass(monthIndex, date) {
 
 function getDateTooltip(monthIndex, date) {
   const dateStr = `${currentYear}-${String(monthIndex + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`
-  const count = availabilityMap.value.get(dateStr) || 0
+  const count = when2MeetStore.getAvailabilityCountForDate(dateStr)
+  const users = when2MeetStore.getUsersAvailableForDate(dateStr)
 
   if (count === 0) return 'No availability'
-  return `${count} team member${count > 1 ? 's' : ''} available`
+
+  const userList = users.length > 0 ? `\nUsers: ${users.join(', ')}` : ''
+  return `${count} team member${count > 1 ? 's' : ''} available${userList}`
 }
 </script>
 
@@ -159,6 +195,14 @@ function getDateTooltip(monthIndex, date) {
   padding: 16px;
   max-width: 100%;
   margin: 0 auto;
+}
+
+.no-data-message {
+  text-align: center;
+  padding: 40px 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
 }
 
 .year-calendar-grid {
@@ -207,6 +251,7 @@ function getDateTooltip(monthIndex, date) {
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
 }
 
 .date-cell.blank {
@@ -261,6 +306,33 @@ function getDateTooltip(monthIndex, date) {
   border: 1px solid #ddd;
 }
 
+.summary-stats {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid #e9ecef;
+}
+
+.stat-card {
+  text-align: center;
+  padding: 8px;
+}
+
+.stat-number {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #1976d2;
+  line-height: 1.2;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+}
+
 /* Responsive design */
 @media (max-width: 1024px) {
   .year-calendar-grid {
@@ -279,6 +351,14 @@ function getDateTooltip(monthIndex, date) {
   .team-calendar-wrapper {
     padding: 12px;
   }
+
+  .summary-stats {
+    padding: 12px;
+  }
+
+  .stat-number {
+    font-size: 1.2rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -289,6 +369,10 @@ function getDateTooltip(monthIndex, date) {
 
   .legend-items {
     flex-direction: column;
+  }
+
+  .no-data-message {
+    padding: 30px 15px;
   }
 }
 </style>
