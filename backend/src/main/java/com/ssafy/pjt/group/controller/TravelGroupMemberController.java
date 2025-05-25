@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import com.ssafy.pjt.common.dto.response.CommonResponse;
 import com.ssafy.pjt.common.service.UserValidationService;
 import com.ssafy.pjt.financial.dto.request.MemberInviteRequestDto;
+import com.ssafy.pjt.group.dto.request.RoleRequestDto;
 import com.ssafy.pjt.group.entity.GroupMemberInfo;
 import com.ssafy.pjt.group.service.TravelGroupMemberService;
 import com.ssafy.pjt.util.JwtUtil;
@@ -73,9 +74,10 @@ public class TravelGroupMemberController {
 			@PathVariable Integer groupId,
 			@PathVariable String userId,
 			@RequestParam Integer roleId,
+			@RequestParam Boolean accept,
 			@AuthenticationPrincipal UserDetails userDetails) {
 		String requesterId = userDetails.getUsername();
-		CommonResponse<Void> response = memberService.assignMemberRole(requesterId, groupId, userId, roleId);
+		CommonResponse<Void> response = memberService.assignMemberRole(requesterId, groupId, userId, roleId, accept);
 		return ResponseEntity.ok(response);
 	}
 	
@@ -108,7 +110,7 @@ public class TravelGroupMemberController {
 	}
 	
 	// 7. 그룹원의 역할 목록 조회
-	@Operation(summary = "요청 유저의 역할 목록 조회", description = "유저의 해당 그룹에서의 역할 목록을 boolean 배열 형태로 반환합니다.")
+	@Operation(summary = "유저의 역할 목록 조회", description = "유저의 해당 그룹에서의 역할 목록을 boolean 배열 형태로 반환합니다.")
 	@ApiResponse(responseCode = "200", description = "유저의 역할 목록 조회 성공")
 	@GetMapping("/{groupId}/member/roles")
 	public ResponseEntity<?> getMemberRoles(
@@ -120,4 +122,32 @@ public class TravelGroupMemberController {
 		return ResponseEntity.ok(new CommonResponse<>(true, "유저 역할 목록 조회에 성공했습니다.", myRoles));
 	}
 	
+	// 8. 그룹에 희망 역할 요청
+	@Operation(summary = "희망하는 역할 요청", description = "유저가 희망하는 역할을 요청합니다.")
+	@ApiResponse(responseCode = "200", description = "희망 역할 요청 성공")
+	@PostMapping("/{groupId}/member/role-request")
+	public ResponseEntity<?> requestRole(
+			@AuthenticationPrincipal UserDetails userDetails,
+			@PathVariable Integer groupId,
+			@RequestBody RoleRequestDto roleRequest){
+		
+		String userId = userDetails.getUsername();
+		memberService.roleRequest(groupId, userId, roleRequest);
+		return ResponseEntity.ok(new CommonResponse<>(true, "역할 신청에 성공했습니다.", null));
+	}
+	
+	
+	
+	// 9. 역할 요청 목록 조회
+	@Operation(summary = "역할 요청 목록 조회", description = "현재 역할 요청 목록을 조회합니다.")
+	@ApiResponse(responseCode = "200", description = "역할 요청 목록 조회 성공")
+	@GetMapping("/{groupId}/member/role-request")
+	public ResponseEntity<?> requestRole(
+			@AuthenticationPrincipal UserDetails userDetails,
+			@PathVariable Integer groupId){
+		
+		String userId = userDetails.getUsername();
+		List<?> roleRequestList = memberService.getRoleRequestList(groupId, userId);
+		return ResponseEntity.ok(new CommonResponse<>(true, "역할 신청 목록 조회에 성공했습니다.", roleRequestList));
+	}
 }
