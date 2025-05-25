@@ -26,43 +26,21 @@ public class AiConfig {
 
     @Bean
     ChatClient simpleChatClient(ChatClient.Builder builder, ChatMemory memory) {
-        // TODO: 02. ChatClient 타입의 빈을 생성해보자.
          return builder.defaultSystem(systemPrompt)
         		 .defaultAdvisors(
         				 new SimpleLoggerAdvisor(Ordered.LOWEST_PRECEDENCE-1),
         				 new MessageChatMemoryAdvisor(memory)
         				 )
         		 .build();
-
-        //END
-    }
-    // TODO: 06-1. 위에서 선언한 빈에 SimpleLoggerAdvisor를 default로 선언해보자.
-
-    @Bean
-    ChatClient reReadingChatClient(ChatClient.Builder builder) {
-        // TODO: 06-3. SimpleLoggerAdvisor와 ReReadingAdvisor를 적용한 ChatClient를 생성해보자.
-         return null;
-
-        // END
     }
 
-    // TODO: 07-2 In Memory 기반의 ChatMemory빈과 ChatClient(advisedChatClient)빈을 구성하세요. 
+ 
     @Bean
     ChatMemory chatMemory() {
     	return new InMemoryChatMemory();
     }
-    //  ChatClient(advisedChatClient)는 SimpleLoggerAdvisor와 MessageChatMemoryAdvisor를 갖는다.
-    
-    @Bean
-    ChatClient advisedChatClient(ChatClient.Builder builder, ChatMemory memory) {
-    	return builder.defaultSystem(systemPrompt)
-    			.defaultAdvisors(
-    					new SimpleLoggerAdvisor(Ordered.LOWEST_PRECEDENCE-1),
-    					new MessageChatMemoryAdvisor(memory)).build();
-    }
-    // END
 
-    // TODO: 09-1. VectorStore의 구성을 확인하세요.
+
      // @Bean
     VectorStore vectorStore(EmbeddingModel embeddingModel,
             @Value("${spring.ai.vectorstore.redis.index}") String index,
@@ -77,7 +55,6 @@ public class AiConfig {
         return vs;
     }
 
-    // TODO: 10-1. 검색된 내용만을 가지고 RAG 서비스를 하기 위한 ChatClient 타입 빈의 생성 코드를 확인하세요.
      // @Bean
     ChatClient ragChatDefaultClient(ChatClient.Builder builder, ChatMemory chatMemory, VectorStore store) {
         SearchRequest request = SearchRequest.builder().topK(3).similarityThreshold(0.75).build();
@@ -88,7 +65,6 @@ public class AiConfig {
                 .build();
     }
 
-    // TODO: 10-2. 검색된 내용에 모델의 데이터를 추가해서 서비스 하기 위한 ChatClient 타입 빈의 생성 코드를 확인하세요.
      // @Bean
     ChatClient ragChatCustomClient(ChatClient.Builder builder, ChatMemory chatMemory, VectorStore store, @Value("${ssafy.ai.rag-prompt}") String ragPrompt) {
         SearchRequest request = SearchRequest.builder().topK(3).similarityThreshold(0.75).build();

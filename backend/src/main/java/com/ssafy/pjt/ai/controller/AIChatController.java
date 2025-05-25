@@ -65,4 +65,5 @@ public class AIChatController implements RestControllerHelper {
             return ResponseEntity.internalServerError().body(Map.of("error", "일정 최적화 중 오류가 발생했습니다: " + e.getMessage()));
         }
     }
+    
 }
