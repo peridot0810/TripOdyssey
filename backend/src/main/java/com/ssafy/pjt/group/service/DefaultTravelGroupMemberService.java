@@ -11,7 +11,10 @@ import com.ssafy.pjt.common.exception.UserNotInGroupException;
 import com.ssafy.pjt.common.service.UserValidationService;
 import com.ssafy.pjt.config.OpenApiConfig;
 import com.ssafy.pjt.financial.dto.request.MemberInviteRequestDto;
+import com.ssafy.pjt.group.dto.request.HandleRoleRequestDto;
+import com.ssafy.pjt.group.dto.request.RoleRequestDto;
 import com.ssafy.pjt.group.dto.response.InvitedMemberResponseDto;
+import com.ssafy.pjt.group.dto.response.RoleRequestResponseDto;
 import com.ssafy.pjt.group.entity.GroupMemberInfo;
 import com.ssafy.pjt.group.mapper.TravelGroupMemberMapper;
 
@@ -75,7 +78,7 @@ public class DefaultTravelGroupMemberService implements TravelGroupMemberService
 	}
 
 	@Override
-	public CommonResponse<Void> assignMemberRole(String requesterId, Integer groupId, String userId, Integer roleId) {
+	public CommonResponse<Void> assignMemberRole(String requesterId, Integer groupId, String userId, Integer roleId, Boolean accept) {
 		
 		// 유저 확인
 		if(!userValidationService.isUserInGroup(requesterId, groupId)) {
@@ -86,8 +89,25 @@ public class DefaultTravelGroupMemberService implements TravelGroupMemberService
 		}
 		
 		// 비즈니스 로직
-		memberMapper.addGroupUserRole(groupId, userId, roleId);
-		return new CommonResponse<>(true, "그룹 멤버 역할 변경 완료", null);
+		// group_role_request 테이블 데이터 수정
+		Integer changedRowCnt = memberMapper.handleRoleRequest(HandleRoleRequestDto.builder()
+				.userId(userId)
+				.groupId(groupId)
+				.accept(accept)
+				.roleId(roleId)
+				.build());
+		
+		if(changedRowCnt==0) {
+			return new CommonResponse<>(true, "해당 역할 신청이 존재하지 않습니다.", null);
+		}
+		
+		// group_user_info에 데이터 추가 
+		if(accept) {
+			memberMapper.addGroupUserRole(groupId, userId, roleId);
+			return new CommonResponse<>(true, "그룹 멤버 역할 추가 완료", null);
+		}else {
+			return new CommonResponse<>(true, "그룹 멤버 역할 신청을 거절했습니다.", null);
+		}
 	}
 
 	@Override
@@ -140,5 +160,33 @@ public class DefaultTravelGroupMemberService implements TravelGroupMemberService
 		
 		// 비즈니스 로직
 		return memberMapper.getInvitedMemberList(groupId);
+	}
+	
+	@Override
+	public CommonResponse<Void> roleRequest(Integer groupId, String userId, RoleRequestDto roleRequest) {
+		// 유저 확인
+		if(!userValidationService.isUserInGroup(userId, groupId)) {
+			throw new UserNotInGroupException("속하지 않은 그룹의 정보를 요청하였습니다.");
+		}
+		if(userValidationService.isUserRoleValid(userId, groupId, roleRequest.getRoleId())) {
+			throw new UnauthorizedRoleAccessException("해당 역할은 이미 임명된 상태입니다.");
+		}
+		
+		roleRequest.setGroupId(groupId);
+		roleRequest.setUserId(userId);
+		memberMapper.roleRequest(roleRequest);
+		return null;
+	}
+	
+	@Override
+	public List<RoleRequestResponseDto> getRoleRequestList(Integer groupId, String userId) {
+		// 유저 확인
+		if(!userValidationService.isUserInGroup(userId, groupId)) {
+			throw new UserNotInGroupException("속하지 않은 그룹의 정보를 요청하였습니다.");
+		}
+		if(userValidationService.isUserRoleValid(userId, groupId, MemberRole.NORMAL.getId())) {
+			throw new UnauthorizedRoleAccessException("일반 그룹원은 역할 신청 목록을 조회할 수 없습니다.");
+		}
+		return memberMapper.getRoleRequestList(groupId);
 	}
 }

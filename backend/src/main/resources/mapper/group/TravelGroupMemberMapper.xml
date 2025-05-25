@@ -54,5 +54,32 @@
     WHERE inv.group_id = #{groupId}
   </select>
   
-
+  <insert id="roleRequest">
+  	INSERT INTO group_role_request(user_id, role_id, group_id)
+  	VALUES(#{userId},#{roleId},#{groupId})
+  </insert>
+  
+  <select id="getRoleRequestList">
+  	SELECT user_id, group_id, role_id, requested_at, status
+  	FROM group_role_request
+  	WHERE group_id=#{groupId}
+  </select>
+  
+  <update id="handleRoleRequest">
+  	UPDATE group_role_request
+	SET
+		status=
+			<choose>
+				<when test="accept==true">'ACCEPTED'</when>
+				<otherwise>'REJECTED'</otherwise>
+			</choose>
+	WHERE 
+		user_id=#{userId} 
+		AND group_id=#{groupId} 
+		AND role_id=#{roleId}
+		AND status='PENDING'
+  	
+  </update>
+  
+  
 </mapper>

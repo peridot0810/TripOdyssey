@@ -168,7 +168,7 @@ CREATE TABLE `tripsaga`.`invitation` (
     `group_id` INT NOT NULL,
     `sender_id` VARCHAR(100) NOT NULL,
     `receiver_email` VARCHAR(100) NOT NULL,
-    `status` VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+    `status` ENUM('PENDING', 'ACCEPTED', 'REJECTED') DEFAULT 'PENDING',
     `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
     `responded_at` DATETIME DEFAULT NULL,
     FOREIGN KEY (`group_id`) REFERENCES `travel_group`(`group_id`) ON DELETE CASCADE,
@@ -366,6 +366,23 @@ CREATE TABLE IF NOT EXISTS `tripsaga`.`group_role_limit` (
   CONSTRAINT `group_role_limit_ibfk_2`
     FOREIGN KEY (`role_id`)
     REFERENCES `tripsaga`.`role` (`role_id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
+
+-- -----------------------------------------------------
+-- Table `tripsaga`.`group_role_request`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `tripsaga`.`group_role_request`(
+	`user_id` VARCHAR(100) NOT NULL,
+    `group_id` INT NOT NULL,
+	`role_id` INT UNSIGNED NOT NULL,
+    `requested_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+	`status` ENUM('PENDING', 'ACCEPTED', 'REJECTED') DEFAULT 'PENDING',
+    
+    PRIMARY KEY (`user_id`, `group_id`, `role_id`),
+    FOREIGN KEY (`user_id`) REFERENCES `user` (`id`),
+    FOREIGN KEY (`group_id`) REFERENCES `travel_group` (`group_id`),
+    FOREIGN KEY (`role_id`) REFERENCES `role` (`role_id`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
 
