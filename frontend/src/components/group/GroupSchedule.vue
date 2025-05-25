@@ -46,29 +46,57 @@
         </v-alert>
       </div>
 
+      <!-- Each Schedule Item with Order Badge and Finance Button -->
       <div
         v-for="(schedule, index) in filteredSchedules"
         :key="schedule.contentId"
-        class="readonly-schedule-card"
+        class="schedule-item"
       >
-        <ScheduleCard :schedule="schedule" class="schedule-card-with-order">
-          <template #order>
-            <div class="order-badge">
-              <v-chip size="small" color="primary" variant="elevated" class="order-chip">
-                {{ index + 1 }}
-                <v-icon end size="small">mdi-check-circle</v-icon>
-              </v-chip>
-            </div>
-          </template>
-        </ScheduleCard>
+        <div class="schedule-content">
+          <!-- Order Badge positioned absolutely over the schedule card -->
+          <div class="order-badge-overlay">
+            <v-chip size="small" color="primary" variant="elevated" class="order-chip">
+              {{ index + 1 }}
+              <v-icon end size="small">mdi-check-circle</v-icon>
+            </v-chip>
+          </div>
+
+          <!-- Original Schedule Card (unchanged) -->
+          <div class="schedule-card-wrapper">
+            <ScheduleCard :schedule="schedule" />
+          </div>
+
+          <!-- Finance Button - positioned to the right of the card -->
+          <div v-if="isFinancePage" class="finance-button-container">
+            <v-btn
+              icon
+              color="success"
+              size="large"
+              variant="elevated"
+              @click="openFinanceModal(schedule)"
+              class="finance-add-btn"
+            >
+              <v-icon>mdi-plus</v-icon>
+            </v-btn>
+          </div>
+        </div>
       </div>
     </div>
+
+    <!-- Create Finance Modal -->
+    <CreateFinanceModal
+      v-model="showFinanceModal"
+      :schedule="selectedSchedule"
+      @close="closeFinanceModal"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import ScheduleCard from '../schedule/ScheduleCard.vue'
+import CreateFinanceModal from '../finance/CreateFinanceModal.vue'
 import { dummyScheduleData } from '@/data/schedule/dummyScheduleData.js'
 
 // Props
@@ -83,9 +111,19 @@ const props = defineProps({
   },
 })
 
+// Router
+const route = useRoute()
+
 // Reactive data
 const schedules = ref([...props.scheduleData])
 const selectedDay = ref(1)
+const showFinanceModal = ref(false)
+const selectedSchedule = ref(null)
+
+// Check if current route is finance page
+const isFinancePage = computed(() => {
+  return route.path.includes('finance')
+})
 
 // Get all available days from the schedule data
 const availableDays = computed(() => {
@@ -99,6 +137,17 @@ const filteredSchedules = computed(() => {
     .filter((schedule) => schedule.day === selectedDay.value)
     .sort((a, b) => a.order - b.order)
 })
+
+// Methods
+const openFinanceModal = (schedule) => {
+  selectedSchedule.value = schedule
+  showFinanceModal.value = true
+}
+
+const closeFinanceModal = () => {
+  showFinanceModal.value = false
+  selectedSchedule.value = null
+}
 </script>
 
 <style scoped>
@@ -151,37 +200,48 @@ const filteredSchedules = computed(() => {
   font-weight: bold;
 }
 
-.schedule-card-with-order {
-  position: relative;
-  margin-bottom: 16px;
-}
-
-.order-badge {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  z-index: 5;
-}
-
-/* Read-only schedule card styles */
-.readonly-schedule-card {
-  position: relative;
-  margin-bottom: 16px;
-  cursor: default;
-  transition: all 0.3s ease;
-}
-
-.readonly-schedule-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
 .readonly-info-hint {
   margin-bottom: 12px;
 }
 
+/* Schedule Item Styling */
+.schedule-item {
+  margin-bottom: 20px;
+}
+
+.schedule-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: relative;
+}
+
+.schedule-card-wrapper {
+  flex: 1;
+  position: relative;
+}
+
+.order-badge-overlay {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 15;
+}
+
 .order-chip {
   user-select: none;
+}
+
+/* Finance Button Container */
+.finance-button-container {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.finance-add-btn {
+  box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3) !important;
 }
 
 /* Responsive adjustments */

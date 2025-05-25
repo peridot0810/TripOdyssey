@@ -77,16 +77,35 @@
           <!-- Divider -->
           <v-divider class="mb-3"></v-divider>
 
-          <!-- Description/Overview -->
-          <div v-if="accommodation.accommodationInfo.overview" class="description-section">
-            <p class="text-body-2 text-grey-darken-1 mb-0 description-text">
-              {{ accommodation.accommodationInfo.overview }}
-            </p>
-          </div>
-          <div v-else class="description-section">
-            <p class="text-body-2 text-grey-lighten-1 mb-0 font-italic">
-              숙소 정보가 제공되지 않았습니다.
-            </p>
+          <!-- Description/Overview and Delete Button -->
+          <div class="description-delete-section">
+            <div class="description-content">
+              <div v-if="accommodation.accommodationInfo.overview" class="description-section">
+                <p class="text-body-2 text-grey-darken-1 mb-0 description-text">
+                  {{ accommodation.accommodationInfo.overview }}
+                </p>
+              </div>
+              <div v-else class="description-section">
+                <p class="text-body-2 text-grey-lighten-1 mb-0 font-italic">
+                  숙소 정보가 제공되지 않았습니다.
+                </p>
+              </div>
+            </div>
+
+            <!-- Delete Button -->
+            <div class="delete-button-container">
+              <v-btn
+                color="error"
+                variant="flat"
+                size="small"
+                class="delete-btn"
+                @click="handleDelete"
+                :loading="isDeleting"
+              >
+                <v-icon size="small" class="mr-1">mdi-delete</v-icon>
+                삭제
+              </v-btn>
+            </div>
           </div>
         </v-card-item>
       </div>
@@ -114,16 +133,77 @@
         </div>
       </div>
     </div>
+
+    <!-- Delete Confirmation Dialog -->
+    <v-dialog v-model="showDeleteDialog" max-width="450px">
+      <v-card>
+        <v-card-title class="text-h6">
+          <v-icon color="error" class="mr-2">mdi-alert-circle</v-icon>
+          숙소 예약 취소
+        </v-card-title>
+        <v-card-text>
+          <p class="mb-3">이 숙소 예약을 취소하시겠습니까?</p>
+          <div class="delete-preview pa-3 bg-grey-lighten-4 rounded">
+            <div class="d-flex align-center mb-2">
+              <v-icon size="small" color="primary" class="mr-2">mdi-bed</v-icon>
+              <span class="text-body-1 font-weight-medium">
+                {{ accommodation.accommodationInfo.title }}
+              </span>
+            </div>
+            <div v-if="accommodation.name !== accommodation.accommodationInfo.title" class="mb-2">
+              <v-chip size="x-small" color="secondary" variant="outlined">
+                {{ accommodation.name }}
+              </v-chip>
+            </div>
+            <div class="text-caption text-grey-darken-1 mb-1">
+              <strong>체크인:</strong> {{ formatTime(accommodation.checkInTime) }}
+            </div>
+            <div class="text-caption text-grey-darken-1">
+              <strong>체크아웃:</strong> {{ formatTime(accommodation.checkOutTime) }}
+            </div>
+          </div>
+          <p class="text-caption text-error mt-3 mb-0">
+            ⚠️ 이 작업은 되돌릴 수 없습니다.
+          </p>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn variant="text" @click="showDeleteDialog = false">취소</v-btn>
+          <v-btn
+            color="error"
+            variant="elevated"
+            @click="confirmDelete"
+            :loading="isDeleting"
+          >
+            예약 취소
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-card>
 </template>
 
 <script setup>
-defineProps({
+import { ref } from 'vue'
+import { useRoute } from 'vue-router'
+import { useAccommodationStore } from '@/stores/accommodation'
+import { apiClient } from '@/utils/apiClient'
+
+// Props
+const props = defineProps({
   accommodation: {
     type: Object,
     required: true,
   },
 })
+
+// Store and Route
+const route = useRoute()
+const accommodationStore = useAccommodationStore()
+
+// State
+const showDeleteDialog = ref(false)
+const isDeleting = ref(false)
 
 // Helper function to format datetime to display format
 const formatTime = (dateTimeString) => {
@@ -140,6 +220,78 @@ const extractUrl = (htmlString) => {
   if (!htmlString) return ''
   const match = htmlString.match(/href="([^"]*)"/)
   return match ? match[1] : htmlString
+}
+
+// Methods
+const handleDelete = () => {
+  showDeleteDialog.value = true
+}
+
+const confirmDelete = async () => {
+  isDeleting.value = true
+
+  try {
+    // Get group ID from route
+    const groupId = route.params.groupId
+    if (!groupId) {
+      throw new Error('그룹 ID를 찾을 수 없습니다.')
+    }
+
+    // Call API to delete accommodation
+    const response = await apiClient.delete(`/accommodation/${groupId}`, {
+      params: {
+        accommodationId: props.accommodation.accommodationId
+      }
+    })
+
+    if (response.data.success) {
+      // Remove from store
+      const result = accommodationStore.removeAccommodation(props.accommodation.accommodationId)
+
+      if (result.success) {
+        showDeleteDialog.value = false
+        console.log('숙소 예약 취소 성공:', response.data.message)
+      } else {
+        // This shouldn't happen if API succeeded, but handle gracefully
+        console.warn('Store에서 삭제 실패:', result.error)
+        showDeleteDialog.value = false
+        // Force a page refresh or refetch might be needed here
+      }
+    } else {
+      throw new Error(response.data.message || '숙소 예약 취소에 실패했습니다.')
+    }
+  } catch (err) {
+    console.error('숙소 예약 취소 오류:', err)
+
+    let errorMessage = '숙소 예약 취소 중 오류가 발생했습니다.'
+
+    if (err.response) {
+      const status = err.response.status
+      const message = err.response.data?.message || err.message
+
+      if (status === 400) {
+        errorMessage = `잘못된 요청: ${message}`
+      } else if (status === 401) {
+        errorMessage = '로그인이 필요합니다.'
+      } else if (status === 403) {
+        errorMessage = '숙소 예약 취소 권한이 없습니다.'
+      } else if (status === 404) {
+        errorMessage = '해당 숙소 예약을 찾을 수 없습니다.'
+      } else {
+        errorMessage = `서버 오류 (${status}): ${message}`
+      }
+    } else if (err.code === 'ECONNABORTED') {
+      errorMessage = '요청 시간이 초과되었습니다. 다시 시도해주세요.'
+    } else {
+      errorMessage = err.message || errorMessage
+    }
+
+    // Set error in store for display
+    accommodationStore.error = errorMessage
+    showDeleteDialog.value = false
+  } finally {
+    isDeleting.value = false
+  }
 }
 </script>
 
@@ -192,12 +344,46 @@ const extractUrl = (htmlString) => {
   padding: 12px;
 }
 
+.description-delete-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+}
+
+.description-content {
+  flex: 1;
+  min-width: 0;
+}
+
 .description-text {
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
   line-height: 1.4;
+}
+
+.delete-button-container {
+  flex-shrink: 0;
+}
+
+.delete-btn {
+  background-color: rgba(244, 67, 54, 0.1) !important;
+  border: 1px solid rgba(244, 67, 54, 0.3);
+  color: #d32f2f !important;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.delete-btn:hover {
+  background-color: rgba(244, 67, 54, 0.15) !important;
+  border-color: rgba(244, 67, 54, 0.5);
+  transform: translateY(-1px);
+}
+
+.delete-preview {
+  border: 1px solid #e0e0e0;
 }
 
 /* Responsive adjustments */
@@ -230,6 +416,16 @@ const extractUrl = (htmlString) => {
     flex-direction: column;
     gap: 4px;
     text-align: center;
+  }
+
+  .description-delete-section {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  .delete-btn {
+    width: 100%;
   }
 }
 </style>
