@@ -126,7 +126,7 @@ const handleForgotPassword = () => {
 const handleSignUp = () => {
   // TODO: Navigate to sign up page
   console.log('Sign up clicked')
-  // router.push('/signup')
+  router.push('/signup')
 }
 </script>
 

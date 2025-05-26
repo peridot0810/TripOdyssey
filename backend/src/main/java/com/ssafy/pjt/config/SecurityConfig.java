@@ -67,7 +67,8 @@ public class SecurityConfig {
 							"/swagger-ui.html",           // 리디렉션 경로
 							"/favicon.ico",
 							"/uploads/profile/**",
-							"/uploads/group/**"
+							"/uploads/group/**",
+							"/user/check/**"
 						).permitAll()
 					.anyRequest().authenticated()
 			)
