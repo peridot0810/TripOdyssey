@@ -65,7 +65,9 @@ public class SecurityConfig {
 							"/v3/api-docs/**",            // OpenAPI 문서 JSON
 							"/swagger-ui/**",             // Swagger UI 정적 파일
 							"/swagger-ui.html",           // 리디렉션 경로
-							"/favicon.ico"
+							"/favicon.ico",
+							"/uploads/profile/**",
+							"/uploads/group/**"
 						).permitAll()
 					.anyRequest().authenticated()
 			)

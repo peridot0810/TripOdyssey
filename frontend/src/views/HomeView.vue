@@ -9,22 +9,10 @@
     </div>
 
     <!-- Error State -->
-    <v-alert
-      v-else-if="error"
-      type="error"
-      class="mb-6"
-      closable
-      @click:close="clearError"
-    >
+    <v-alert v-else-if="error" type="error" class="mb-6" closable @click:close="clearError">
       {{ error }}
       <template #append>
-        <v-btn
-          variant="text"
-          size="small"
-          @click="loadGroups"
-        >
-          다시 시도
-        </v-btn>
+        <v-btn variant="text" size="small" @click="loadGroups"> 다시 시도 </v-btn>
       </template>
     </v-alert>
 
@@ -85,7 +73,7 @@ const loadGroups = async () => {
     const response = await apiClient.get('/user/groups')
 
     // Transform API response to match expected format
-    const transformedGroups = response.data.map(group => ({
+    const transformedGroups = response.data.map((group) => ({
       groupId: group.groupId,
       name: group.name,
       description: '', // API doesn't provide description, set empty
@@ -98,12 +86,11 @@ const loadGroups = async () => {
       roleLimits: {
         finance: 1, // Default values since API doesn't provide these
         schedule: 1,
-        logistics: 1
-      }
+        logistics: 1,
+      },
     }))
 
     groupStore.setGroups(transformedGroups)
-
   } catch (err) {
     console.error('Failed to load groups:', err)
 
