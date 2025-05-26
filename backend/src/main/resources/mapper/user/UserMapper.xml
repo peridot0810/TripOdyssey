@@ -19,10 +19,9 @@
     </select>
     
     <select id="getUserInfo">
-    	SELECT email, gender, age, leader_exp, schedule_exp, finance_exp, logistics_exp, member_exp
+    	SELECT email, gender, age, leader_exp, schedule_exp, finance_exp, logistics_exp, member_exp, nickname, user_id, profile_image
     	FROM user u
-    		INNER JOIN user_experience e 
-    		ON (u.id = e.user_id) 
+    		INNER JOIN user_experience e ON (u.id = e.user_id) 
     	WHERE u.id = #{userId}
     </select>
     

@@ -43,9 +43,12 @@
                         {{ group.startDate }} ~ {{ group.endDate }}
                       </p>
                     </div>
-                    <v-chip :color="getRoleColor(group.myRole)" size="small" variant="flat">
-                      {{ group.myRole }}
-                    </v-chip>
+                    <template v-for="role in group.myRole" :key="role">
+                      <v-chip :color="getRoleColor(role)" size="small" variant="flat">
+                        {{ role }}
+                      </v-chip>
+                    </template>
+                    
                   </div>
 
                   <div class="d-flex align-center">
@@ -68,18 +71,18 @@
 
             <div v-else>
               <v-card
-                v-for="group in invitedGroups"
-                :key="group.id"
+                v-for="invitation in invitedGroups"
+                :key="invitation.groupId"
                 class="invitation-card mb-3"
                 variant="outlined"
                 :class="{ 'invitation-highlight': true }"
               >
                 <v-card-text class="pa-3">
                   <div class="mb-3">
-                    <h3 class="text-subtitle-1 font-weight-bold mb-1">{{ group.name }}</h3>
-                    <p class="text-body-2 text-grey-darken-1 mb-2">{{ group.description }}</p>
+                    <h3 class="text-subtitle-1 font-weight-bold mb-1">{{ invitation.groupInfo.name }}</h3>
+                    <p class="text-body-2 text-grey-darken-1 mb-2">{{ invitation.groupInfo.description }}</p>
                     <p class="text-caption text-grey">
-                      {{ group.startDate }} ~ {{ group.endDate }}
+                      {{ invitation.groupInfo.startDate }} ~ {{ invitation.groupInfo.endDate }}
                     </p>
                   </div>
 
@@ -87,20 +90,22 @@
                     <div class="d-flex align-center">
                       <v-icon size="small" color="grey" class="mr-1">mdi-account-multiple</v-icon>
                       <span class="text-caption text-grey">
-                        {{ group.currentMembers }}/{{ group.maxMembers }}명
+                        {{invitation.memberCount}}/(최대 멤버 수)명
                       </span>
                     </div>
 
-                    <v-chip color="orange" size="small" variant="flat"> 초대 대기중 </v-chip>
+                    <v-chip :color="getStatusColor(invitation.status)" size="small" variant="flat">
+                        {{ invitation.status }}
+                      </v-chip>
                   </div>
 
-                  <div class="d-flex gap-2">
+                  <div v-if="invitation.status==='PENDING'" class="d-flex gap-2">
                     <v-btn
                       color="success"
                       variant="flat"
                       size="small"
                       prepend-icon="mdi-check"
-                      @click="acceptInvitation(group.id)"
+                      @click="acceptInvitation(invitation.senderId, invitation.groupId)"
                     >
                       수락
                     </v-btn>
@@ -109,7 +114,7 @@
                       variant="outlined"
                       size="small"
                       prepend-icon="mdi-close"
-                      @click="declineInvitation(group.id)"
+                      @click="declineInvitation(invitation.senderId,invitation.groupId)"
                     >
                       거절
                     </v-btn>
@@ -126,94 +131,86 @@
 
 <script setup>
 import { ref } from 'vue'
+import { apiClient } from '@/stores/apiClient'
+
+const props = defineProps({
+  joinedGroups: {
+    type: Array,
+    required: true,
+  },
+  invitedGroups: {
+    type: Array,
+    required: true
+  }
+})
 
 const activeTab = ref('joined')
 
-// Dummy data for joined groups
-const joinedGroups = ref([
-  {
-    id: 1,
-    name: '제주도 힐링 여행',
-    startDate: '2025-06-15',
-    endDate: '2025-06-18',
-    myRole: '리더',
-    memberCount: 4,
-  },
-  {
-    id: 2,
-    name: '부산 맛집 탐방',
-    startDate: '2025-07-20',
-    endDate: '2025-07-22',
-    myRole: '멤버',
-    memberCount: 6,
-  },
-  {
-    id: 3,
-    name: '강원도 캠핑 여행',
-    startDate: '2025-08-10',
-    endDate: '2025-08-13',
-    myRole: '일정관리',
-    memberCount: 5,
-  },
-])
-
-// Dummy data for invited groups
-const invitedGroups = ref([
-  {
-    id: 4,
-    name: '경주 역사 탐방',
-    description: '경주의 아름다운 역사 유적지들을 함께 둘러보는 문화 여행입니다.',
-    startDate: '2025-09-05',
-    endDate: '2025-09-07',
-    currentMembers: 3,
-    maxMembers: 6,
-  },
-  {
-    id: 5,
-    name: '전주 한옥마을 투어',
-    description: '전주의 전통과 맛을 느낄 수 있는 특별한 여행을 계획하고 있습니다.',
-    startDate: '2025-10-12',
-    endDate: '2025-10-14',
-    currentMembers: 2,
-    maxMembers: 5,
-  },
-])
-
 function getRoleColor(role) {
   const roleColors = {
-    리더: 'primary',
-    일정관리: 'success',
-    재정관리: 'warning',
-    물류관리: 'info',
-    멤버: 'grey',
+    master: 'primary',
+    schedule: 'success',
+    finance: 'warning',
+    logistics: 'info',
+    normal: 'grey',
   }
   return roleColors[role] || 'grey'
 }
 
-function acceptInvitation(groupId) {
-  const groupIndex = invitedGroups.value.findIndex((g) => g.id === groupId)
+function getStatusColor(status) {
+  const statusColors = {
+    PENDING: 'primary',
+    REJECTED: 'warning',
+    ACCEPTED: 'success'
+  }
+  return statusColors[status] || 'grey'
+}
+
+async function acceptInvitation(senderId, groupId) {
+  console.log("props invitedGroups : ")
+  console.log(props.invitedGroups)
+  const groupIndex = props.invitedGroups.findIndex((g) => g.groupId === groupId)
+  console.log("groupIndex : ")
+  console.log(groupIndex)
   if (groupIndex !== -1) {
-    const acceptedGroup = invitedGroups.value.splice(groupIndex, 1)[0]
 
-    // Add to joined groups (with default member role)
-    joinedGroups.value.push({
-      id: acceptedGroup.id,
-      name: acceptedGroup.name,
-      startDate: acceptedGroup.startDate,
-      endDate: acceptedGroup.endDate,
-      myRole: '멤버',
-      memberCount: acceptedGroup.currentMembers + 1,
+    const acceptedInvitation = props.invitedGroups[groupIndex]
+    const res = await apiClient.put("/user/invited", {
+      "senderId" : senderId,
+      "groupId" : groupId,
+      "accept" : true
     })
+    acceptedInvitation.status="ACCEPTED"
 
-    console.log(`Accepted invitation for group: ${acceptedGroup.name}`)
+    // 새로 참여하게 된 그룹 생성 및 추가 
+    props.joinedGroups.unshift({
+      "groupId" : groupId,
+      "memberCount" : acceptedInvitation.memberCount+1,
+      "myRole" : ['normal'],
+      "name" : acceptedInvitation.groupInfo.name,
+      "progress" : acceptedInvitation.groupInfo.progress,
+      "startDate" : acceptedInvitation.groupInfo.startDate,
+      "endDate" : acceptedInvitation.groupInfo.endDate,
+      "status" : acceptedInvitation.groupInfo.status
+    })
   }
 }
 
-function declineInvitation(groupId) {
-  const groupIndex = invitedGroups.value.findIndex((g) => g.id === groupId)
+async function declineInvitation(senderId, groupId) {
+  const groupIndex = props.invitedGroups.findIndex((g) => g.groupId === groupId)
   if (groupIndex !== -1) {
-    const declinedGroup = invitedGroups.value.splice(groupIndex, 1)[0]
-    console.log(`Declined invitation for group: ${declinedGroup.name}`)
+    // const declinedGroup = props.invitedGroups.splice(groupIndex, 1)[0]
+
+    const declinedInvitation = props.invitedGroups[groupIndex]
+    const res = await apiClient.put("/user/invited", {
+      "senderId" : senderId,
+      "groupId" : groupId,
+      "accept" : false
+    })
+
+    declinedInvitation.status="REJECTED";
+    
+    console.log(props.invitedGroups[groupIndex])
   }
 }
 </script>

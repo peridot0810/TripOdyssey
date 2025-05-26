@@ -60,7 +60,8 @@ const props = defineProps({
 })
 
 // For now, profile image URL is empty
-const profileImageUrl = ''
+const imageUrlPrefix="http://localhost:8080"
+const profileImageUrl = props.userInfo.profileImage ? imageUrlPrefix + props.userInfo.profileImage : '';
 
 const genderText = computed(() => {
   return props.userInfo.gender === 'male' ? '남성' : '여성'
