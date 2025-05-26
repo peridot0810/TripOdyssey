@@ -7,11 +7,11 @@
         @click="previousMonth"
         :disabled="isNavigationDisabled('prev')"
       >
-        ◀
+        <svg-icon type="mdi" :path="chevronLeftPath" size="20"></svg-icon>
       </button>
 
       <div class="navigation-title">
-        Navigate Months
+        {{ getMonthRangeLabel() }}
       </div>
 
       <button
@@ -19,17 +19,12 @@
         @click="nextMonth"
         :disabled="isNavigationDisabled('next')"
       >
-        ▶
+        <svg-icon type="mdi" :path="chevronRightPath" size="20"></svg-icon>
       </button>
     </div>
 
     <!-- Vertical Calendar Layout -->
     <div class="vertical-calendar-grid">
-      <!-- Top Month Title -->
-      <div class="month-header top-header">
-        <h3 class="month-title">{{ getMonthLabel(leftMonth, leftYear) }}</h3>
-      </div>
-
       <!-- First Calendar -->
       <div class="calendar-container">
         <div class="calendar-grid">
@@ -75,32 +70,17 @@
           </div>
         </div>
       </div>
-
-      <!-- Bottom Month Title -->
-      <div class="month-header bottom-header">
-        <h3 class="month-title">{{ getMonthLabel(rightMonth, rightYear) }}</h3>
-      </div>
-    </div>
-
-    <!-- Selection Info -->
-    <div v-if="selectedStart || selectedEnd" class="selection-info">
-      <div class="selection-text">
-        <span v-if="selectedStart && !selectedEnd">
-          Start: {{ formatDate(selectedStart) }} (Select end date)
-        </span>
-        <span v-else-if="selectedStart && selectedEnd">
-          Range: {{ formatDate(selectedStart) }} → {{ formatDate(selectedEnd) }}
-        </span>
-      </div>
-      <button class="clear-btn" @click="clearSelection">
-        Clear
-      </button>
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import SvgIcon from '@jamescoyle/vue-icon'
+import { mdiChevronLeft, mdiChevronRight } from '@mdi/js'
+
+const chevronLeftPath = mdiChevronLeft
+const chevronRightPath = mdiChevronRight
 
 // Props (if needed for external control)
 const props = defineProps({
@@ -140,14 +120,23 @@ const rightYear = computed(() => {
 })
 
 const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-const monthNames = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December'
+
+const monthNamesKorean = [
+  '1월', '2월', '3월', '4월', '5월', '6월',
+  '7월', '8월', '9월', '10월', '11월', '12월'
 ]
 
-// Methods
-function getMonthLabel(month, year) {
-  return `${monthNames[month]} ${year}`
+function getMonthRangeLabel() {
+  const leftMonthName = monthNamesKorean[leftMonth.value]
+  const rightMonthName = monthNamesKorean[rightMonth.value]
+
+  // If both months are in the same year, show: "5월 - 6월 2025"
+  if (leftYear.value === rightYear.value) {
+    return `${leftMonthName} - ${rightMonthName} ${leftYear.value}`
+  } else {
+    // If crossing years, show: "12월 2024 - 1월 2025"
+    return `${leftMonthName} ${leftYear.value} - ${rightMonthName} ${rightYear.value}`
+  }
 }
 
 function getBlankDays(month, year) {
@@ -261,15 +250,6 @@ function isNavigationDisabled(direction) {
   }
 }
 
-function formatDate(date) {
-  if (!date) return ''
-  return date.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric'
-  })
-}
-
 // Expose methods for parent component
 defineExpose({
   clearSelection,
@@ -281,7 +261,7 @@ defineExpose({
 
 onMounted(() => {
   // Initialize with current month
-  console.log('DatePicker initialized with:', getMonthLabel(leftMonth.value, leftYear.value))
+  console.log('DatePicker initialized with:', getMonthRangeLabel())
 })
 </script>
 
@@ -312,10 +292,11 @@ onMounted(() => {
   width: 40px;
   height: 40px;
   border: none;
-  border-radius: 8px;
+  border-radius: 50%;
   cursor: pointer;
-  font-size: 16px;
-  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: all 0.2s ease;
 }
 
@@ -340,11 +321,11 @@ onMounted(() => {
 }
 
 .navigation-title {
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 600;
-  color: #666;
+  color: #1976d2;
   text-align: center;
-  min-width: 140px;
+  min-width: 180px;
 }
 
 .vertical-calendar-grid {
@@ -355,29 +336,6 @@ onMounted(() => {
 
 .calendar-container {
   width: 100%;
-}
-
-.month-header {
-  padding: 8px 0;
-  text-align: center;
-  background-color: #f5f5f5;
-  border-radius: 6px;
-  border: 1px solid #e0e0e0;
-}
-
-.top-header {
-  margin-bottom: 8px;
-}
-
-.bottom-header {
-  margin-top: 8px;
-}
-
-.month-title {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #1976d2;
-  margin: 0;
 }
 
 .calendar-grid {
@@ -487,8 +445,8 @@ onMounted(() => {
   }
 
   .navigation-title {
-    font-size: 0.9rem;
-    min-width: 120px;
+    font-size: 1rem;
+    min-width: 160px;
   }
 
   .vertical-calendar-grid {
@@ -512,14 +470,14 @@ onMounted(() => {
     padding: 6px 2px;
   }
 
-  .month-title {
-    font-size: 1rem;
+  .navigation-title {
+    font-size: 0.9rem;
+    min-width: 140px;
   }
 
   .nav-btn {
     width: 36px;
     height: 36px;
-    font-size: 14px;
   }
 }
 </style>

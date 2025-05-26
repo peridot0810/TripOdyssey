@@ -11,6 +11,9 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@jamescoyle/vue-icon": "^0.1.2",
+    "@mdi/font": "^7.4.47",
+    "@mdi/js": "^7.4.47",
     "axios": "^1.9.0",
     "markdown-it": "^14.1.0",
     "markdown-it-abbr": "^2.0.0",

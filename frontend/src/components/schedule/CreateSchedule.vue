@@ -1,51 +1,62 @@
 <template>
-  <v-dialog v-model="internalDialog" max-width="600px" persistent>
+  <v-dialog v-model="showDialog" max-width="600px" persistent>
     <v-card>
       <v-card-title class="d-flex align-center justify-space-between">
         <div class="d-flex align-center">
-          <v-icon color="primary" class="mr-2">mdi-calendar-plus</v-icon>
+          <SvgIcon type="mdi" :path="calendarPlusIcon" size="20" color="primary" class="mr-2" />
           <span class="text-h6 font-weight-bold">새 일정 추가</span>
         </div>
         <v-btn icon variant="text" @click="closeDialog">
-          <v-icon>mdi-close</v-icon>
+          <SvgIcon type="mdi" :path="closeIcon" size="20" />
         </v-btn>
       </v-card-title>
 
       <v-divider></v-divider>
 
       <v-card-text class="pa-6">
+        <!-- Error Alert -->
+        <v-alert
+          v-if="error"
+          type="error"
+          class="mb-4"
+          closable
+          @click:close="clearError"
+        >
+          {{ error }}
+        </v-alert>
+
         <v-form ref="form" @submit.prevent="handleSubmit">
           <!-- Selected Location Info -->
           <div class="selected-location mb-6">
             <h3 class="text-h6 font-weight-bold mb-3">선택된 장소</h3>
-            <v-card variant="outlined" class="pa-4">
-              <div class="d-flex flex-column align-center text-center">
-                <v-img
-                  v-if="selectedLocation?.firstImage1"
-                  :src="selectedLocation.firstImage1"
-                  width="200"
-                  height="150"
-                  cover
-                  class="rounded mb-3"
-                ></v-img>
-                <div v-else class="location-placeholder mb-3">
-                  <v-icon color="grey" size="x-large">mdi-image-off</v-icon>
-                </div>
-                <div class="location-details">
-                  <h4 class="text-h6 font-weight-bold mb-2">{{ selectedLocation?.title || '장소 미정' }}</h4>
-                  <v-chip
-                    color="primary"
-                    variant="flat"
-                    size="small"
-                    class="mb-2"
-                  >
-                    {{ selectedLocation?.contentTypeName || '카테고리 미정' }}
-                  </v-chip>
-                  <p v-if="selectedLocation?.addr1" class="text-body-2 text-grey mb-0">
-                    <v-icon size="small" class="mr-1">mdi-map-marker</v-icon>
-                    {{ selectedLocation.addr1 }}
-                  </p>
-                </div>
+            <v-card variant="outlined" class="pa-0 overflow-hidden">
+              <v-img
+                v-if="selectedLocation?.firstImage1"
+                :src="selectedLocation.firstImage1"
+                height="200"
+                cover
+                class="location-img"
+              />
+              <div v-else class="location-placeholder">
+                <SvgIcon type="mdi" :path="imageOffIcon" size="28" color="grey" />
+              </div>
+
+              <div class="location-meta pa-4 text-center">
+                <h4 class="text-h6 font-weight-bold mb-2">
+                  {{ selectedLocation?.title || '장소 미정' }}
+                </h4>
+                <v-chip
+                  color="primary"
+                  variant="outlined"
+                  size="small"
+                  class="mb-2 font-weight-bold"
+                >
+                  {{ selectedLocation?.contentTypeName || '카테고리 미정' }}
+                </v-chip>
+                <p v-if="selectedLocation?.addr1" class="text-body-2 text-grey d-flex align-center justify-center mb-0">
+                  <SvgIcon type="mdi" :path="mapMarkerIcon" size="16" class="mr-1" />
+                  {{ selectedLocation.addr1 }}
+                </p>
               </div>
             </v-card>
           </div>
@@ -85,8 +96,9 @@
           취소
         </v-btn>
         <v-btn
-          color="primary"
-          variant="elevated"
+          variant="flat"
+          color="pink"
+          style="border-radius: 9999px; background-color: #d81b60; color: white; font-weight: 600; padding: 6px 20px;"
           @click="handleSubmit"
           :loading="isSubmitting"
         >
@@ -98,22 +110,24 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useScheduleStore } from '@/stores/schedule'
+import { apiClient } from '@/utils/apiClient'
+import SvgIcon from '@jamescoyle/vue-icon'
+import { mdiCalendarPlus, mdiClose, mdiMapMarker, mdiImageOff } from '@mdi/js'
+
+const calendarPlusIcon = mdiCalendarPlus
+const closeIcon = mdiClose
+const mapMarkerIcon = mdiMapMarker
+const imageOffIcon = mdiImageOff
 
 const props = defineProps({
-  modelValue: {
-    type: Boolean,
-    default: false
-  },
   selectedLocation: {
     type: Object,
     required: true
   }
 })
-
-const emit = defineEmits(['update:modelValue'])
 
 const route = useRoute()
 const scheduleStore = useScheduleStore()
@@ -121,11 +135,8 @@ const scheduleStore = useScheduleStore()
 // Get groupId from route params
 const groupId = route.params.groupId
 
-// Internal dialog state
-const internalDialog = computed({
-  get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value)
-})
+// Internal dialog state (no emit needed)
+const showDialog = ref(false)
 
 // Form data
 const scheduleForm = ref({
@@ -134,6 +145,7 @@ const scheduleForm = ref({
 })
 
 const isSubmitting = ref(false)
+const error = ref(null)
 const form = ref(null)
 
 // Form validation rules
@@ -147,8 +159,15 @@ const descriptionRules = [
 ]
 
 // Methods
+const openDialog = () => {
+  showDialog.value = true
+  // Pre-fill schedule name with location title
+  scheduleForm.value.name = props.selectedLocation?.title || ''
+  clearError()
+}
+
 const closeDialog = () => {
-  internalDialog.value = false
+  showDialog.value = false
   resetForm()
 }
 
@@ -160,6 +179,11 @@ const resetForm = () => {
   if (form.value) {
     form.value.resetValidation()
   }
+  clearError()
+}
+
+const clearError = () => {
+  error.value = null
 }
 
 const handleSubmit = async () => {
@@ -169,43 +193,59 @@ const handleSubmit = async () => {
   if (!valid) return
 
   isSubmitting.value = true
+  error.value = null
 
   try {
-    // Create schedule data
+    // 1. First, make API call to create schedule on server
+    const response = await apiClient.post(`/schedule/${groupId}/content`, {
+      name: scheduleForm.value.name,
+      description: scheduleForm.value.description,
+      attractionNo: props.selectedLocation.no
+    })
+
+    if (!response.data.success) {
+      throw new Error(response.data.message || 'Failed to create schedule')
+    }
+
+    // 2. Then, add to schedule store with the server response data
     const newScheduleData = {
       name: scheduleForm.value.name,
       description: scheduleForm.value.description,
       selectedLocation: props.selectedLocation
     }
 
-    // Add to schedule store directly
     const newSchedule = scheduleStore.addSchedule(newScheduleData)
 
-    // Optionally save to server
-    try {
-      await scheduleStore.saveScheduleToServer(groupId, newSchedule)
-      console.log('Schedule saved to server successfully')
-    } catch (serverError) {
-      // Even if server save fails, keep the local schedule
-      console.warn('Failed to save to server, but schedule added locally:', serverError)
+    // Update the local schedule with any server-provided data if needed
+    if (response.data.data && response.data.data.contentId) {
+      // Find the schedule we just added and update it with server data
+      const addedSchedule = scheduleStore.schedules.find(s => s === newSchedule)
+      if (addedSchedule) {
+        addedSchedule.contentId = response.data.data.contentId
+      }
     }
 
-    console.log('New schedule created and added to store:', newSchedule)
+    console.log('Schedule created successfully:', newSchedule)
     closeDialog()
-  } catch (error) {
-    console.error('Error creating schedule:', error)
+
+  } catch (err) {
+    console.error('Error creating schedule:', err)
+    error.value = err.response?.data?.message || err.message || 'Failed to create schedule'
   } finally {
     isSubmitting.value = false
   }
 }
 
-// Reset form when dialog opens
-watch(() => props.modelValue, (newValue) => {
-  if (newValue) {
-    // Pre-fill schedule name with location title
-    scheduleForm.value.name = props.selectedLocation?.title || ''
-  } else {
-    resetForm()
+// Expose methods to parent if needed
+defineExpose({
+  openDialog,
+  closeDialog
+})
+
+// Watch for selectedLocation changes to update form when dialog is open
+watch(() => props.selectedLocation, (newLocation) => {
+  if (showDialog.value && newLocation) {
+    scheduleForm.value.name = newLocation.title || ''
   }
 })
 </script>
@@ -233,5 +273,10 @@ watch(() => props.modelValue, (newValue) => {
 
 .v-card-title {
   background-color: #f5f5f5;
+}
+
+.location-img {
+  width: 100%;
+  object-fit: cover;
 }
 </style>

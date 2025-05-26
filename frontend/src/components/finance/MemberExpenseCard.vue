@@ -70,11 +70,11 @@
             icon
             size="small"
             variant="flat"
-            :color="isEditing ? 'success' : 'primary'"
+            :color="isEditing ? 'success' : 'orange'"
             @click="handleSaveOrEdit"
             :loading="isSaving"
           >
-            <v-icon size="20">{{ isEditing ? 'mdi-check' : 'mdi-pencil' }}</v-icon>
+            <SvgIcon type="mdi" :path="isEditing ? checkIcon : pencilIcon" size="20" />
           </v-btn>
         </div>
       </div>
@@ -104,6 +104,11 @@ import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useMemberExpenseStore } from '@/stores/memberExpense'
 import { apiClient } from '@/utils/apiClient'
+import SvgIcon from '@jamescoyle/vue-icon'
+import { mdiCheck, mdiPencil } from '@mdi/js'
+
+const checkIcon = mdiCheck
+const pencilIcon = mdiPencil
 
 // Router and Store
 const route = useRoute()
@@ -185,7 +190,7 @@ const remainingAmountClass = computed(() => {
 
 const avatarColor = computed(() => {
   // Generate a consistent color based on userId
-  const colors = ['primary', 'secondary', 'accent', 'info', 'warning', 'error', 'success']
+  const colors = ['orange', 'deep-orange', 'amber', 'orange-darken-2', 'orange-lighten-2', 'deep-orange-darken-2']
   const hash = props.member.userId.split('').reduce((a, b) => {
     a = ((a << 5) - a) + b.charCodeAt(0)
     return a & a
@@ -246,10 +251,35 @@ const handleSaveOrEdit = async () => {
 
       console.log('Member expense updated successfully')
     } else {
-      console.error('Failed to update member expense:', response.data.message)
+      throw new Error(response.data.message || 'Failed to update member expense')
     }
   } catch (error) {
     console.error('Error updating member expense:', error)
+
+    let errorMessage = '멤버 경비 업데이트 중 오류가 발생했습니다.'
+
+    if (error.response) {
+      const status = error.response.status
+      const message = error.response.data?.message || error.message
+
+      if (status === 400) {
+        errorMessage = `입력 데이터 오류: ${message}`
+      } else if (status === 401) {
+        errorMessage = '로그인이 필요합니다.'
+      } else if (status === 403) {
+        errorMessage = '멤버 경비를 수정할 권한이 없습니다.'
+      } else if (status === 404) {
+        errorMessage = '해당 그룹을 찾을 수 없습니다.'
+      } else {
+        errorMessage = `서버 오류 (${status}): ${message}`
+      }
+    } else if (error.code === 'ECONNABORTED') {
+      errorMessage = '요청 시간이 초과되었습니다. 다시 시도해주세요.'
+    } else {
+      errorMessage = error.message || errorMessage
+    }
+
+    memberExpenseStore.setError(errorMessage)
   } finally {
     isSaving.value = false
   }
@@ -315,8 +345,8 @@ const handleSaveOrEdit = async () => {
 
 .expense-input:focus {
   outline: none;
-  border-color: #1976d2;
-  box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+  border-color: #ff9800;
+  box-shadow: 0 0 0 2px rgba(255, 152, 0, 0.2);
 }
 
 .action-section {

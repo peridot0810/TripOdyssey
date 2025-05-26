@@ -25,10 +25,10 @@ const showDialog = ref(false)
 
 <style scoped>
 .transportation-ai-helper {
-  position: fixed;
-  bottom: 24px;
-  left: 24px;
-  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
 }
 
 .ai-helper-button {
@@ -36,9 +36,7 @@ const showDialog = ref(false)
   height: 56px !important;
   border-radius: 50% !important;
   min-width: auto !important;
-  transition:
-    transform 0.2s,
-    box-shadow 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
 }
 

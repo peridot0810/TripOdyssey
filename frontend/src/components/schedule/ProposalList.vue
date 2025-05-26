@@ -1,7 +1,7 @@
 <template>
   <div class="proposal-list">
     <h2 class="text-h5 font-weight-bold mb-4 d-flex align-center">
-      <v-icon size="large" color="primary" class="mr-2">mdi-map-marker-multiple</v-icon>
+      <SvgIcon type="mdi" :path="mapMarkerIcon" size="24" class="mr-2" />
       추천 관광지 목록
     </h2>
 
@@ -24,7 +24,7 @@
 
     <!-- Empty State -->
     <div v-else-if="proposalStore.proposals.length === 0" class="empty-state text-center py-8">
-      <v-icon size="x-large" color="grey">mdi-map-search</v-icon>
+      <SvgIcon type="mdi" :path="mapSearchIcon" size="28" color="grey" />
       <p class="text-body-1 text-grey-darken-1 mt-3">추천된 장소가 없습니다</p>
     </div>
 
@@ -47,23 +47,22 @@
             v-if="isSchedulePage"
             icon
             size="small"
+            variant="flat"
             color="success"
-            variant="elevated"
             class="add-schedule-button"
             @click="handleAddToSchedule(location)"
             :title="'일정 후보에 추가'"
           >
-            <span class="add-text">추가</span>
+            <SvgIcon type="mdi" :path="plusIcon" size="20" color="white" />
           </v-btn>
         </div>
       </div>
     </div>
 
-    <!-- Create Schedule Modal -->
+    <!-- Updated Create Schedule Modal -->
     <CreateSchedule
-      v-if="selectedLocationForSchedule && selectedLocationForSchedule.proposalId"
-      v-model="showCreateScheduleDialog"
-      :selected-location="selectedLocationForSchedule"
+      ref="createScheduleModal"
+      :selected-location="selectedLocationForSchedule || {}"
     />
   </div>
 </template>
@@ -75,6 +74,12 @@ import ProposalCard from '@/components/schedule/ProposalCard.vue'
 import CreateSchedule from '@/components/schedule/CreateSchedule.vue'
 import { useProposalStore } from '@/stores/proposal'
 import { useScheduleStore } from '@/stores/schedule'
+import SvgIcon from '@jamescoyle/vue-icon'
+import { mdiMapMarkerMultiple, mdiMapSearch, mdiPlus } from '@mdi/js'
+
+const mapMarkerIcon = mdiMapMarkerMultiple
+const mapSearchIcon = mdiMapSearch
+const plusIcon = mdiPlus
 
 const route = useRoute()
 const proposalStore = useProposalStore()
@@ -89,7 +94,7 @@ const isSchedulePage = computed(() => {
 })
 
 // Create Schedule Modal state
-const showCreateScheduleDialog = ref(false)
+const createScheduleModal = ref(null)
 const selectedLocationForSchedule = ref(null)
 
 const handleToggleLike = async (proposalId) => {
@@ -103,7 +108,8 @@ const handleToggleLike = async (proposalId) => {
 
 const handleAddToSchedule = (location) => {
   selectedLocationForSchedule.value = location
-  showCreateScheduleDialog.value = true
+  // Use the exposed method to open the dialog
+  createScheduleModal.value?.openDialog()
 }
 
 // Fetch proposals when component mounts
@@ -151,17 +157,12 @@ onMounted(() => {
   min-width: auto !important;
   transition: transform 0.2s, box-shadow 0.2s;
   flex-shrink: 0;
+  background-color: #4397ff !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .add-schedule-button:hover {
-  transform: translateY(-1px) scale(1.05);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
-}
-
-.add-text {
-  font-size: 11px;
-  font-weight: bold;
-  color: white;
-  line-height: 1;
+  transform: scale(1.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
 }
 </style>

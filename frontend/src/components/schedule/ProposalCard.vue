@@ -27,23 +27,29 @@
       </v-card-title>
 
       <v-card-text class="d-flex justify-space-between align-center pa-0 mt-1">
-        <v-chip size="small" color="primary" variant="flat" class="text-caption">
-          {{ location.contentTypeName }}
-        </v-chip>
+      <v-chip
+        size="small"
+        variant="outlined"
+        color="primary"
+        class="text-caption font-weight-bold"
+      >
+        {{ location.contentTypeName }}
+      </v-chip>
+
 
         <span class="text-caption text-grey">{{ location.userId }}</span>
 
         <v-btn
           size="small"
-          :color="location.userLiked ? 'red' : 'pink'"
+          :color="location.userLiked ? 'pink' : 'pink'"
           variant="elevated"
           class="like-button"
           @click="handleLikeClick"
           :loading="isLiking"
         >
-          <v-icon size="small" class="mr-1">
-            {{ location.userLiked ? 'mdi-heart' : 'mdi-heart-outline' }}
-          </v-icon>
+          <template #prepend>
+            <SvgIcon type="mdi" :path="location.userLiked ? heartPath : heartOutlinePath" size="16" />
+          </template>
           <span class="text-caption">{{ location.likes || 0 }}</span>
         </v-btn>
       </v-card-text>
@@ -53,21 +59,21 @@
 
 <script setup>
 import { ref } from 'vue'
+import SvgIcon from '@jamescoyle/vue-icon'
+import { mdiHeart, mdiHeartOutline } from '@mdi/js'
+
+const heartPath = mdiHeart
+const heartOutlinePath = mdiHeartOutline
 
 const props = defineProps({
-  location: {
-    type: Object,
-    required: true
-  }
+  location: { type: Object, required: true }
 })
-
 const emit = defineEmits(['toggle-like'])
 
 const isLiking = ref(false)
 
 const handleLikeClick = async () => {
   if (isLiking.value) return
-
   isLiking.value = true
   try {
     await emit('toggle-like', props.location.proposalId)
@@ -76,6 +82,7 @@ const handleLikeClick = async () => {
   }
 }
 </script>
+
 
 <style scoped>
 .proposal-card {

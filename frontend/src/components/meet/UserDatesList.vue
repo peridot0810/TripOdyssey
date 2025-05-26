@@ -50,47 +50,15 @@
                 variant="text"
                 :loading="deletingIds.has(dateRange.id)"
                 :disabled="deletingIds.has(dateRange.id)"
-                @click="confirmDelete(dateRange)"
+                @click="deleteDate(dateRange)"
               >
-                <v-icon size="small">mdi-close</v-icon>
+                <svg-icon type="mdi" :path="deletePath" size="20"></svg-icon>
               </v-btn>
             </div>
           </v-card-text>
         </v-card>
       </div>
     </div>
-
-    <!-- Delete Confirmation Dialog -->
-    <v-dialog v-model="showDeleteDialog" max-width="400">
-      <v-card>
-        <v-card-title class="text-h6">
-          Delete Available Date?
-        </v-card-title>
-        <v-card-text>
-          <p>Are you sure you want to delete this availability?</p>
-          <div class="mt-2 pa-2 bg-grey-lighten-4 rounded">
-            <strong>{{ selectedDateForDeletion ? formatDateRange(selectedDateForDeletion.startDate, selectedDateForDeletion.endDate) : '' }}</strong>
-          </div>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-            text
-            @click="cancelDelete"
-          >
-            Cancel
-          </v-btn>
-          <v-btn
-            color="error"
-            variant="flat"
-            :loading="isDeleting"
-            @click="deleteDate"
-          >
-            Delete
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
 
     <!-- Error Alert -->
     <v-alert
@@ -102,43 +70,28 @@
     >
       {{ errorMessage }}
     </v-alert>
-
-    <!-- Success Alert -->
-    <v-alert
-      v-if="successMessage"
-      type="success"
-      class="mt-3"
-      closable
-      @click:close="clearSuccess"
-    >
-      {{ successMessage }}
-    </v-alert>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-//import { useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { useWhen2MeetStore } from '@/stores/when2meet'
 import { apiClient } from '@/utils/apiClient'
 
+import SvgIcon from '@jamescoyle/vue-icon'
+import { mdiDelete } from '@mdi/js'
+
+const deletePath = mdiDelete
+
 // Stores
 const userStore = useUserStore()
 const when2MeetStore = useWhen2MeetStore()
-//const route = useRoute()
 
 // State
 const isLoading = ref(false)
-const isDeleting = ref(false)
 const errorMessage = ref('')
-const successMessage = ref('')
-const showDeleteDialog = ref(false)
-const selectedDateForDeletion = ref(null)
 const deletingIds = ref(new Set())
-
-// Get group ID from route
-//const groupId = route.params.groupId
 
 // Get user's available dates from store
 const userDates = computed(() => {
@@ -153,22 +106,9 @@ const userDates = computed(() => {
 })
 
 // Methods
-const confirmDelete = (dateRange) => {
-  selectedDateForDeletion.value = dateRange
-  showDeleteDialog.value = true
-}
+const deleteDate = async (dateRange) => {
+  const dateId = dateRange.id
 
-const cancelDelete = () => {
-  showDeleteDialog.value = false
-  selectedDateForDeletion.value = null
-}
-
-const deleteDate = async () => {
-  if (!selectedDateForDeletion.value) return
-
-  const dateId = selectedDateForDeletion.value.id
-
-  isDeleting.value = true
   deletingIds.value.add(dateId)
   clearMessages()
 
@@ -178,17 +118,11 @@ const deleteDate = async () => {
     const response = await apiClient.delete(`/meet/schedule/${dateId}`)
 
     if (response.data.success) {
-      successMessage.value = response.data.message || 'Availability deleted successfully!'
-
       // Remove from store
       const updatedData = when2MeetStore.availabilityData.filter(
         item => item.id !== dateId
       )
       when2MeetStore.setAvailabilityData(updatedData)
-
-      // Close dialog
-      showDeleteDialog.value = false
-      selectedDateForDeletion.value = null
 
       console.log('Availability deleted successfully')
     } else {
@@ -217,7 +151,6 @@ const deleteDate = async () => {
       errorMessage.value = 'Network error. Please check your connection.'
     }
   } finally {
-    isDeleting.value = false
     deletingIds.value.delete(dateId)
   }
 }
@@ -261,15 +194,10 @@ const formatDateDetails = (startDate, endDate) => {
 
 const clearMessages = () => {
   errorMessage.value = ''
-  successMessage.value = ''
 }
 
 const clearError = () => {
   errorMessage.value = ''
-}
-
-const clearSuccess = () => {
-  successMessage.value = ''
 }
 
 // Lifecycle

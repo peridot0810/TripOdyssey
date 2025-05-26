@@ -1,112 +1,175 @@
 <template>
   <v-dialog v-model="dialog" max-width="600px" persistent>
     <v-card>
-      <v-card-title class="text-h5 pa-6 bg-primary text-white">
-        <v-icon class="mr-3">mdi-cash-plus</v-icon>
-        경비 추가
-        <v-spacer></v-spacer>
-        <v-btn icon variant="text" @click="closeModal" class="text-white">
-          <v-icon>mdi-close</v-icon>
-        </v-btn>
-      </v-card-title>
-
-      <v-card-text class="pa-6">
-        <!-- Schedule Info (if linked to schedule) -->
-        <div v-if="schedule" class="schedule-info mb-4">
-          <v-alert type="info" variant="tonal" density="compact">
-            <div class="d-flex align-center">
-              <v-icon class="mr-2">mdi-map-marker</v-icon>
-              <div>
-                <strong>{{ schedule.attractionInfo?.title || schedule.name }}</strong>
-                <div class="text-caption">{{ schedule.attractionInfo?.addr1 || '주소 정보 없음' }}</div>
-              </div>
+      <!-- Removed card title header -->
+      <v-card-text class="pa-0">
+        <!-- Schedule Info Section -->
+        <div v-if="schedule" class="schedule-info-section">
+          <!-- Schedule Image -->
+          <div class="schedule-image-container">
+            <v-img
+              v-if="schedule.attractionInfo?.firstImage1"
+              :src="schedule.attractionInfo.firstImage1"
+              :alt="schedule.attractionInfo.title"
+              height="200"
+              cover
+              class="schedule-image"
+            >
+              <template v-slot:placeholder>
+                <div class="d-flex align-center justify-center fill-height">
+                  <v-progress-circular indeterminate color="primary"></v-progress-circular>
+                </div>
+              </template>
+            </v-img>
+            <div v-else class="no-image-placeholder d-flex flex-column align-center justify-center">
+              <SvgIcon type="mdi" :path="imageOffIcon" size="32" color="grey-lighten-1" />
+              <span class="text-caption text-grey-lighten-1 mt-2">이미지 없음</span>
             </div>
-          </v-alert>
+          </div>
+
+          <!-- Schedule Details -->
+          <div class="schedule-details pa-4">
+            <div class="d-flex align-center justify-between mb-2">
+              <h3 class="text-h6 font-weight-bold">{{ schedule.attractionInfo?.title || schedule.name }}</h3>
+              <v-btn icon variant="text" @click="closeModal">
+                <SvgIcon type="mdi" :path="closeIcon" size="20" />
+              </v-btn>
+            </div>
+            <div class="d-flex align-center mb-2">
+              <SvgIcon type="mdi" :path="mapMarkerIcon" size="16" color="grey-darken-1" class="mr-2" />
+              <span class="text-body-2 text-grey-darken-1">
+                {{ schedule.attractionInfo?.addr1 || '주소 정보 없음' }}
+              </span>
+            </div>
+            <div class="d-flex align-center">
+              <SvgIcon type="mdi" :path="cashPlusIcon" size="16" color="primary" class="mr-2" />
+              <span class="text-body-2 text-primary font-weight-medium">경비 추가</span>
+            </div>
+          </div>
         </div>
 
-        <v-form ref="form" v-model="valid" @submit.prevent="submitForm">
-          <v-row>
-            <!-- Amount -->
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model="formData.amount"
-                label="금액"
-                type="number"
-                variant="outlined"
-                density="comfortable"
-                prepend-inner-icon="mdi-currency-krw"
-                suffix="원"
-                :rules="amountRules"
-                required
-              ></v-text-field>
-            </v-col>
+        <!-- No Schedule State -->
+        <div v-else class="no-schedule-header pa-4 d-flex align-center justify-between">
+          <div class="d-flex align-center">
+            <SvgIcon type="mdi" :path="cashPlusIcon" size="24" color="primary" class="mr-3" />
+            <span class="text-h5 font-weight-bold">경비 추가</span>
+          </div>
+          <v-btn icon variant="text" @click="closeModal">
+            <SvgIcon type="mdi" :path="closeIcon" size="20" />
+          </v-btn>
+        </div>
 
-            <!-- Category -->
-            <v-col cols="12" sm="6">
-              <v-select
-                v-model="formData.categoryId"
-                :items="categoryOptions"
-                label="카테고리"
-                variant="outlined"
-                density="comfortable"
-                prepend-inner-icon="mdi-tag"
-                :rules="categoryRules"
-                required
-              ></v-select>
-            </v-col>
+        <v-divider></v-divider>
+
+        <!-- Form Section -->
+        <div class="form-section pa-6">
+          <v-form ref="form" v-model="valid" @submit.prevent="submitForm">
+            <!-- Amount and Category Row -->
+            <v-row class="mb-2">
+              <v-col cols="12" sm="6">
+                <v-text-field
+                  v-model="formData.amount"
+                  label="금액"
+                  type="number"
+                  variant="outlined"
+                  density="comfortable"
+                  suffix="원"
+                  :rules="amountRules"
+                  required
+                >
+                  <template v-slot:prepend-inner>
+                    <SvgIcon type="mdi" :path="currencyKrwIcon" size="20" color="grey" />
+                  </template>
+                </v-text-field>
+              </v-col>
+
+              <v-col cols="12" sm="6">
+                <v-select
+                  v-model="formData.categoryId"
+                  :items="categoryOptions"
+                  label="카테고리"
+                  variant="outlined"
+                  density="comfortable"
+                  :rules="categoryRules"
+                  required
+                >
+                  <template v-slot:prepend-inner>
+                    <SvgIcon type="mdi" :path="tagIcon" size="20" color="grey" />
+                  </template>
+                </v-select>
+              </v-col>
+            </v-row>
 
             <!-- Description -->
-            <v-col cols="12">
-              <v-textarea
-                v-model="formData.description"
-                label="설명"
-                variant="outlined"
-                density="comfortable"
-                prepend-inner-icon="mdi-text"
-                rows="3"
-                :rules="descriptionRules"
-                required
-              ></v-textarea>
-            </v-col>
+            <v-textarea
+              v-model="formData.description"
+              label="설명"
+              variant="outlined"
+              density="comfortable"
+              rows="3"
+              :rules="descriptionRules"
+              class="mb-4"
+              required
+            >
+              <template v-slot:prepend-inner>
+                <SvgIcon type="mdi" :path="textIcon" size="20" color="grey" />
+              </template>
+            </v-textarea>
 
-            <!-- Date -->
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model="formData.date"
-                label="날짜"
-                type="date"
-                variant="outlined"
-                density="comfortable"
-                prepend-inner-icon="mdi-calendar"
-                :rules="dateRules"
-                required
-              ></v-text-field>
-            </v-col>
+            <!-- Date and Time Section -->
+            <div class="datetime-section mb-4">
+              <h4 class="text-subtitle-1 font-weight-medium mb-3 d-flex align-center">
+                <SvgIcon type="mdi" :path="calendarClockIcon" size="20" color="primary" class="mr-2" />
+                경비 발생 날짜/시간
+              </h4>
+              <v-row>
+                <v-col cols="7">
+                  <v-text-field
+                    v-model="formData.date"
+                    label="날짜"
+                    type="date"
+                    variant="outlined"
+                    density="comfortable"
+                    :rules="dateRules"
+                    required
+                  />
+                </v-col>
+                <v-col cols="5">
+                  <v-text-field
+                    v-model="formData.time"
+                    label="시간"
+                    type="time"
+                    variant="outlined"
+                    density="comfortable"
+                    :rules="timeRules"
+                    required
+                  />
+                </v-col>
+              </v-row>
+            </div>
 
-            <!-- Time -->
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model="formData.time"
-                label="시간"
-                type="time"
-                variant="outlined"
-                density="comfortable"
-                prepend-inner-icon="mdi-clock"
-                :rules="timeRules"
-                required
-              ></v-text-field>
-            </v-col>
-          </v-row>
-        </v-form>
+            <!-- Error Alert -->
+            <v-alert
+              v-if="error"
+              type="error"
+              class="mb-4"
+              closable
+              @click:close="clearError"
+            >
+              {{ error }}
+            </v-alert>
+          </v-form>
+        </div>
       </v-card-text>
 
-      <v-card-actions class="pa-6 pt-0">
+      <v-divider></v-divider>
+
+      <v-card-actions class="pa-6">
         <v-spacer></v-spacer>
         <v-btn
-          color="grey"
           variant="outlined"
           @click="closeModal"
-          class="mr-3"
+          :disabled="loading"
         >
           취소
         </v-btn>
@@ -117,8 +180,8 @@
           :disabled="!valid"
           :loading="loading"
         >
-          <v-icon start>mdi-check</v-icon>
-          추가
+          <SvgIcon type="mdi" :path="checkIcon" size="20" class="mr-2" />
+          경비 추가
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -130,30 +193,49 @@ import { ref, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useFinanceStore } from '@/stores/finance'
 import { apiClient } from '@/utils/apiClient'
+import SvgIcon from '@jamescoyle/vue-icon'
+import {
+  mdiCashPlus,
+  mdiClose,
+  mdiMapMarker,
+  mdiImageOff,
+  mdiCurrencyKrw,
+  mdiTag,
+  mdiText,
+  mdiCalendarClock,
+  mdiCheck
+} from '@mdi/js'
 
-// Props
+const cashPlusIcon = mdiCashPlus
+const closeIcon = mdiClose
+const mapMarkerIcon = mdiMapMarker
+const imageOffIcon = mdiImageOff
+const currencyKrwIcon = mdiCurrencyKrw
+const tagIcon = mdiTag
+const textIcon = mdiText
+const calendarClockIcon = mdiCalendarClock
+const checkIcon = mdiCheck
+
+// Props (removed modelValue)
 const props = defineProps({
-  modelValue: {
-    type: Boolean,
-    default: false
-  },
   schedule: {
     type: Object,
     default: null
   }
 })
 
-// Emits
-const emit = defineEmits(['update:modelValue', 'close'])
-
 // Stores
 const financeStore = useFinanceStore()
 const route = useRoute()
+
+// Internal dialog state (no emit needed)
+const dialog = ref(false)
 
 // Reactive data
 const form = ref(null)
 const valid = ref(false)
 const loading = ref(false)
+const error = ref(null)
 
 // Form data
 const formData = ref({
@@ -171,12 +253,12 @@ const groupId = computed(() => {
 
 // Category options based on the finance store categories
 const categoryOptions = [
-  { title: 'Transportation', value: 1 },
-  { title: 'Accommodation', value: 2 },
-  { title: 'Food', value: 3 },
-  { title: 'Leisure', value: 4 },
-  { title: 'Shared Supplies', value: 5 },
-  { title: 'Others', value: 6 }
+  { title: '교통비', value: 1 },
+  { title: '숙박비', value: 2 },
+  { title: '식비', value: 3 },
+  { title: '레저', value: 4 },
+  { title: '공용품', value: 5 },
+  { title: '기타', value: 6 }
 ]
 
 // Validation rules
@@ -204,21 +286,18 @@ const timeRules = [
   v => !!v || '시간을 선택해주세요'
 ]
 
-// Computed
-const dialog = computed({
-  get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value)
-})
-
-// Watch for dialog changes to reset form
-watch(() => props.modelValue, (newValue) => {
-  if (newValue) {
-    resetForm()
-    setDefaultValues()
-  }
-})
-
 // Methods
+const openDialog = () => {
+  dialog.value = true
+  resetForm()
+  setDefaultValues()
+}
+
+const closeModal = () => {
+  dialog.value = false
+  resetForm()
+}
+
 const resetForm = () => {
   formData.value = {
     amount: '',
@@ -227,6 +306,7 @@ const resetForm = () => {
     date: '',
     time: ''
   }
+  error.value = null
 
   if (form.value) {
     form.value.resetValidation()
@@ -246,9 +326,8 @@ const setDefaultValues = () => {
   }
 }
 
-const closeModal = () => {
-  dialog.value = false
-  emit('close')
+const clearError = () => {
+  error.value = null
 }
 
 const submitForm = async () => {
@@ -258,6 +337,7 @@ const submitForm = async () => {
   if (!isValid.valid) return
 
   loading.value = true
+  error.value = null
 
   try {
     // Combine date and time into ISO datetime format
@@ -296,49 +376,127 @@ const submitForm = async () => {
 
       console.log('경비가 성공적으로 추가되었습니다!')
 
-      closeModal()
+      // Ensure modal closes after successful submission
+      setTimeout(() => {
+        closeModal()
+      }, 100)
     } else {
       throw new Error(response.data.message || '경비 추가에 실패했습니다.')
     }
 
-  } catch (error) {
-    console.error('Error submitting finance data:', error)
+  } catch (err) {
+    console.error('Error submitting finance data:', err)
 
-    let errorMessage = '경비 추가 중 오류가 발생했습니다.'
+    if (err.response) {
+      const status = err.response.status
+      const message = err.response.data?.message || err.message
 
-    if (error.response?.data?.message) {
-      errorMessage = error.response.data.message
-    } else if (error.message) {
-      errorMessage = error.message
+      if (status === 400) {
+        error.value = `입력 데이터 오류: ${message}`
+      } else if (status === 401) {
+        error.value = '로그인이 필요합니다.'
+      } else if (status === 403) {
+        error.value = '경비 추가 권한이 없습니다.'
+      } else if (status === 404) {
+        error.value = '해당 그룹을 찾을 수 없습니다.'
+      } else {
+        error.value = `서버 오류 (${status}): ${message}`
+      }
+    } else if (err.code === 'ECONNABORTED') {
+      error.value = '요청 시간이 초과되었습니다. 다시 시도해주세요.'
+    } else {
+      error.value = err.message || '경비 추가 중 오류가 발생했습니다.'
     }
-
-    // Set error in store
-    financeStore.setError(errorMessage)
-
-    // Show error to user
-    alert(errorMessage)
 
   } finally {
     loading.value = false
   }
 }
+
+// Expose methods to parent
+defineExpose({
+  openDialog,
+  closeModal
+})
+
+// Watch for schedule changes to update description when dialog is open
+watch(() => props.schedule, (newSchedule) => {
+  if (dialog.value && newSchedule) {
+    const scheduleName = newSchedule.attractionInfo?.title || newSchedule.name
+    formData.value.description = `${scheduleName} 관련 비용`
+  }
+})
 </script>
 
 <style scoped>
-.schedule-info {
-  border-radius: 8px;
+.schedule-info-section {
+  background-color: #ffffff;
 }
 
-.v-card-title {
-  position: sticky;
-  top: 0;
-  z-index: 1;
+.schedule-image-container {
+  height: 200px;
+  overflow: hidden;
+}
+
+.schedule-image {
+  width: 100%;
+}
+
+.no-image-placeholder {
+  height: 200px;
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.schedule-details {
+  background-color: #fafafa;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.no-schedule-header {
+  background-color: #fafafa;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.form-section {
+  background-color: #ffffff;
+}
+
+/* DateTime section styling */
+.datetime-section {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid #e9ecef;
+}
+
+.datetime-section h4 {
+  margin-bottom: 12px;
+}
+
+.v-card-actions {
+  background-color: #fafafa;
+  border-top: 1px solid #e0e0e0;
+}
+
+/* Button hover effects */
+.v-btn:not(.v-btn--disabled):hover {
+  transform: translateY(-1px);
+  transition: transform 0.2s;
 }
 
 /* Responsive adjustments */
 @media (max-width: 600px) {
   .v-dialog {
     margin: 16px;
+  }
+
+  .schedule-details {
+    padding: 16px !important;
+  }
+
+  .form-section {
+    padding: 16px !important;
   }
 
   .v-card-actions {

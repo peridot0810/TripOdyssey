@@ -1,20 +1,9 @@
 <template>
   <div class="schedule-list-official">
     <h2 class="text-h6 font-weight-bold mb-4 d-flex align-center">
-      <v-icon size="large" color="primary" class="mr-2">mdi-calendar-check</v-icon>
+      <SvgIcon type="mdi" :path="calendarCheckIcon" size="24" color="primary" class="mr-2" />
       확정된 일정
     </h2>
-
-    <!-- Error Alert -->
-    <v-alert
-      v-if="scheduleStore.error || groupStore.error"
-      type="error"
-      class="mb-4"
-      closable
-      @click:close="clearErrors"
-    >
-      {{ scheduleStore.error || groupStore.error }}
-    </v-alert>
 
     <!-- Loading State -->
     <div
@@ -25,27 +14,16 @@
       <p class="text-body-1 mt-3">일정을 불러오는 중...</p>
     </div>
 
-    <!-- Day Selection Tabs (always show based on trip duration) -->
+    <!-- Day Selection Component -->
     <div v-else-if="availableDays.length > 0">
-      <div class="day-selector mb-4">
-        <v-chip-group v-model="selectedDay" active-class="primary" mandatory class="day-chips">
-          <v-chip
-            v-for="day in availableDays"
-            :key="day"
-            :value="day"
-            variant="outlined"
-            size="large"
-            class="day-chip"
-          >
-            <v-icon start>mdi-calendar-today</v-icon>
-            {{ day }}일차
-          </v-chip>
-        </v-chip-group>
-      </div>
+      <DaySelector
+        v-model="selectedDay"
+        :available-days="availableDays"
+      />
 
       <!-- Schedule Cards for Selected Day -->
       <div v-if="filteredSchedules.length === 0" class="empty-state text-center py-8">
-        <v-icon size="x-large" color="grey">mdi-calendar-blank</v-icon>
+        <SvgIcon type="mdi" :path="calendarBlankIcon" size="32" color="grey" />
         <p class="text-body-1 text-grey-darken-1 mt-3">{{ selectedDay }}일차 일정이 없습니다</p>
         <p class="text-caption text-grey mt-2">일정 후보에서 일정을 추가해보세요</p>
       </div>
@@ -53,16 +31,12 @@
       <div v-else class="schedule-cards">
         <div class="day-header mb-3">
           <v-divider></v-divider>
-          <v-chip color="primary" variant="elevated" class="day-title-chip">
-            <v-icon start>mdi-calendar-star</v-icon>
-            {{ selectedDay }}일차 일정
-          </v-chip>
           <v-divider></v-divider>
         </div>
 
         <div class="drag-info-hint mb-3">
           <v-alert type="info" variant="tonal" density="compact" class="text-caption">
-            <v-icon start>mdi-drag</v-icon>
+            <SvgIcon type="mdi" :path="dragIcon" size="16" class="mr-1" />
             카드를 드래그하여 순서를 변경할 수 있습니다
           </v-alert>
         </div>
@@ -86,7 +60,8 @@
                 <div class="order-badge">
                   <v-chip size="small" color="secondary" variant="elevated">
                     {{ index + 1 }}
-                    <v-icon end size="small">mdi-drag-vertical</v-icon>
+                    <SvgIcon type="mdi" :path="dragVerticalIcon" size="16" />
+
                   </v-chip>
                 </div>
               </template>
@@ -96,14 +71,14 @@
           <!-- Move Back to Edit Button -->
           <v-btn
             icon
-            size="small"
-            color="primary"
-            variant="elevated"
+            size="x-small"
+            variant="flat"
             class="move-back-button"
+            style="background-color: #c62828; width: 36px; height: 36px;"
             @click="handleMoveBackToEdit(schedule)"
             :title="'일정 후보로 이동'"
           >
-            <v-icon>mdi-arrow-left</v-icon>
+            <SvgIcon type="mdi" :path="minusIcon" size="18" color="white" />
           </v-btn>
         </div>
       </div>
@@ -121,13 +96,13 @@
             @click="saveChangesToServer"
             class="save-button"
           >
-            <v-icon start>mdi-content-save</v-icon>
-            변경사항 저장 ({{ totalChanges }}개)
+            <SvgIcon type="mdi" :path="saveIcon" size="20" class="mr-1" />
+            변경사항 저장
           </v-btn>
         </div>
 
         <!-- Changes Summary -->
-        <div v-if="hasChangesToSave" class="changes-summary mt-3 text-center">
+        <!-- <div v-if="hasChangesToSave" class="changes-summary mt-3 text-center">
           <v-chip
             v-if="scheduleStore.newOfficialSchedules.length > 0"
             size="small"
@@ -155,7 +130,7 @@
           >
             삭제: {{ scheduleStore.removedOfficialSchedules.length }}개
           </v-chip>
-        </div>
+        </div> -->
       </div>
     </div>
 
@@ -171,9 +146,29 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import ScheduleCard from './ScheduleCard.vue'
+import DaySelector from '@/components/schedule/DaySelector.vue'
 import { useScheduleStore } from '@/stores/schedule'
 import { useGroupStore } from '@/stores/group'
 import { apiClient } from '@/utils/apiClient'
+
+import SvgIcon from '@jamescoyle/vue-icon'
+import { mdiMinus } from '@mdi/js'
+import {
+  mdiCalendarCheck,
+  mdiCalendarBlank,
+  mdiDrag,
+  mdiContentSave,
+  mdiDragVertical
+} from '@mdi/js'
+
+const calendarCheckIcon = mdiCalendarCheck
+const calendarBlankIcon = mdiCalendarBlank
+const dragIcon = mdiDrag
+const saveIcon = mdiContentSave
+const dragVerticalIcon = mdiDragVertical
+
+
+const minusIcon = mdiMinus
 
 const route = useRoute()
 const scheduleStore = useScheduleStore()
@@ -288,13 +283,13 @@ const hasChangesToSave = computed(() => {
 })
 
 // Calculate total number of changes
-const totalChanges = computed(() => {
-  return (
-    scheduleStore.newOfficialSchedules.length +
-    scheduleStore.modifiedOfficialSchedules.length +
-    scheduleStore.removedOfficialSchedules.length
-  )
-})
+// const totalChanges = computed(() => {
+//   return (
+//     scheduleStore.newOfficialSchedules.length +
+//     scheduleStore.modifiedOfficialSchedules.length +
+//     scheduleStore.removedOfficialSchedules.length
+//   )
+// })
 
 const saveChangesToServer = async () => {
   if (!hasChangesToSave.value) return
@@ -333,12 +328,6 @@ const onDragEnd = () => {
   dragOverIndex.value = null
 }
 
-// Clear errors from both stores
-const clearErrors = () => {
-  scheduleStore.clearError()
-  groupStore.clearError()
-}
-
 onMounted(async () => {
   if (groupId) {
     if (!groupStore.hasGroup || groupStore.myGroup.groupId !== parseInt(groupId)) {
@@ -354,28 +343,7 @@ onMounted(async () => {
   padding: 16px;
 }
 
-.day-selector {
-  position: sticky;
-  top: 0;
-  background-color: white;
-  z-index: 10;
-  padding: 8px 0;
-  border-radius: 8px;
-}
-
-.day-chips {
-  justify-content: center;
-}
-
-.day-chip {
-  margin: 0 4px;
-  transition: all 0.3s ease;
-}
-
-.day-chip:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
+/* Removed day-selector styles since they're now in DaySelector component */
 
 .empty-state,
 .loading-state {
@@ -400,7 +368,7 @@ onMounted(async () => {
   font-weight: bold;
 }
 
-/* NEW: Schedule card container with button layout */
+/* Schedule card container with button layout */
 .schedule-card-container {
   display: flex;
   align-items: center;
@@ -445,7 +413,7 @@ onMounted(async () => {
   border-radius: 8px;
 }
 
-/* NEW: Move back to edit button styling */
+/* Move back to edit button styling */
 .move-back-button {
   width: 48px !important;
   height: 48px !important;
@@ -485,16 +453,6 @@ onMounted(async () => {
 
 /* Responsive adjustments */
 @media (max-width: 600px) {
-  .day-chips {
-    justify-content: flex-start;
-    overflow-x: auto;
-    padding-bottom: 8px;
-  }
-
-  .day-chip {
-    flex-shrink: 0;
-  }
-
   .day-header {
     gap: 8px;
   }
