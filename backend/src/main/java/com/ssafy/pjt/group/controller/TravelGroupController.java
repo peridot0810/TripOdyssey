@@ -3,6 +3,7 @@ package com.ssafy.pjt.group.controller;
 import java.io.IOException;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,6 +25,7 @@ import com.ssafy.pjt.common.exception.UserNotInGroupException;
 import com.ssafy.pjt.common.service.UserValidationService;
 import com.ssafy.pjt.group.dto.request.TravelGroupPostRequest;
 import com.ssafy.pjt.group.dto.request.TravelGroupUpdateRequest;
+import com.ssafy.pjt.group.dto.request.UpdateProgressRequestDto;
 import com.ssafy.pjt.group.dto.response.TravelGroupInfoResponse;
 import com.ssafy.pjt.group.dto.response.TravelGroupPostResponse;
 import com.ssafy.pjt.group.service.TravelGroupService;
@@ -89,7 +91,7 @@ public class TravelGroupController {
 		}
 	}
 	
-	@PostMapping("/{groupId}/upload-group-image")
+	@PostMapping(value="/{groupId}/upload-group-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@Operation(summary = "그룹 이미지 업로드", description = "그룹 대표 이미지를 업로드합니다. MASTER 또는 MANAGER만 가능.")
 	@ApiResponse(responseCode = "200", description = "그룹 이미지 업로드 성공 또는 예외 처리 메시지 반환")
 	public ResponseEntity<?> updateGroupImage(
@@ -101,8 +103,8 @@ public class TravelGroupController {
 		if(!userValidationService.isUserInGroup(userId, groupId)) {
 			throw new UserNotInGroupException("그룹원만 요청할 수 있는 기능입니다.");
 		}
-		if(userValidationService.isUserRoleValid(userId, groupId, MemberRole.NORMAL.getId())) {
-			throw new UserNotInGroupException("일반 그룹원은 그룹 이미지를 변경할 수 없습니다.");
+		if(!userValidationService.isUserRoleValid(userId, groupId, MemberRole.MASTER.getId())) {
+			throw new UserNotInGroupException("그룹 이미지는 방장만 변경 가능합니다.");
 		}
 		
 		if(file == null || file.isEmpty()) {
@@ -117,4 +119,26 @@ public class TravelGroupController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new CommonResponse<>(false, "파일 업로드에 실패했습니다.", null));
 		}
 	}
+	
+	
+	@PutMapping("/{groupId}/update-progress")
+	@Operation(summary = "그룹 진척도 업데이트", description = "현재 그룹 진척도를 업데이트합니다.")
+	@ApiResponse(responseCode = "200", description = "그룹 진척도 업데이트 완료")
+	public ResponseEntity<?> updateProgress(
+			@AuthenticationPrincipal UserDetails userDetails,
+			@PathVariable Integer groupId,
+			@RequestBody UpdateProgressRequestDto updateProgressRequest){
+		
+		String userId = userDetails.getUsername();
+		if(!userValidationService.isUserInGroup(userId, groupId)) {
+			throw new UserNotInGroupException("그룹원만 요청할 수 있는 기능입니다.");
+		}
+		if(!userValidationService.isUserRoleValid(userId, groupId, MemberRole.MASTER.getId())) {
+			throw new UserNotInGroupException("그룹 진척도 업데이트는 방장만 요청 가능합니다.");
+		}
+		
+		travelGroupService.updateProgress(groupId, updateProgressRequest);
+		return ResponseEntity.ok(new CommonResponse<>(true, "그룹 진척도 업데이트에 성공했습니다.", null));
+	}
+	
 }

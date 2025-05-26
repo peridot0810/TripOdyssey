@@ -81,5 +81,18 @@
   	
   </update>
   
+  <insert id="roleAssignment">
+  	INSERT INTO group_user_info(user_id, group_id, role_id)
+  	VALUES(#{userId},#{groupId},#{roleId})
+  </insert>
+  
+  <delete id="roleRemoval">
+  	DELETE FROM group_user_info
+  	WHERE 
+  		user_id=#{userId} 
+		AND group_id=#{groupId}
+		AND role_id=#{roleId}
+  </delete>
+  
   
 </mapper>

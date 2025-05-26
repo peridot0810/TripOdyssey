@@ -6,6 +6,8 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import com.ssafy.pjt.group.dto.request.UpdateProgressRequestDto;
+import com.ssafy.pjt.group.entity.GroupProgress;
 import com.ssafy.pjt.group.entity.GroupRoleLimit;
 import com.ssafy.pjt.group.entity.TravelGroup;
 import com.ssafy.pjt.user.entity.GroupUserInfo2;
@@ -33,8 +35,9 @@ public interface TravelGroupMapper {
     int updateGroupRoleLimits(GroupRoleLimit groupRoleLimit);
     
     TravelGroup selectTravelGroupById(Integer groupId);
-    
     List<GroupRoleLimit> selectGroupRoleLimits(Integer groupId);
+    GroupProgress selectGroupProgress(Integer groupId);
 
     void updateGroupImage(Integer groupId, String imgUrl);
+    void updateGroupProgress(UpdateProgressRequestDto updateProgressRequest);
 }

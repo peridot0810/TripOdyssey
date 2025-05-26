@@ -13,4 +13,5 @@ public class Group {
 	private String createdAt;
 	private String startDate;
 	private String endDate;
+	private String profileImage;
 }

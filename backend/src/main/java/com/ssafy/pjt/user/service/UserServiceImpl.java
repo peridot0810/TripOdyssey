@@ -201,6 +201,7 @@ public class UserServiceImpl implements UserService{
 					.memberCount(memberCnt)
 					.startDate(LocalDate.parse(group.getStartDate()))
 					.endDate(LocalDate.parse(group.getEndDate()))
+					.imageUrl(group.getProfileImage())
 					.progress(progress)
 					.build()
 					);
