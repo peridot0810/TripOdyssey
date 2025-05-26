@@ -45,7 +45,7 @@ public interface UserMapper {
 	// 그룹 조회
 	List<Group> getGroupList(String userId);
 	GroupProgressResponseDto getGroupProgress(String groupId);
-	String getMyRoleInGroup(GetMyRoleInGroupRequestDto myRoleRequest);
+	List<String> getMyRoleInGroup(GetMyRoleInGroupRequestDto myRoleRequest);
 	Integer getMemberCntInGroup(String groupId);
 	
 	// 프로필 이미지

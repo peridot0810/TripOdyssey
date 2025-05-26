@@ -102,6 +102,7 @@
     	FROM group_user_info gui
     		INNER JOIN travel_group tg USING (group_id)
     	WHERE user_id=#{userId}
+    	GROUP BY group_id
     </select>
     
     <select id="getGroupProgress">
@@ -119,8 +120,12 @@
     
     <select id="getMemberCntInGroup">
     	SELECT COUNT(*)
-    	FROM group_user_info
-    	WHERE group_id=#{groupId}
+    	FROM (
+			SELECT user_id, group_id FROM group_user_info
+            WHERE group_id = #{groupId}
+            GROUP BY user_id
+        ) as T
+        GROUP BY group_id;
     </select>
     
 	<update id="updateProfileImage">

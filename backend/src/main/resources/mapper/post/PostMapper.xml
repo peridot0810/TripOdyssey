@@ -49,6 +49,7 @@
 		SELECT 
 				post_id, 
 				title, 
+				content,
 				views, 
 				created_at, 
 				author, 
@@ -75,7 +76,9 @@
 			USING(post_id)
 			JOIN post_category USING (category_id)
 		<where>
-			category_id = #{categoryId}
+			<if test="categoryId != null">
+				category_id = #{categoryId}
+			</if>
 			<if test="keyword != null and keyword != ''">
 				AND ( title LIKE CONCAT('%', #{keyword}, '%') )
 			</if>
@@ -84,12 +87,16 @@
 			</if>
 		</where>
 		ORDER BY created_at DESC
-		LIMIT #{limit} OFFSET #{offset}
+		
+		<if test="limit != null and offset != null">
+		LIMIT ${limit} OFFSET ${offset}
+		</if>
 	</select>
 	
 	<select id="getComments">
-		SELECT comment_id, post_id, content, writer, created_at
+		SELECT comment_id, post_id, content, created_at, nickname AS writer, writer AS writer_id
 		FROM comment
+			JOIN user ON (comment.writer = user.id)
 		WHERE post_id=#{postId}
 	</select>
 	
@@ -128,4 +135,10 @@
 		INSERT INTO comment(post_id, content, writer)
 		VALUES(#{postId},#{content},#{writer})
 	</insert>
+	
+	<update id="addViewCount">
+		UPDATE post
+		SET views=views+1
+		WHERE post_id=#{postId}
+	</update>
 </mapper>

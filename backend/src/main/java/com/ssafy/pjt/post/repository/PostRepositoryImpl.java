@@ -68,5 +68,10 @@ public class PostRepositoryImpl implements PostRepository{
 		postMapper.createComment(createCommentRequest);
 	}
 	
+	@Override
+	public void addViewCount(Integer postId) {
+		postMapper.addViewCount(postId);
+	}
+	
 	
 }

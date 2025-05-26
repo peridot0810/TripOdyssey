@@ -27,7 +27,9 @@ import com.ssafy.pjt.util.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/posts")
@@ -52,9 +54,9 @@ public class PostController {
 	@GetMapping
 	public ResponseEntity<?> getPostList(
 			@AuthenticationPrincipal UserDetails userDetails,
-			@RequestParam(required = true) Integer categoryId,
-			@RequestParam(required = false, defaultValue = "1") Integer page,
-			@RequestParam(required = false, defaultValue = "5") Integer perPage,
+			@RequestParam(required = false) Integer categoryId,
+			@RequestParam(required = false) Integer page,
+			@RequestParam(required = false) Integer perPage,
 			@RequestParam(required = false, defaultValue = "") String keyword,
 			@RequestParam(required = false, defaultValue = "") String author) {
 		List<GetPostResponseDto> postList = postService.getPostList(userDetails.getUsername(), categoryId, page, perPage, keyword, author);
@@ -117,6 +119,11 @@ public class PostController {
 			@PathVariable Integer postId,
 			@RequestBody String content) {
 		String userId = userDetails.getUsername();
+		
+		if (content.startsWith("\"") && content.endsWith("\"")) {
+	        content = content.substring(1, content.length() - 1);
+	    }
+		log.debug("content : {}", content);
 		Integer newCommentId = postService.createComment(userId, postId, content);
 		return ResponseEntity.ok(new CommonResponse<>(true, "댓글 작성에 성공했습니다.", Map.of("commentId", newCommentId)));
 	}
