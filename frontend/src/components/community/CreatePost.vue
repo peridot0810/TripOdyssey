@@ -64,7 +64,11 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { categories, currentUser } from '@/data/communityData.js'
+import {useUserStore} from '@/stores/user'
+import { categories } from '@/data/communityData.js'
+import { apiClient } from '@/stores/apiClient.js'
+
+const userStore = useUserStore();
 
 const props = defineProps({
   modelValue: {
@@ -117,20 +121,21 @@ async function submitPost() {
 
   try {
     // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
     const newPost = {
-      postId: Date.now(),
       title: formData.value.title,
       content: formData.value.content,
       categoryId: formData.value.categoryId,
-      categoryName: categories.find((c) => c.id === formData.value.categoryId)?.name || '',
-      createdAt: new Date().toISOString(),
-      views: 0,
-      likes: 0,
-      author: currentUser,
-      commentList: [],
     }
+
+    const res = await apiClient.post('/posts', newPost);
+    console.log("게시글 등록 후 응답 : ", res);
+
+    newPost.postId=res.data.data.postId;
+    newPost.createdAt = new Date().toISOString();
+    newPost.author=userStore.userInfo.id;
+    newPost.views=0;
+    newPost.likes=0;
+    newPost.commentList=[];
 
     emit('submit', newPost)
     emit('close')

@@ -97,6 +97,15 @@
                 <v-icon size="small" class="mr-1">mdi-heart</v-icon>
                 <span>{{ selectedPost.likes }}</span>
               </v-btn>
+
+              <v-btn
+                v-if="user.userInfo && (selectedPost.author === user.userInfo.id)"
+                icon
+                size="x-small"
+                variant="text"
+                class="ml-2"
+                @click="deletePost(selectedPost.postId)"
+              ></v-btn>
             </div>
 
             <!-- Post Content -->
@@ -122,7 +131,11 @@
                   hide-details
                 ></v-textarea>
                 <div class="d-flex justify-end mt-2">
-                  <v-btn type="submit" color="primary" :disabled="!newComment.trim()" size="small">
+                  <v-btn 
+                    type="submit" 
+                    color="primary" 
+                    :disabled="!newComment.trim()" 
+                    size="small">
                     댓글 작성
                   </v-btn>
                 </div>
@@ -139,22 +152,23 @@
                   :key="comment.commentId"
                   class="comment-item mb-3 pa-3"
                 >
-                  <div class="d-flex justify-space-between align-center mb-2">
+                  <div class="d-flex align-center mb-2">
                     <span class="font-weight-medium">{{ comment.writer }}</span>
-                    <div class="d-flex align-center">
-                      <span class="text-caption text-grey mr-2">
-                        {{ formatDate(comment.createdAt) }}
-                      </span>
-                      <v-btn
-                        v-if="comment.writer === currentUser"
-                        icon
-                        size="x-small"
-                        variant="text"
-                        @click="deleteComment(comment.commentId)"
-                      >
-                        <v-icon size="small">mdi-delete</v-icon>
-                      </v-btn>
-                    </div>
+                    <v-spacer />
+                    <v-btn
+                      v-if="user.userInfo && (comment.writerId === user.userInfo.id)"
+                      icon
+                      size="x-small"
+                      variant="text"
+                      class="ml-2"
+                      @click="deleteComment(comment.commentId)"
+                    >
+                      <v-icon size="small">mdi-delete</v-icon>
+                    </v-btn>
+
+                    <span class="text-caption text-grey mr-2">
+                      {{ formatDate(comment.createdAt) }}
+                    </span>
                   </div>
                   <p class="text-body-2 mb-0">{{ comment.content }}</p>
                 </div>
@@ -192,14 +206,20 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
-import { communityPosts, categories, currentUser } from '@/data/communityData.js'
+import { categories } from '@/data/communityData.js'
+import { useCommunityStore } from "@/stores/community"
+import { useUserStore } from "@/stores/user"
+import { apiClient } from "@/stores/apiClient.js"
 import PostCard from '@/components/community/PostCard.vue'
 import CreatePost from '@/components/community/CreatePost.vue'
 import SearchFilter from '@/components/community/SearchFilter.vue'
 
+// Store
+const user = useUserStore();
+
 // Data
 const posts = ref([])
-const selectedCategory = ref(null)
+const selectedCategory = ref(1)
 const searchKeyword = ref('')
 const sortBy = ref('latest')
 const currentPage = ref(1)
@@ -274,7 +294,6 @@ const paginatedPosts = computed(() => {
 watch(selectedPost, (newPost) => {
   if (newPost) {
     comments.value = [...newPost.commentList]
-    isLiked.value = false
   }
 })
 
@@ -284,16 +303,28 @@ function filterPosts() {
   selectedPost.value = null // Clear selection when filtering
 }
 
-function selectPost(post) {
+async function selectPost(post) {
+  console.log(post);
   selectedPost.value = post
-  // Simulate view count increment
   post.views++
+  isLiked.value = post.userLiked;
+
+  const res = await apiClient.get(`/posts/${post.postId}`);
+  console.log(res.data.data);
 }
 
 function addNewPost(newPost) {
   posts.value.unshift(newPost)
   filterPosts()
 }
+
+async function deletePost(postId){
+  const res = await apiClient.delete(`/posts/${postId}`);
+  console.log(res);
+  posts.value = posts.value.filter((post) => post.postId !== postId);
+}
+
+
 
 function getCategoryColor(categoryId) {
   const category = categories.find((cat) => cat.id === categoryId)
@@ -319,42 +350,83 @@ function formatDate(dateString) {
   }
 }
 
-function addComment() {
+async function addComment() {
   if (!newComment.value.trim()) return
 
   const comment = {
     commentId: Date.now(),
     postId: selectedPost.value.postId,
     content: newComment.value.trim(),
-    writer: currentUser,
+    writer: user.userInfo.nickname,
     createdAt: new Date().toISOString(),
   }
+  console.log("newComment : " + comment.content);
+  const res = await apiClient.post(`/posts/${comment.postId}/comments`, comment.content);
+  console.log(res.data);
 
-  comments.value.push(comment)
-  selectedPost.value.commentList.push(comment)
-  newComment.value = ''
+  comment.writerId=user.userInfo.id;
+  comment.commentId=res.data.data.commentId;
+  comments.value.push(comment);
+  selectedPost.value.commentList.push(comment);
+  newComment.value = '';
 }
 
-function deleteComment(commentId) {
+async function deleteComment(commentId) {
   comments.value = comments.value.filter((c) => c.commentId !== commentId)
   selectedPost.value.commentList = selectedPost.value.commentList.filter(
     (c) => c.commentId !== commentId,
   )
+
+  const res = await apiClient.delete(`/comments/${commentId}`);
+  console.log(res);
 }
 
 function toggleLike() {
   isLiked.value = !isLiked.value
   if (isLiked.value) {
     selectedPost.value.likes++
+    selectedPost.value.userLiked = true;
   } else {
     selectedPost.value.likes--
+    selectedPost.value.userLiked = false;
+  }
+
+  const res = apiClient.post(`/posts/${selectedPost.value.postId}/like`)
+  console.log(res);
+}
+
+
+// fetch
+const communityStore = useCommunityStore();
+async function fetchPost(){
+  communityStore.setLoading(true);
+  try {
+    console.log("fetch 요청")
+    const res = await apiClient.get("/posts", {
+      params : {
+        keyword : searchKeyword.value,
+      }
+    })
+
+    console.log("응답:", res);
+
+    communityStore.setPosts({
+      posts: res.data.data,
+      totalCount: res.data.data.length,
+    })
+    posts.value = res.data.data;
+    console.log("post list : ", posts.value);
+    communityStore.setError(null);
+  } catch (error) {
+    communityStore.setError(error.message || "게시글을 불러올 수 없습니다.");
+  } finally {
+    communityStore.setLoading(false);
   }
 }
 
+
 // Lifecycle
-onMounted(() => {
-  posts.value = [...communityPosts]
-})
+onMounted(fetchPost);
 </script>
 
 <style scoped>

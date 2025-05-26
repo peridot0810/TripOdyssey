@@ -158,6 +158,13 @@ export const useUserStore = defineStore('user', () => {
     })
   }
 
+  const loadUserInfoFromStorage = () => {
+    const saved = localStorage.getItem('userInfo');
+    if(saved){
+      userInfo.value=JSON.parse(saved);
+    }
+  }
+
   return {
     // State
     userInfo,
@@ -176,6 +183,7 @@ export const useUserStore = defineStore('user', () => {
     clearError,
     isTokenExpired,
     validateSession,
-    authenticatedRequest
+    authenticatedRequest,
+    loadUserInfoFromStorage
   }
 })

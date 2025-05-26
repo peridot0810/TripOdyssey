@@ -43,13 +43,21 @@ public class PostServiceImpl implements PostService{
 		PostFilterDto filter = PostFilterDto.builder()
 											.categoryId(categoryId)
 											.limit(perPage)
-											.offset((page-1) * perPage)
 											.keyword(keyword)
 											.author(author)
 											.userId(userId)
 											.build();
 		
-		return postRepository.getPostList(filter);
+		if(page != null) {
+			filter.setOffset((page-1) * perPage);
+		}
+		
+		List<GetPostResponseDto> postList = postRepository.getPostList(filter);
+		for(GetPostResponseDto post : postList) {
+			post.setCommentList(postRepository.getComments(post.getPostId()));
+		}
+		
+		return postList;
 	}
 	
 	@Override
@@ -67,7 +75,7 @@ public class PostServiceImpl implements PostService{
 		
 		// 댓글 정보 가져오기 
 		post.setCommentList(postRepository.getComments(postId));
-		
+		postRepository.addViewCount(postId);
 		return post;
 	}
 	

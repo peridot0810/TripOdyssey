@@ -57,6 +57,15 @@
 
 <script setup>
 import { RouterView } from 'vue-router'
+import { ref, onMounted } from 'vue'
+import { useUserStore } from '@/stores/user'
+
+const userStore = useUserStore();
+
+onMounted(() => {
+  userStore.loadUserInfoFromStorage();
+})
+
 import { useRoute } from 'vue-router'
 
 const $route = useRoute()

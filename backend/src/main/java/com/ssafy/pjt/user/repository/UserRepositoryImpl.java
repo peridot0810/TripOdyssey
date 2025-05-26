@@ -95,7 +95,7 @@ public class UserRepositoryImpl implements UserRepository{
 	}
 	
 	@Override
-	public String getMyRoleInGroup(GetMyRoleInGroupRequestDto myRoleRequest) {
+	public List<String> getMyRoleInGroup(GetMyRoleInGroupRequestDto myRoleRequest) {
 		return userMapper.getMyRoleInGroup(myRoleRequest);
 	}
 	
