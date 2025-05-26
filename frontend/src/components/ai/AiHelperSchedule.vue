@@ -16,11 +16,15 @@
 
     <!-- Custom Dialog-style Tooltip with Fixed Positioning -->
     <Teleport to="body">
-      <div v-if="showTooltip && !showDialog" class="ai-dialog-tooltip" :style="tooltipStyle">
+      <div
+        v-if="showTooltip && !showDialog"
+        class="ai-dialog-tooltip"
+        :style="tooltipStyle"
+      >
         <div class="dialog-bubble">
-          일정 짜기가<br />
-          막막하면<br />
-          저에게<br />
+          일정 짜기가<br>
+          막막하면<br>
+          저에게<br>
           물어보세요!
         </div>
         <div class="dialog-pointer"></div>
@@ -48,7 +52,7 @@ const tooltipStyle = computed(() => {
     position: 'fixed',
     left: `${rect.right + 10}px`,
     top: `${rect.top - 80}px`,
-    zIndex: 9999,
+    zIndex: 9999
   }
 })
 
@@ -72,9 +76,7 @@ const handleAiHelperClick = () => {
   height: 56px !important;
   border-radius: 50% !important;
   min-width: auto !important;
-  transition:
-    transform 0.2s,
-    box-shadow 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
 }
 

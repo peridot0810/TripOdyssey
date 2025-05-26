@@ -1,13 +1,13 @@
 <template>
   <div class="member-expense-list">
     <!-- Header Section -->
-    <MemberExpenseHeader @refresh="fetchMemberExpenseList" />
+    <MemberExpenseHeader />
 
     <!-- Loading State -->
     <div v-if="memberExpenseStore.isLoading" class="text-center py-8">
       <v-progress-circular
         indeterminate
-        color="primary"
+        color="orange"
         size="48"
       ></v-progress-circular>
       <p class="text-body-2 text-grey mt-3">멤버 정보를 불러오는 중...</p>
@@ -29,7 +29,7 @@
       v-else-if="memberExpenseStore.memberExpenseList.length === 0"
       class="empty-state text-center py-8"
     >
-      <v-icon size="64" color="grey-lighten-1">mdi-account-group-outline</v-icon>
+      <SvgIcon type="mdi" :path="accountGroupOutlineIcon" size="64" color="grey-lighten-1" />
       <p class="text-h6 text-grey mt-3">멤버가 없습니다</p>
       <p class="text-body-2 text-grey-darken-1">그룹에 멤버를 추가해주세요</p>
     </div>
@@ -41,7 +41,6 @@
           v-for="member in memberExpenseStore.memberExpenseList"
           :key="member.userId"
           :member="member"
-          @edit="handleEditMember"
           class="mb-3"
         />
       </div>
@@ -65,6 +64,10 @@ import { useMemberExpenseStore } from '@/stores/memberExpense'
 import { apiClient } from '@/utils/apiClient'
 import MemberExpenseCard from './MemberExpenseCard.vue'
 import MemberExpenseHeader from './MemberExpenseHeader.vue'
+import SvgIcon from '@jamescoyle/vue-icon'
+import { mdiAccountGroupOutline } from '@mdi/js'
+
+const accountGroupOutlineIcon = mdiAccountGroupOutline
 
 // Router and Store
 const route = useRoute()
@@ -76,11 +79,6 @@ const groupId = computed(() => {
 })
 
 // Methods
-const handleEditMember = (member) => {
-  // TODO: Implement edit member logic
-  console.log('Edit member:', member)
-}
-
 const fetchMemberExpenseList = async () => {
   if (!groupId.value) {
     memberExpenseStore.setError('그룹 ID를 찾을 수 없습니다.')
@@ -96,20 +94,33 @@ const fetchMemberExpenseList = async () => {
     if (response.data.success) {
       memberExpenseStore.setMemberExpenseList(response.data.data)
     } else {
-      memberExpenseStore.setError(response.data.message || '멤버 목록을 불러오는데 실패했습니다.')
+      throw new Error(response.data.message || '멤버 목록을 불러오는데 실패했습니다.')
     }
   } catch (error) {
     console.error('Error fetching member expense list:', error)
 
-    if (error.response?.status === 404) {
-      memberExpenseStore.setError('해당 그룹을 찾을 수 없습니다.')
-    } else if (error.response?.status === 403) {
-      memberExpenseStore.setError('접근 권한이 없습니다.')
-    } else if (error.response?.data?.message) {
-      memberExpenseStore.setError(error.response.data.message)
+    let errorMessage = '멤버 목록을 불러오는 중 오류가 발생했습니다.'
+
+    if (error.response) {
+      const status = error.response.status
+      const message = error.response.data?.message || error.message
+
+      if (status === 401) {
+        errorMessage = '로그인이 필요합니다.'
+      } else if (status === 403) {
+        errorMessage = '접근 권한이 없습니다.'
+      } else if (status === 404) {
+        errorMessage = '해당 그룹을 찾을 수 없습니다.'
+      } else {
+        errorMessage = `서버 오류 (${status}): ${message}`
+      }
+    } else if (error.code === 'ECONNABORTED') {
+      errorMessage = '요청 시간이 초과되었습니다. 네트워크 연결을 확인해주세요.'
     } else {
-      memberExpenseStore.setError('네트워크 오류가 발생했습니다.')
+      errorMessage = error.message || errorMessage
     }
+
+    memberExpenseStore.setError(errorMessage)
   } finally {
     memberExpenseStore.setLoading(false)
   }

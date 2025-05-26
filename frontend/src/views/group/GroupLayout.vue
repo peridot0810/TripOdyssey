@@ -7,73 +7,73 @@
 
   <!-- Error State -->
   <div v-else-if="error" class="error-container">
-    <v-alert type="error" variant="tonal" class="mb-4" :text="error">
+    <v-alert
+      type="error"
+      variant="tonal"
+      class="mb-4"
+      :text="error"
+    >
       <template #append>
-        <v-btn variant="text" size="small" @click="loadGroupInfo"> 다시 시도 </v-btn>
+        <v-btn
+          variant="text"
+          size="small"
+          @click="loadGroupInfo"
+        >
+          다시 시도
+        </v-btn>
       </template>
     </v-alert>
 
-    <v-btn to="/" variant="outlined" prepend-icon="mdi-arrow-left"> 홈으로 돌아가기 </v-btn>
+    <v-btn
+      to="/"
+      variant="outlined"
+      prepend-icon="mdi-arrow-left"
+    >
+      홈으로 돌아가기
+    </v-btn>
   </div>
 
   <!-- Main Content -->
-  <div v-else-if="groupStore.hasGroup" class="group-layout-container">
-    <div class="group-layout">
-      <!-- Navigation Drawer -->
-      <div class="navigator-container">
-        <!-- Navigation Links -->
-        <div class="navigator">
-          <div
-            v-for="item in links"
-            :key="item.label"
-            class="nav-item"
-            :class="{ 'nav-item-active': isActiveRoute(item.path) }"
-            @click="$router.push(`/group/${groupId}/${item.path}`)"
-          >
-            <div class="nav-item-content">
-              <div class="nav-icon-container">
-                <img
-                  :src="getIconPath(item.icon)"
-                  :alt="item.label"
-                  :class="[
-                    'nav-icon',
-                    { 'nav-icon-large': item.path === 'master' || item.path === 'logistics' },
-                  ]"
-                />
-              </div>
-              <span class="nav-label">{{ item.label }}</span>
+  <div v-else-if="groupStore.hasGroup" class="group-layout">
+    <!-- Navigation Drawer -->
+    <div class="navigator-container">
+      <!-- Navigation Links -->
+      <div class="navigator">
+                <div
+          v-for="item in links"
+          :key="item.label"
+          class="nav-item"
+          :class="{ 'nav-item-active': isActiveRoute(item.path) }"
+          @click="$router.push(`/group/${groupId}/${item.path}`)"
+        >
+          <div class="nav-item-content">
+            <div class="nav-icon-container">
+              <img
+                :src="getIconPath(item.icon)"
+                :alt="item.label"
+                :class="['nav-icon', { 'nav-icon-large': item.path === 'master' || item.path === 'logistics' }]"
+              />
             </div>
+            <span class="nav-label">{{ item.label }}</span>
           </div>
         </div>
-
-        <!-- AI Helper - Only show on schedule page -->
-        <div v-if="isSchedulePage" class="ai-helper-container">
-          <ScheduleAiHelper />
-        </div>
       </div>
-
-      <!-- Main Content Area -->
-      <v-main class="pa-4">
-        <RouterView />
-      </v-main>
     </div>
 
-    <!-- Transportation AI Helper - Only show on logistics page -->
-    <TransportationAiHelper v-if="isLogisticsPage" />
-
-    <!-- Finance AI Helper - Only show on finance page -->
-    <FinanceAiHelper v-if="isFinancePage" />
+    <!-- Main Content Area -->
+    <v-main class="pa-4">
+      <RouterView />
+    </v-main>
+    <HelperSpace/>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, watch, onUnmounted, computed } from 'vue'
+import { ref, onMounted, watch, onUnmounted } from 'vue'
 import { useRoute, useRouter, RouterView } from 'vue-router'
 import { useGroupStore } from '@/stores/group'
 import { apiClient } from '@/utils/apiClient'
-import ScheduleAiHelper from '@/components/ai/AiHelperSchedule.vue'
-import TransportationAiHelper from '@/components/ai/TransportationAiHelper.vue'
-import FinanceAiHelper from '@/components/ai/FinanceAiHelper.vue'
+import HelperSpace from '@/components/ai/HelperSpace.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -92,24 +92,8 @@ const links = [
   { label: '일정 계획', path: 'schedule', icon: 'schedule.png' },
   { label: '교통/숙소', path: 'logistics', icon: 'logistics.png' },
   { label: '재무', path: 'finance', icon: 'finance.png' },
-  { label: '채팅', path: 'chat', icon: 'chat.png' },
   { label: '역할', path: 'role', icon: 'role.png' },
 ]
-
-// Check if current page is schedule page
-const isSchedulePage = computed(() => {
-  return route.path.includes('/schedule')
-})
-
-// Check if current page is logistics page
-const isLogisticsPage = computed(() => {
-  return route.path.includes('/logistics')
-})
-
-// Check if current page is finance page
-const isFinancePage = computed(() => {
-  return route.path.includes('/finance')
-})
 
 // 아이콘 경로 생성 함수
 const getIconPath = (iconName) => {
@@ -120,11 +104,11 @@ const getIconPath = (iconName) => {
 const isActiveRoute = (itemPath) => {
   // 그룹 홈의 경우 (빈 경로)
   if (itemPath === '') {
-    return route.path === `/group/${groupId}` || route.path === `/group/${groupId}/`
+    return route.path === `/group/${groupId}` || route.path === `/group/${groupId}/`;
   }
 
   // 다른 메뉴 아이템의 경우
-  return route.path === `/group/${groupId}/${itemPath}`
+  return route.path === `/group/${groupId}/${itemPath}`;
 }
 
 // Load group information and store in pinia
@@ -165,7 +149,7 @@ watch(
     if (newGroupId && newGroupId !== oldGroupId) {
       loadGroupInfo()
     }
-  },
+  }
 )
 
 onMounted(() => {
@@ -202,14 +186,7 @@ onUnmounted(() => {
   padding: 32px;
 }
 
-/* 전체 레이아웃 컨테이너 */
-.group-layout-container {
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
-}
-
-/* 메인 레이아웃 스타일 */
+/* 전체 레이아웃 스타일 */
 .group-layout {
   min-height: 100vh;
   display: flex;
@@ -219,7 +196,7 @@ onUnmounted(() => {
 /* 네비게이터 컨테이너 스타일 */
 .navigator-container {
   width: 258px;
-  background-color: #f5f5f5;
+  background-color: #F5F5F5;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -239,18 +216,6 @@ onUnmounted(() => {
   gap: 18.48px;
   width: 100%;
   margin-top: 30px;
-  flex: 1;
-}
-
-/* AI Helper 컨테이너 */
-.ai-helper-container {
-  margin-top: auto;
-  width: 100%;
-  border-top: 1px solid #dedede;
-  background-color: #f0f0f0;
-  padding: 10px;
-  max-height: 200px;
-  overflow-y: auto;
 }
 
 /* 네비게이션 아이템 스타일 */
@@ -258,8 +223,8 @@ onUnmounted(() => {
   width: 100px;
   height: 100px;
   border-radius: 85px;
-  background-color: #fffeff;
-  border: 3px solid #dedede;
+  background-color: #FFFEFF;
+  border: 3px solid #DEDEDE;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -311,7 +276,7 @@ onUnmounted(() => {
 .nav-label {
   display: none;
   white-space: nowrap;
-  color: #2ec7c5;
+  color: #2EC7C5;
   font-size: 19.2px;
   font-weight: 500;
   margin-left: 10px;
@@ -323,7 +288,7 @@ onUnmounted(() => {
 .nav-item-active {
   width: 220px;
   border-radius: 85px;
-  border: 5px solid #55f6d7;
+  border: 5px solid #55F6D7;
   transform: scale(1.1);
   justify-content: center;
   padding: 0;

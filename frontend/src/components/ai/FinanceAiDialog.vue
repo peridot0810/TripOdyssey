@@ -66,7 +66,12 @@
       <!-- Actions -->
       <v-card-actions class="close-section">
         <v-spacer></v-spacer>
-        <v-btn variant="outlined" color="grey" @click="closeDialog" :disabled="isProcessing">
+        <v-btn
+          variant="outlined"
+          color="grey"
+          @click="closeDialog"
+          :disabled="isProcessing"
+        >
           닫기
         </v-btn>
       </v-card-actions>
@@ -74,7 +79,10 @@
   </v-dialog>
 
   <!-- Response Display Component -->
-  <FinanceResponseDisplay v-model="showResponse" :response-text="responseText" />
+  <FinanceResponseDisplay
+    v-model="showResponse"
+    :response-text="responseText"
+  />
 </template>
 
 <script setup>
@@ -111,7 +119,7 @@ const submitMessage = async () => {
   const groupId = route.params.groupId
 
   isProcessing.value = true
-
+  console.log(messageText)
   try {
     const response = await apiClient.get(`/financial/expense-tracker/${groupId}/summary`, {
       params: {
@@ -122,7 +130,12 @@ const submitMessage = async () => {
     console.log('Finance AI Response:', response.data)
 
     if (response.data && response.data.success) {
-      responseText.value = response.data.data || '분석 결과를 받을 수 없었습니다.'
+      let cleanResponse = response.data.data || '분석 결과를 받을 수 없었습니다.'
+
+      // Clean up markdown code block syntax if present
+      cleanResponse = cleanResponse.replace(/^```html\s*\n?/i, '').replace(/\n?\s*```$/i, '')
+
+      responseText.value = cleanResponse
 
       // Close this dialog and show response
       isOpen.value = false
@@ -130,6 +143,7 @@ const submitMessage = async () => {
         showResponse.value = true
       }, 300)
     }
+
   } catch (error) {
     console.error('Finance AI Error:', error)
     responseText.value = '재무 분석 중 오류가 발생했습니다.'

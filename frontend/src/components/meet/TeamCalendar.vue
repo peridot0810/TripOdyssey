@@ -2,11 +2,8 @@
   <div class="team-calendar-wrapper">
     <div class="calendar-header mb-4">
       <h2 class="text-h5 font-weight-bold text-center">
-        Team Availability Calendar {{ currentYear }}
+        그룹 일정 정보 {{ currentYear }}
       </h2>
-      <p class="text-center text-grey-darken-1">
-        Darker colors indicate more team members are available
-      </p>
       <div v-if="when2MeetStore.isLoading" class="text-center mt-2">
         <v-progress-circular indeterminate size="small" color="primary"></v-progress-circular>
         <span class="ml-2 text-caption">Loading availability data...</span>
@@ -22,86 +19,41 @@
       </p>
     </div>
 
-    <!-- Calendar Grid -->
-    <div v-else class="year-calendar-grid">
-      <div v-for="month in 12" :key="month" class="month-calendar">
-        <div class="month-header">
-          <h3 class="text-h6 font-weight-medium text-center">
-            {{ getMonthName(month - 1) }}
-          </h3>
-        </div>
-
-        <div class="calendar-grid">
-          <div class="weekday" v-for="day in weekDays" :key="day">
-            {{ day }}
+    <!-- Scrollable Calendar Container -->
+    <div v-else class="calendar-scroll-container">
+      <div class="year-calendar-grid">
+        <div v-for="month in 12" :key="month" class="month-calendar">
+          <div class="month-header">
+            <h3 class="text-h6 font-weight-medium text-center">
+              {{ getMonthName(month - 1) }}
+            </h3>
           </div>
 
-          <!-- Blank days for month start -->
-          <div
-            v-for="blank in getBlankDays(month - 1)"
-            :key="'blank-' + blank"
-            class="date-cell blank"
-          />
+          <div class="calendar-grid">
+            <div class="weekday" v-for="day in weekDays" :key="day">
+              {{ day }}
+            </div>
 
-          <!-- Actual dates -->
-          <div
-            v-for="date in getDatesInMonth(month - 1)"
-            :key="date"
-            class="date-cell"
-            :class="getDateClass(month - 1, date)"
-            :title="getDateTooltip(month - 1, date)"
-          >
-            {{ date }}
+            <!-- Blank days for month start -->
+            <div
+              v-for="blank in getBlankDays(month - 1)"
+              :key="'blank-' + blank"
+              class="date-cell blank"
+            />
+
+            <!-- Actual dates -->
+            <div
+              v-for="date in getDatesInMonth(month - 1)"
+              :key="date"
+              class="date-cell"
+              :class="getDateClass(month - 1, date)"
+              :title="getDateTooltip(month - 1, date)"
+            >
+              {{ date }}
+            </div>
           </div>
         </div>
       </div>
-    </div>
-
-    <!-- Legend -->
-    <div v-if="availabilityData.length > 0" class="legend mt-4">
-      <h4 class="text-subtitle-1 font-weight-medium mb-2">Availability Legend:</h4>
-      <div class="legend-items">
-        <div class="legend-item">
-          <div class="legend-color" style="background-color: #e3f2fd"></div>
-          <span class="text-caption">1 person</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-color" style="background-color: #90caf9"></div>
-          <span class="text-caption">2-3 people</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-color" style="background-color: #42a5f5"></div>
-          <span class="text-caption">4-5 people</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-color" style="background-color: #1976d2"></div>
-          <span class="text-caption">6+ people</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Summary Stats -->
-    <div v-if="availabilityData.length > 0" class="summary-stats mt-4">
-      <v-row>
-        <v-col cols="4">
-          <div class="stat-card">
-            <div class="stat-number">{{ uniqueUsers }}</div>
-            <div class="stat-label">Team Members</div>
-          </div>
-        </v-col>
-        <v-col cols="4">
-          <div class="stat-card">
-            <div class="stat-number">{{ totalAvailabilityEntries }}</div>
-            <div class="stat-label">Total Entries</div>
-          </div>
-        </v-col>
-        <v-col cols="4">
-          <div class="stat-card">
-            <div class="stat-number">{{ daysWithAvailability }}</div>
-            <div class="stat-label">Available Days</div>
-          </div>
-        </v-col>
-      </v-row>
     </div>
   </div>
 </template>
@@ -134,24 +86,6 @@ const monthNames = [
   'November',
   'December',
 ]
-
-// Use the availability map from the store
-const availabilityMap = computed(() => when2MeetStore.availabilityMap || new Map())
-
-// Summary statistics
-const uniqueUsers = computed(() => {
-  const users = new Set()
-  availabilityData.value.forEach(entry => {
-    if (entry.userId) users.add(entry.userId)
-  })
-  return users.size
-})
-
-const totalAvailabilityEntries = computed(() => availabilityData.value.length)
-
-const daysWithAvailability = computed(() => {
-  return availabilityMap.value.size
-})
 
 function getMonthName(monthIndex) {
   return monthNames[monthIndex]
@@ -195,6 +129,13 @@ function getDateTooltip(monthIndex, date) {
   padding: 16px;
   max-width: 100%;
   margin: 0 auto;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.calendar-header {
+  flex-shrink: 0;
 }
 
 .no-data-message {
@@ -203,55 +144,80 @@ function getDateTooltip(monthIndex, date) {
   background-color: #f8f9fa;
   border-radius: 8px;
   border: 1px solid #e9ecef;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.calendar-scroll-container {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 8px;
+  margin-right: -8px;
 }
 
 .year-calendar-grid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  grid-template-rows: repeat(2, 1fr);
-  gap: 12px;
-  margin-bottom: 16px;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 16px;
+  min-height: fit-content;
+  padding-bottom: 16px;
 }
 
 .month-calendar {
   border: 1px solid #e0e0e0;
-  border-radius: 6px;
-  padding: 8px;
+  border-radius: 8px;
+  padding: 12px;
   background-color: #fff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
 }
 
 .month-header {
-  margin-bottom: 8px;
+  margin-bottom: 12px;
   padding-bottom: 8px;
   border-bottom: 1px solid #f0f0f0;
+  flex-shrink: 0;
 }
 
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 2px;
+  gap: 3px;
+  flex: 1;
 }
 
 .weekday {
   text-align: center;
   font-weight: 500;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   color: #666;
-  padding: 4px 2px;
+  padding: 6px 3px;
 }
 
 .date-cell {
   text-align: center;
-  padding: 4px 2px;
-  font-size: 0.75rem;
-  border-radius: 3px;
+  padding: 6px 3px;
+  font-size: 0.8rem;
+  border-radius: 4px;
   cursor: default;
-  min-height: 20px;
+  min-height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
+  transition: all 0.2s ease;
+}
+
+.date-cell:hover:not(.blank) {
+  transform: scale(1.1);
+  z-index: 1;
 }
 
 .date-cell.blank {
@@ -280,99 +246,86 @@ function getDateTooltip(monthIndex, date) {
   font-weight: bold;
 }
 
-.legend {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+/* Custom scrollbar */
+.calendar-scroll-container::-webkit-scrollbar {
+  width: 8px;
 }
 
-.legend-items {
-  display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
-  justify-content: center;
+.calendar-scroll-container::-webkit-scrollbar-thumb {
+  background-color: #bdbdbd;
+  border-radius: 4px;
 }
 
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+.calendar-scroll-container::-webkit-scrollbar-thumb:hover {
+  background-color: #9e9e9e;
 }
 
-.legend-color {
-  width: 16px;
-  height: 16px;
-  border-radius: 3px;
-  border: 1px solid #ddd;
-}
-
-.summary-stats {
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  padding: 16px;
-  border: 1px solid #e9ecef;
-}
-
-.stat-card {
-  text-align: center;
-  padding: 8px;
-}
-
-.stat-number {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #1976d2;
-  line-height: 1.2;
-}
-
-.stat-label {
-  font-size: 0.8rem;
-  color: #666;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-top: 4px;
+.calendar-scroll-container::-webkit-scrollbar-track {
+  background-color: #f5f5f5;
+  border-radius: 4px;
 }
 
 /* Responsive design */
-@media (max-width: 1024px) {
-  .year-calendar-grid {
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(3, 1fr);
-  }
-}
-
-@media (max-width: 768px) {
+@media (max-width: 1200px) {
   .year-calendar-grid {
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(4, 1fr);
-    gap: 10px;
+  }
+}
+
+@media (max-width: 900px) {
+  .year-calendar-grid {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+    gap: 12px;
+  }
+
+  .month-calendar {
+    padding: 10px;
+    min-height: 180px;
   }
 
   .team-calendar-wrapper {
     padding: 12px;
   }
-
-  .summary-stats {
-    padding: 12px;
-  }
-
-  .stat-number {
-    font-size: 1.2rem;
-  }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 600px) {
   .year-calendar-grid {
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(6, 1fr);
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(12, 1fr);
+    gap: 10px;
   }
 
-  .legend-items {
-    flex-direction: column;
+  .month-calendar {
+    padding: 8px;
+    min-height: 160px;
+  }
+
+  .date-cell {
+    font-size: 0.75rem;
+    min-height: 20px;
+    padding: 4px 2px;
+  }
+
+  .weekday {
+    font-size: 0.75rem;
+    padding: 4px 2px;
   }
 
   .no-data-message {
     padding: 30px 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .team-calendar-wrapper {
+    padding: 8px;
+  }
+
+  .calendar-scroll-container {
+    padding-right: 4px;
+    margin-right: -4px;
   }
 }
 </style>

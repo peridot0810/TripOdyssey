@@ -1,25 +1,24 @@
 <template>
-  <v-card class="tourism-card pa-5 rounded-lg" elevation="3">
-    <div class="d-flex align-center mb-4">
-      <v-icon size="large" color="primary" class="mr-3">mdi-map-search</v-icon>
-      <h2 class="text-h5 font-weight-bold mb-0 primary--text">관광지 정보 검색</h2>
+  <v-card class="tourism-card pa-4 rounded-lg" elevation="2" style="border: 2px solid #3d9fff;">
+    <div class="d-flex align-center mb-3">
+      <svg-icon type="mdi" :path="mapSearchPath" size="24" class="mr-2" style="color: #1976d2;"></svg-icon>
+      <h3 class="text-h6 font-weight-bold mb-0 primary--text">관광지 정보 검색</h3>
     </div>
-
-    <v-divider class="mb-4"></v-divider>
 
     <!-- Error Alert -->
     <v-alert
       v-if="attractionStore.error"
       type="error"
-      class="mb-4"
+      class="mb-3"
       closable
       @click:close="attractionStore.clearError()"
     >
       {{ attractionStore.error }}
     </v-alert>
 
-    <v-row>
-      <v-col cols="12" md="8" lg="6" class="mx-auto">
+    <!-- Row 1: Three Dropdowns -->
+    <v-row class="mb-2">
+      <v-col cols="12" sm="4">
         <v-select
           v-model="selectedSido"
           :items="sidoList"
@@ -27,13 +26,19 @@
           item-value="code"
           label="시도 선택"
           variant="outlined"
-          density="comfortable"
-          class="rounded-lg search-field mb-3"
-          prepend-inner-icon="mdi-city"
+          density="compact"
           hide-details
           :disabled="attractionStore.isLoading"
-        />
+          rounded="lg"
+          style="border-radius: 12px;"
+        >
+          <template v-slot:prepend-inner>
+            <svg-icon type="mdi" :path="cityPath" size="18" style="color: #666;"></svg-icon>
+          </template>
+        </v-select>
+      </v-col>
 
+      <v-col cols="12" sm="4">
         <v-select
           v-model="selectedGugun"
           :items="filteredGuguns"
@@ -42,12 +47,18 @@
           label="시군구 선택"
           :disabled="!selectedSido || attractionStore.isLoading"
           variant="outlined"
-          density="comfortable"
-          class="rounded-lg search-field mb-3"
-          prepend-inner-icon="mdi-map-marker"
+          density="compact"
           hide-details
-        />
+          rounded="lg"
+          style="border-radius: 12px;"
+        >
+          <template v-slot:prepend-inner>
+            <svg-icon type="mdi" :path="mapMarkerPath" size="18" style="color: #666;"></svg-icon>
+          </template>
+        </v-select>
+      </v-col>
 
+      <v-col cols="12" sm="4">
         <v-select
           v-model="selectedContentType"
           :items="contentTypes"
@@ -55,60 +66,74 @@
           item-value="code"
           label="관광타입 선택"
           variant="outlined"
-          density="comfortable"
-          class="rounded-lg search-field mb-3"
-          prepend-inner-icon="mdi-tag-multiple"
+          density="compact"
           hide-details
           :disabled="attractionStore.isLoading"
-        />
+          rounded="lg"
+          style="border-radius: 12px;"
+        >
+          <template v-slot:prepend-inner>
+            <svg-icon type="mdi" :path="tagMultiplePath" size="18" style="color: #666;"></svg-icon>
+          </template>
+        </v-select>
+      </v-col>
+    </v-row>
 
-        <!-- Optional Keyword Field -->
+    <!-- Row 2: Search Input + Button -->
+    <v-row class="align-center">
+      <v-col cols="12" sm="9">
         <v-text-field
           v-model="keyword"
           label="검색 키워드 (선택사항)"
           variant="outlined"
-          density="comfortable"
-          class="rounded-lg search-field mb-4"
-          prepend-inner-icon="mdi-magnify"
+          density="compact"
           hide-details
           :disabled="attractionStore.isLoading"
           placeholder="예: 허브, 공원, 박물관..."
-        />
-
-        <v-btn
-          color="primary"
-          @click="handleSearch"
-          block
-          class="search-button rounded-lg py-3"
-          elevation="2"
-          :disabled="!selectedSido || !selectedContentType || attractionStore.isLoading"
-          :loading="attractionStore.isLoading"
+          @keyup.enter="handleSearch"
+          rounded="lg"
+          style="border-radius: 12px;"
         >
-          <v-icon class="mr-1">mdi-magnify</v-icon>
-          관광지 조회
-        </v-btn>
+          <template v-slot:prepend-inner>
+            <svg-icon type="mdi" :path="magnifyPath" size="18" style="color: #666;"></svg-icon>
+          </template>
+        </v-text-field>
+      </v-col>
+
+      <v-col cols="12" sm="3">
+        <v-btn
+  color="primary"
+  @click="handleSearch"
+  block
+  elevation="3"
+  :loading="attractionStore.isLoading"
+  size="large"
+  rounded="lg"
+  class="font-weight-bold text-none"
+  style="
+    height: 48px;
+    border-radius: 12px;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+    transition: all 0.2s ease;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+  "
+>
+  <svg-icon type="mdi" :path="magnifyPath" size="20" class="mr-2" style="color: white;"></svg-icon>
+  검색
+</v-btn>
       </v-col>
     </v-row>
 
-    <v-expand-transition>
-      <div v-if="showTips" class="mt-4 pt-3 search-tips">
-        <v-divider class="mb-3"></v-divider>
-        <div class="d-flex align-center mb-2">
-          <v-icon color="grey darken-1" size="small" class="mr-2">mdi-information</v-icon>
-          <span class="text-caption text-grey-darken-1 font-weight-medium">검색 도움말</span>
-        </div>
-        <p class="text-caption text-grey-darken-1 mb-0">
-          시도와 관광타입을 선택하여 원하는 관광지를 찾아보세요. 더 정확한 결과를 위해 시군구와 키워드도 함께 입력하시면 좋습니다.
-        </p>
-      </div>
-    </v-expand-transition>
-
     <!-- Results Summary -->
     <v-expand-transition>
-      <div v-if="attractionStore.hasAttractions && !attractionStore.isLoading" class="mt-4 pt-3">
-        <v-divider class="mb-3"></v-divider>
+      <div v-if="attractionStore.hasAttractions && !attractionStore.isLoading" class="mt-3 pt-2">
+        <v-divider class="mb-2"></v-divider>
         <div class="d-flex align-center">
-          <v-icon color="success" size="small" class="mr-2">mdi-check-circle</v-icon>
+          <svg-icon type="mdi" :path="checkCirclePath" size="16" class="mr-2" style="color: #4caf50;"></svg-icon>
           <span class="text-caption text-success font-weight-medium">
             {{ attractionStore.attractions.length }}개의 관광지를 찾았습니다
           </span>
@@ -127,15 +152,33 @@ import {
   gugunList,
 } from '@/data/map/searchOptions'
 
+// Icon imports
+import SvgIcon from '@jamescoyle/vue-icon'
+import {
+  mdiMapSearch,
+  mdiCity,
+  mdiMapMarker,
+  mdiTagMultiple,
+  mdiMagnify,
+  mdiCheckCircle
+} from '@mdi/js'
+
 // Store
 const attractionStore = useAttractionStore()
+
+// Icon paths
+const mapSearchPath = mdiMapSearch
+const cityPath = mdiCity
+const mapMarkerPath = mdiMapMarker
+const tagMultiplePath = mdiTagMultiple
+const magnifyPath = mdiMagnify
+const checkCirclePath = mdiCheckCircle
 
 // Form data
 const selectedSido = ref('')
 const selectedGugun = ref('')
 const selectedContentType = ref('')
 const keyword = ref('')
-const showTips = ref(true)
 
 // Computed
 const filteredGuguns = computed(() =>
@@ -165,9 +208,6 @@ const handleSearch = async () => {
   // Call store action to search attractions
   await attractionStore.searchAttractions(searchData)
 
-  // Hide tips after first search
-  showTips.value = false
-
   // Emit search event to parent if needed
   emit('search', searchData)
 }
@@ -178,38 +218,36 @@ const emit = defineEmits(['search'])
 
 <style scoped>
 .tourism-card {
-  max-width: 1000px;
-  margin: auto;
+  border-radius: 16px;
+  transition: all 0.3s ease;
+  border: 1px solid #e0e0e0;
+}
+
+.v-btn:active:not(:disabled) {
+  transform: translateY(0) scale(0.98) !important;
+}
+
+/* Input field styling */
+:deep(.v-field--variant-outlined .v-field__outline) {
   border-radius: 12px;
-  transition: all 0.3s ease;
 }
 
-.tourism-card:hover {
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1) !important;
+:deep(.v-field--variant-outlined .v-field__outline__start) {
+  border-radius: 12px 0 0 12px;
 }
 
-.search-field {
-  transition: all 0.2s ease;
+:deep(.v-field--variant-outlined .v-field__outline__end) {
+  border-radius: 0 12px 12px 0;
 }
 
-.search-field:hover {
-  transform: translateY(-2px);
-}
+/* Mobile responsiveness */
+@media (max-width: 599px) {
+  .v-btn {
+    margin-top: 8px;
+  }
 
-.search-button {
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  text-transform: none;
-  transition: all 0.3s ease;
-}
-
-.search-button:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
-}
-
-.search-tips {
-  border-radius: 8px;
-  transition: all 0.3s ease;
+  .tourism-card {
+    border-radius: 12px;
+  }
 }
 </style>

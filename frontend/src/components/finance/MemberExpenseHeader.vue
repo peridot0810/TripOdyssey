@@ -3,18 +3,18 @@
     <!-- Header Title and Refresh -->
     <div class="d-flex justify-space-between align-center mb-4">
       <h2 class="text-h6 font-weight-bold">그룹 멤버</h2>
-      <div class="d-flex align-center gap-2">
+      <div class="d-flex align-center gap-3">
         <v-btn
           icon
           size="small"
           variant="text"
-          color="primary"
-          @click="$emit('refresh')"
+          color="orange"
+          @click="refreshExpenses"
           :loading="memberExpenseStore.isLoading"
         >
-          <v-icon>mdi-refresh</v-icon>
+          <SvgIcon type="mdi" :path="refreshIcon" size="20" />
         </v-btn>
-        <v-chip size="small" color="primary" variant="flat">
+        <v-chip size="small" color="orange" variant="flat">
           {{ memberExpenseStore.totalMembersCount }}명
         </v-chip>
       </div>
@@ -28,7 +28,7 @@
         <v-col cols="6">
           <v-card elevation="1" class="pa-3 text-center">
             <p class="text-caption text-grey mb-1">예상 총 지출</p>
-            <p class="text-h6 font-weight-bold text-primary">
+            <p class="text-h6 font-weight-bold text-orange">
               ₩{{ formatCurrency(memberExpenseStore.totalExpenseToPay) }}
             </p>
           </v-card>
@@ -60,7 +60,7 @@
 
         <div class="budget-input-section">
           <v-form @submit.prevent="submitBudget" ref="budgetForm">
-            <div class="d-flex align-center gap-2">
+            <div class="budget-input-container">
               <v-text-field
                 v-model="budgetInput"
                 type="number"
@@ -71,21 +71,23 @@
                 placeholder="회비 금액 입력"
                 prefix="₩"
                 hide-details
-                class="flex-grow-1"
+                class="budget-input-field"
                 :disabled="isSubmittingBudget"
                 :rules="budgetRules"
-              ></v-text-field>
+              />
 
-              <v-btn
-                type="submit"
-                color="primary"
-                variant="elevated"
-                size="small"
-                :loading="isSubmittingBudget"
-                :disabled="!budgetInput || budgetInput <= 0"
-              >
-                설정
-              </v-btn>
+<v-btn
+  type="submit"
+  icon
+  color="orange"
+  class="budget-submit-circle"
+  :loading="isSubmittingBudget"
+  :disabled="!budgetInput || budgetInput <= 0"
+>
+  <SvgIcon type="mdi" :path="checkIcon" size="20" />
+</v-btn>
+
+
             </div>
           </v-form>
 
@@ -96,7 +98,7 @@
                 ₩{{ formatCurrency(currentAverageBudget) }}
               </span>
             </div>
-            <div v-if="budgetInput && budgetInput > 0" class="d-flex justify-space-between text-caption text-primary mt-1">
+            <div v-if="budgetInput && budgetInput > 0" class="d-flex justify-space-between text-caption text-orange mt-1">
               <span>설정 시 총 예상액:</span>
               <span class="font-weight-medium">
                 ₩{{ formatCurrency(budgetInput * memberExpenseStore.totalMembersCount) }}
@@ -133,6 +135,13 @@ import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useMemberExpenseStore } from '@/stores/memberExpense'
 import { apiClient } from '@/utils/apiClient'
+import SvgIcon from '@jamescoyle/vue-icon'
+import { mdiRefresh } from '@mdi/js'
+import { mdiCheck } from '@mdi/js'
+const checkIcon = mdiCheck
+
+
+const refreshIcon = mdiRefresh
 
 // Router and Store
 const route = useRoute()
@@ -143,9 +152,6 @@ const budgetInput = ref('')
 const isSubmittingBudget = ref(false)
 const budgetError = ref(null)
 const budgetForm = ref(null)
-
-// Emits
-const emit = defineEmits(['refresh'])
 
 // Computed
 const groupId = computed(() => {
@@ -194,6 +200,57 @@ const formatCurrency = (amount) => {
   return new Intl.NumberFormat('ko-KR').format(amount || 0)
 }
 
+const refreshExpenses = async () => {
+  await fetchMemberExpenseList()
+}
+
+const fetchMemberExpenseList = async () => {
+  if (!groupId.value) {
+    memberExpenseStore.setError('그룹 ID를 찾을 수 없습니다.')
+    return
+  }
+
+  try {
+    memberExpenseStore.setLoading(true)
+    memberExpenseStore.clearError()
+
+    const response = await apiClient.get(`/financial/${groupId.value}/member-list`)
+
+    if (response.data.success) {
+      memberExpenseStore.setMemberExpenseList(response.data.data)
+    } else {
+      throw new Error(response.data.message || '멤버 목록을 불러오는데 실패했습니다.')
+    }
+  } catch (error) {
+    console.error('Error fetching member expense list:', error)
+
+    let errorMessage = '멤버 목록을 불러오는 중 오류가 발생했습니다.'
+
+    if (error.response) {
+      const status = error.response.status
+      const message = error.response.data?.message || error.message
+
+      if (status === 401) {
+        errorMessage = '로그인이 필요합니다.'
+      } else if (status === 403) {
+        errorMessage = '접근 권한이 없습니다.'
+      } else if (status === 404) {
+        errorMessage = '해당 그룹을 찾을 수 없습니다.'
+      } else {
+        errorMessage = `서버 오류 (${status}): ${message}`
+      }
+    } else if (error.code === 'ECONNABORTED') {
+      errorMessage = '요청 시간이 초과되었습니다. 네트워크 연결을 확인해주세요.'
+    } else {
+      errorMessage = error.message || errorMessage
+    }
+
+    memberExpenseStore.setError(errorMessage)
+  } finally {
+    memberExpenseStore.setLoading(false)
+  }
+}
+
 const submitBudget = async () => {
   if (!budgetInput.value || budgetInput.value <= 0) {
     budgetError.value = '올바른 금액을 입력해주세요.'
@@ -231,24 +288,38 @@ const submitBudget = async () => {
       // Clear the input
       budgetInput.value = ''
 
-      // Show success (you could add a success message here)
       console.log('Budget updated successfully')
 
     } else {
-      budgetError.value = response.data.message || '회비 설정에 실패했습니다.'
+      throw new Error(response.data.message || '회비 설정에 실패했습니다.')
     }
   } catch (error) {
     console.error('Error setting budget:', error)
 
-    if (error.response?.status === 404) {
-      budgetError.value = '해당 그룹을 찾을 수 없습니다.'
-    } else if (error.response?.status === 403) {
-      budgetError.value = '회비 설정 권한이 없습니다.'
-    } else if (error.response?.data?.message) {
-      budgetError.value = error.response.data.message
+    let errorMessage = '회비 설정 중 오류가 발생했습니다.'
+
+    if (error.response) {
+      const status = error.response.status
+      const message = error.response.data?.message || error.message
+
+      if (status === 400) {
+        errorMessage = `입력 데이터 오류: ${message}`
+      } else if (status === 401) {
+        errorMessage = '로그인이 필요합니다.'
+      } else if (status === 403) {
+        errorMessage = '회비 설정 권한이 없습니다.'
+      } else if (status === 404) {
+        errorMessage = '해당 그룹을 찾을 수 없습니다.'
+      } else {
+        errorMessage = `서버 오류 (${status}): ${message}`
+      }
+    } else if (error.code === 'ECONNABORTED') {
+      errorMessage = '요청 시간이 초과되었습니다. 다시 시도해주세요.'
     } else {
-      budgetError.value = '네트워크 오류가 발생했습니다.'
+      errorMessage = error.message || errorMessage
     }
+
+    budgetError.value = errorMessage
   } finally {
     isSubmittingBudget.value = false
   }
@@ -272,21 +343,66 @@ const submitBudget = async () => {
   margin-top: 8px;
 }
 
+.budget-input-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.budget-input-field {
+  max-width: 500px;
+  flex: 1;
+}
+
 .budget-info {
   background-color: #f8f9fa;
   border-radius: 4px;
   padding: 8px 12px;
 }
 
+/* Orange color styles */
+.text-orange {
+  color: #ff9800 !important;
+}
+
 /* Responsive adjustments */
 @media (max-width: 600px) {
-  .budget-input-section .d-flex {
+  .budget-input-container {
     flex-direction: column;
     gap: 8px;
   }
 
-  .budget-input-section .v-btn {
+  .budget-input-field {
+    max-width: 100%;
+  }
+
+  .budget-input-container .v-btn {
     align-self: stretch;
   }
 }
+
+.budget-submit-btn {
+  min-width: 140px;
+  border-radius: 8px;
+}
+
+@media (max-width: 600px) {
+  .budget-submit-btn {
+    width: 100%;
+  }
+}
+
+
+.budget-submit-circle {
+  border-radius: 50% !important;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 </style>

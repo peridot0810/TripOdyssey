@@ -98,19 +98,24 @@
 
       <!-- Recommend Button -->
       <div class="recommend-section">
-        <v-btn
-          color="primary"
-          variant="elevated"
-          size="large"
-          block
-          class="recommend-btn"
-          prepend-icon="mdi-thumb-up"
-          :loading="isRecommending"
-          :disabled="isRecommending"
-          @click="handleRecommend"
-        >
-          {{ isRecommending ? '추천 중...' : '추천하기' }}
-        </v-btn>
+<v-btn
+  variant="text"
+  color="pink"
+  size="large"
+  :loading="isRecommending"
+  :disabled="isRecommending"
+  @click="handleRecommend"
+  style="width: fit-content; max-width: 200px; min-width: 140px; padding: 0 20px; font-weight: 600; letter-spacing: 0.5px; text-transform: none; transition: background-color 0.2s ease; border-radius: 9999px; border: 2px solid #d81b60;"
+>
+  <template #prepend>
+    <SvgIcon type="mdi" :path="thumbUpIcon" size="20" />
+  </template>
+  {{ isRecommending ? '추천 중...' : '추천하기' }}
+</v-btn>
+
+
+
+
       </div>
     </v-card-item>
 
@@ -137,6 +142,11 @@
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { apiClient } from '@/utils/apiClient'
+import SvgIcon from '@jamescoyle/vue-icon'
+import { mdiThumbUp } from '@mdi/js'
+
+const thumbUpIcon = mdiThumbUp
+
 
 const props = defineProps({
   locationData: {
@@ -309,10 +319,6 @@ const handleRecommend = async () => {
   transition: color 0.2s ease;
 }
 
-.overview-text.cursor-pointer:hover {
-  color: #1976d2 !important;
-}
-
 .recommend-section {
   margin-top: 16px;
   padding-top: 16px;
@@ -323,13 +329,13 @@ const handleRecommend = async () => {
   font-weight: 600;
   letter-spacing: 0.5px;
   text-transform: none;
-  transition: all 0.3s ease;
+  transition: background-color 0.2s ease;
 }
 
 .recommend-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
+  background-color: rgba(25, 118, 210, 0.08); /* subtle hover */
 }
+
 
 .success-toast {
   z-index: 9999;
@@ -365,15 +371,5 @@ const handleRecommend = async () => {
   .recommend-btn {
     font-size: 14px;
   }
-}
-
-/* Hover effects */
-.location-info-card {
-  transition: all 0.2s ease;
-}
-
-.location-info-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1) !important;
 }
 </style>

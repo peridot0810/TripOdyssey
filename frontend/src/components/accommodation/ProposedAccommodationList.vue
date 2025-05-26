@@ -3,7 +3,7 @@
     <!-- Header with Add Button -->
     <div class="d-flex justify-space-between align-center mb-4">
       <h2 class="text-h5 font-weight-bold d-flex align-center">
-        <v-icon size="large" color="primary" class="mr-2">mdi-home-search</v-icon>
+        <SvgIcon type="mdi" :path="homeSearchIcon" size="24" class="mr-2" />
         추천 숙박 시설
       </h2>
       <v-btn
@@ -14,98 +14,68 @@
         :loading="isRefreshing"
         :disabled="proposalStore.isLoading"
       >
-        <v-icon class="mr-2">mdi-refresh</v-icon>
+        <SvgIcon type="mdi" :path="refreshIcon" size="20" class="mr-2" />
         새로고침
       </v-btn>
     </div>
 
+    <!-- Error Alert -->
+    <v-alert
+      v-if="proposalStore.error || fetchError"
+      type="error"
+      class="mb-4"
+      closable
+      @click:close="clearErrors"
+    >
+      {{ proposalStore.error || fetchError }}
+    </v-alert>
+
     <!-- Initial Loading State -->
     <div v-if="isInitialLoading" class="loading-state text-center py-8">
-      <v-progress-circular
-        indeterminate
-        color="primary"
-        size="64"
-      ></v-progress-circular>
-      <p class="text-body-1 text-grey-darken-1 mt-3">추천 숙박 시설을 불러오는 중...</p>
+      <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
+      <p class="text-body-1 mt-3">추천 숙박 시설을 불러오는 중...</p>
     </div>
 
-    <!-- Error State -->
-    <div v-else-if="fetchError" class="error-state text-center py-8">
-      <v-icon size="x-large" color="error">mdi-alert-circle</v-icon>
-      <p class="text-body-1 text-error mt-3">추천 숙박 시설을 불러오는데 실패했습니다</p>
-      <p class="text-caption text-grey mb-4">{{ fetchError }}</p>
-      <v-btn
-        color="primary"
-        variant="outlined"
-        @click="fetchAccommodationProposals"
-        :loading="isRetrying"
+    <!-- Empty State -->
+    <div v-else-if="accommodationProposals.length === 0" class="empty-state text-center py-8">
+      <SvgIcon type="mdi" :path="homeOffIcon" size="28" color="grey" />
+      <p class="text-body-1 text-grey-darken-1 mt-3">추천된 숙박 시설이 없습니다</p>
+    </div>
+
+    <!-- Accommodation Proposal Cards -->
+    <div v-else class="accommodation-cards">
+      <div
+        v-for="accommodation in accommodationProposals"
+        :key="accommodation.proposalId"
+        class="accommodation-card-wrapper mb-4"
       >
-        <v-icon class="mr-2">mdi-refresh</v-icon>
-        다시 시도
-      </v-btn>
-    </div>
+        <div class="proposal-card-container">
+          <ProposalCard
+            :location="accommodation"
+            @toggle-like="handleToggleLike"
+            class="proposal-card-item"
+          />
 
-    <!-- Content (Empty State or Accommodation Cards) -->
-    <div v-else>
-      <!-- Empty State -->
-      <div v-if="accommodationProposals.length === 0" class="empty-state text-center py-8">
-        <v-icon size="x-large" color="grey">mdi-home-off</v-icon>
-        <p class="text-body-1 text-grey-darken-1 mt-3">추천된 숙박 시설이 없습니다</p>
-        <p class="text-caption text-grey">다른 지역의 숙박 시설을 확인해보세요!</p>
-      </div>
-
-      <!-- Accommodation Proposal Cards -->
-      <div v-else class="accommodation-cards">
-        <div
-          v-for="accommodation in accommodationProposals"
-          :key="accommodation.proposalId"
-          class="accommodation-card-wrapper mb-4"
-        >
-          <div class="proposal-card-container">
-            <ProposalCard
-              :location="accommodation"
-              @toggle-like="handleToggleLike"
-              class="proposal-card-item"
-            />
-
-            <!-- Select Accommodation Button -->
-            <v-btn
-              color="success"
-              variant="elevated"
-              class="select-accommodation-button"
-              @click="handleSelectAccommodation(accommodation)"
-              :title="'이 숙소 선택하기'"
-            >
-              <v-icon class="mr-1">mdi-plus</v-icon>
-              <span class="select-text">선택</span>
-            </v-btn>
-          </div>
+          <!-- Select Accommodation Button -->
+          <v-btn
+            icon
+            size="small"
+            variant="flat"
+            color="success"
+            class="select-accommodation-button"
+            @click="handleSelectAccommodation(accommodation)"
+            :title="'이 숙소 선택하기'"
+          >
+            <SvgIcon type="mdi" :path="plusIcon" size="20" color="white" />
+          </v-btn>
         </div>
       </div>
     </div>
 
-    <!-- Store Loading State -->
-    <div v-if="proposalStore.isLoading" class="text-center py-4">
-      <v-progress-circular indeterminate color="primary"></v-progress-circular>
-      <p class="text-caption text-grey mt-2">처리 중...</p>
-    </div>
-
-    <!-- Store Error Alert -->
-    <v-alert
-      v-if="proposalStore.error"
-      type="error"
-      class="mt-4"
-      closable
-      @click:close="proposalStore.clearError()"
-    >
-      {{ proposalStore.error }}
-    </v-alert>
-
-    <!-- Create Accommodation Modal (will be added later) -->
+    <!-- Create Accommodation Modal -->
     <CreateAccommodationModal
-      v-model="showCreateModal"
-      :selected-location="selectedAccommodation"
-      @accommodation-created="handleAccommodationCreated"
+      ref="createAccommodationModal"
+      :selected-location="selectedAccommodation || {}"
     />
   </div>
 </template>
@@ -116,6 +86,13 @@ import { useRoute } from 'vue-router'
 import { useProposalStore } from '@/stores/proposal'
 import ProposalCard from '@/components/schedule/ProposalCard.vue'
 import CreateAccommodationModal from '@/components/accommodation/CreateAccommodationModal.vue'
+import SvgIcon from '@jamescoyle/vue-icon'
+import { mdiHomeSearch, mdiRefresh, mdiHomeOff, mdiPlus } from '@mdi/js'
+
+const homeSearchIcon = mdiHomeSearch
+const refreshIcon = mdiRefresh
+const homeOffIcon = mdiHomeOff
+const plusIcon = mdiPlus
 
 const route = useRoute()
 const proposalStore = useProposalStore()
@@ -123,15 +100,12 @@ const proposalStore = useProposalStore()
 // Component state
 const isInitialLoading = ref(false)
 const isRefreshing = ref(false)
-const isRetrying = ref(false)
 const fetchError = ref(null)
 const selectedAccommodation = ref(null)
-const showCreateModal = ref(false)
+const createAccommodationModal = ref(null)
 
 // Get group ID from route params
-const getGroupId = () => {
-  return route.params.groupId
-}
+const groupId = route.params.groupId
 
 // Filter proposals to show only accommodation types (contentTypeId = 32)
 const accommodationProposals = computed(() => {
@@ -143,29 +117,26 @@ const accommodationProposals = computed(() => {
   })
 })
 
+// Clear all errors
+const clearErrors = () => {
+  fetchError.value = null
+  proposalStore.clearError()
+}
+
 // Fetch accommodation proposals from API
 const fetchAccommodationProposals = async () => {
-  const groupId = getGroupId()
-
   if (!groupId) {
     fetchError.value = '그룹 ID를 찾을 수 없습니다.'
     return
   }
 
-  // Set loading state
-  if (isRetrying.value) {
-    isRetrying.value = true
-  } else {
-    isInitialLoading.value = true
-  }
-
+  isInitialLoading.value = true
   fetchError.value = null
   proposalStore.clearError()
 
   try {
     // Use the existing proposal store's fetch method
     await proposalStore.fetchProposals(groupId)
-
     console.log('숙박 제안 목록 조회 성공')
   } catch (error) {
     console.error('숙박 제안 목록 조회 오류:', error)
@@ -191,7 +162,6 @@ const fetchAccommodationProposals = async () => {
     }
   } finally {
     isInitialLoading.value = false
-    isRetrying.value = false
   }
 }
 
@@ -207,7 +177,6 @@ const refreshProposals = async () => {
 
 // Event handlers
 const handleToggleLike = async (proposalId) => {
-  const groupId = getGroupId()
   try {
     await proposalStore.toggleLike(groupId, proposalId)
   } catch (error) {
@@ -217,21 +186,16 @@ const handleToggleLike = async (proposalId) => {
 
 const handleSelectAccommodation = (accommodation) => {
   selectedAccommodation.value = accommodation
-  showCreateModal.value = true
+  // Use the exposed method to open the dialog
+  createAccommodationModal.value?.openDialog()
   console.log('선택된 숙소:', accommodation)
-}
-
-const handleAccommodationCreated = (newAccommodation) => {
-  showCreateModal.value = false
-  console.log('새 숙소가 추가되었습니다:', newAccommodation)
-
-  // Optional: Show success notification
-  // You could add a toast notification here if available
 }
 
 // Lifecycle
 onMounted(() => {
-  fetchAccommodationProposals()
+  if (groupId) {
+    fetchAccommodationProposals()
+  }
 })
 </script>
 
@@ -245,16 +209,9 @@ onMounted(() => {
 }
 
 .loading-state,
-.error-state,
 .empty-state {
   border-radius: 8px;
   background-color: #f5f5f5;
-  padding: 32px 16px;
-}
-
-.error-state {
-  background-color: #ffebee;
-  border: 1px solid #ffcdd2;
 }
 
 .accommodation-cards {
@@ -276,36 +233,19 @@ onMounted(() => {
 }
 
 .select-accommodation-button {
-  width: 64px !important;
+  width: 48px !important;
   height: 48px !important;
-  border-radius: 8px !important;
+  border-radius: 50% !important;
   min-width: auto !important;
   transition: transform 0.2s, box-shadow 0.2s;
   flex-shrink: 0;
-  font-weight: 500;
+  background-color: #213bd0 !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .select-accommodation-button:hover {
-  transform: translateY(-1px) scale(1.02);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
-}
-
-.select-text {
-  font-size: 12px;
-  font-weight: bold;
-  color: white;
-  line-height: 1;
-}
-
-/* Loading animation */
-.loading-state .v-progress-circular {
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0% { opacity: 1; }
-  50% { opacity: 0.7; }
-  100% { opacity: 1; }
+  transform: scale(1.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
 }
 
 /* Responsive adjustments */
@@ -321,12 +261,11 @@ onMounted(() => {
   }
 
   .proposal-card-container {
-    flex-direction: column;
     gap: 8px;
   }
 
   .select-accommodation-button {
-    width: 100% !important;
+    width: 40px !important;
     height: 40px !important;
   }
 }

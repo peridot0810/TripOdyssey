@@ -2,10 +2,10 @@
   <v-card class="accommodation-card" elevation="2">
     <div class="card-container d-flex">
       <!-- Left Content Section -->
-      <div class="content-section flex-grow-1">
+      <div class="content-section">
         <v-card-item class="pa-4">
           <!-- Accommodation Name/Title -->
-          <v-card-title class="text-h6 font-weight-bold pa-0 mb-2">
+          <v-card-title class="text-h6 font-weight-bold pa-0 mb-2 accommodation-title">
             {{ accommodation.accommodationInfo.title }}
           </v-card-title>
 
@@ -19,18 +19,20 @@
             </v-chip>
           </div>
 
-          <!-- Check-in and Check-out Times -->
+          <!-- Check-in and Check-out Times (Vertical Layout) -->
           <div class="time-section mb-3">
-            <div class="time-labels d-flex justify-space-between mb-1">
-              <span class="text-caption text-grey-darken-1">체크인</span>
-              <span class="text-caption text-grey-darken-1">체크아웃</span>
-            </div>
-            <div class="time-values d-flex justify-space-between align-center">
-              <span class="text-body-1 font-weight-medium">{{
+            <div class="time-item mb-2">
+              <span class="text-caption text-grey-darken-1 time-label">체크인</span>
+              <span class="text-body-1 font-weight-medium time-value">{{
                 formatTime(accommodation.checkInTime)
               }}</span>
-              <v-icon color="primary" size="small" class="mx-2">mdi-arrow-right</v-icon>
-              <span class="text-body-1 font-weight-medium">{{
+            </div>
+            <div class="time-divider">
+              <SvgIcon :path="arrowIcon" type="mdi" size="16" color="primary" class="rotate-90" />
+            </div>
+            <div class="time-item">
+              <span class="text-caption text-grey-darken-1 time-label">체크아웃</span>
+              <span class="text-body-1 font-weight-medium time-value">{{
                 formatTime(accommodation.checkOutTime)
               }}</span>
             </div>
@@ -39,19 +41,19 @@
           <!-- Contact Information -->
           <div v-if="accommodation.accommodationInfo.tel" class="contact-section mb-2">
             <div class="d-flex align-center">
-              <v-icon size="small" color="grey-darken-1" class="mr-2">mdi-phone</v-icon>
-              <span class="text-body-2">{{ accommodation.accommodationInfo.tel }}</span>
+              <SvgIcon :path="phoneIcon" type="mdi" size="16" color="grey-darken-1" class="mr-2 contact-icon" />
+              <span class="text-body-2 contact-text">{{ accommodation.accommodationInfo.tel }}</span>
             </div>
           </div>
 
           <!-- Homepage -->
           <div v-if="accommodation.accommodationInfo.homepage" class="homepage-section mb-2">
             <div class="d-flex align-center">
-              <v-icon size="small" color="grey-darken-1" class="mr-2">mdi-web</v-icon>
+              <SvgIcon :path="webIcon" type="mdi" size="16" color="grey-darken-1" class="mr-2 contact-icon" />
               <a
                 :href="extractUrl(accommodation.accommodationInfo.homepage)"
                 target="_blank"
-                class="text-body-2 text-primary text-decoration-none"
+                class="text-body-2 text-primary text-decoration-none contact-text"
               >
                 홈페이지 방문
               </a>
@@ -61,8 +63,8 @@
           <!-- Address -->
           <div class="address-section mb-3">
             <div class="d-flex align-start">
-              <v-icon size="small" color="grey-darken-1" class="mr-2 mt-1">mdi-map-marker</v-icon>
-              <div>
+              <SvgIcon :path="mapMarkerIcon" type="mdi" size="16" color="grey-darken-1" class="mr-2 mt-1 contact-icon" />
+              <div class="address-text">
                 <div class="text-body-2">{{ accommodation.accommodationInfo.addr1 }}</div>
                 <div
                   v-if="accommodation.accommodationInfo.addr2"
@@ -95,38 +97,35 @@
             <!-- Delete Button -->
             <div class="delete-button-container">
               <v-btn
-                color="error"
                 variant="flat"
-                size="small"
+                size="medium"
                 class="delete-btn"
                 @click="handleDelete"
                 :loading="isDeleting"
               >
-                <v-icon size="small" class="mr-1">mdi-delete</v-icon>
-                삭제
+                <SvgIcon :path="deleteIcon" type="mdi" size="20" class="mr-1" />
               </v-btn>
             </div>
           </div>
         </v-card-item>
       </div>
 
-      <!-- Right Image Section -->
+      <!-- Right Image Section (Background Image) -->
       <div class="image-section">
         <v-img
           v-if="accommodation.accommodationInfo.firstImage1"
           :src="accommodation.accommodationInfo.firstImage1"
           :alt="accommodation.accommodationInfo.title"
-          height="100%"
-          width="160"
+          class="accommodation-image fill-height"
           cover
-          class="accommodation-image"
         >
           <template v-slot:placeholder>
             <div class="d-flex align-center justify-center fill-height">
-              <v-progress-circular indeterminate color="primary"></v-progress-circular>
+              <v-progress-circular indeterminate color="primary" />
             </div>
           </template>
         </v-img>
+
         <div v-else class="no-image-placeholder d-flex flex-column align-center justify-center">
           <v-icon color="grey-lighten-1" size="large">mdi-image-off</v-icon>
           <span class="text-caption text-grey-lighten-1 mt-1">이미지 없음</span>
@@ -138,14 +137,14 @@
     <v-dialog v-model="showDeleteDialog" max-width="450px">
       <v-card>
         <v-card-title class="text-h6">
-          <v-icon color="error" class="mr-2">mdi-alert-circle</v-icon>
+          <SvgIcon :path="alertIcon" type="mdi" size="20" color="error" class="mr-2" />
           숙소 예약 취소
         </v-card-title>
         <v-card-text>
           <p class="mb-3">이 숙소 예약을 취소하시겠습니까?</p>
           <div class="delete-preview pa-3 bg-grey-lighten-4 rounded">
             <div class="d-flex align-center mb-2">
-              <v-icon size="small" color="primary" class="mr-2">mdi-bed</v-icon>
+              <SvgIcon :path="bedIcon" type="mdi" size="16" color="primary" class="mr-2" />
               <span class="text-body-1 font-weight-medium">
                 {{ accommodation.accommodationInfo.title }}
               </span>
@@ -188,6 +187,24 @@ import { ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAccommodationStore } from '@/stores/accommodation'
 import { apiClient } from '@/utils/apiClient'
+import SvgIcon from '@jamescoyle/vue-icon'
+import {
+  mdiPhone,
+  mdiWeb,
+  mdiMapMarker,
+  mdiArrowRight,
+  mdiDelete,
+  mdiAlertCircle,
+  mdiBed
+} from '@mdi/js'
+
+const phoneIcon = mdiPhone
+const webIcon = mdiWeb
+const mapMarkerIcon = mdiMapMarker
+const arrowIcon = mdiArrowRight
+const deleteIcon = mdiDelete
+const alertIcon = mdiAlertCircle
+const bedIcon = mdiBed
 
 // Props
 const props = defineProps({
@@ -299,11 +316,10 @@ const confirmDelete = async () => {
 .accommodation-card {
   width: 100%;
   border-radius: 12px;
-  transition:
-    transform 0.2s,
-    box-shadow 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s;
   border: 1px solid #e0e0e0;
   overflow: hidden;
+  position: relative;
 }
 
 .accommodation-card:hover {
@@ -312,36 +328,106 @@ const confirmDelete = async () => {
 }
 
 .card-container {
-  min-height: 200px;
+  height: 400px;
+  position: relative;
+  display: flex;
+  align-items: stretch;
 }
 
 .content-section {
-  min-width: 0; /* Allow flex item to shrink */
+  width: 70%;
+  min-width: 0;
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(2px);
+  z-index: 2;
+  transition: width 0.3s ease;
+  overflow: hidden;
 }
 
 .image-section {
-  width: 160px;
-  min-width: 160px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
   height: 100%;
+  z-index: 1;
 }
 
 .accommodation-image {
-  border-top-right-radius: 12px;
-  border-bottom-right-radius: 12px;
+  height: 100% !important;
+  width: 100% !important;
+  object-fit: cover;
 }
 
 .no-image-placeholder {
-  width: 160px;
+  width: 100%;
   height: 100%;
   background-color: #f5f5f5;
-  border-top-right-radius: 12px;
-  border-bottom-right-radius: 12px;
 }
 
+/* Hover Effect */
+.accommodation-card:hover .content-section {
+  width: 35%;
+}
+
+.accommodation-card:hover .accommodation-title {
+  font-size: 1rem !important;
+  line-height: 1.2;
+}
+
+.accommodation-card:hover .time-section {
+  padding: 8px;
+}
+
+.accommodation-card:hover .contact-icon {
+  display: none;
+}
+
+.accommodation-card:hover .contact-text {
+  font-size: 0.75rem !important;
+}
+
+.accommodation-card:hover .address-text {
+  font-size: 0.75rem !important;
+}
+
+.accommodation-card:hover .description-text {
+  -webkit-line-clamp: 2;
+  font-size: 0.75rem !important;
+}
+
+/* Time Section - Vertical Layout */
 .time-section {
   background-color: #f8f9fa;
   border-radius: 8px;
   padding: 12px;
+  transition: padding 0.3s ease;
+}
+
+.time-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.time-label {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.time-value {
+  display: block;
+}
+
+.time-divider {
+  display: flex;
+  justify-content: center;
+  margin: 8px 0;
+}
+
+.rotate-90 {
+  transform: rotate(90deg);
 }
 
 .description-delete-section {
@@ -362,6 +448,7 @@ const confirmDelete = async () => {
   -webkit-box-orient: vertical;
   overflow: hidden;
   line-height: 1.4;
+  transition: font-size 0.3s ease;
 }
 
 .delete-button-container {
@@ -369,16 +456,12 @@ const confirmDelete = async () => {
 }
 
 .delete-btn {
-  background-color: rgba(244, 67, 54, 0.1) !important;
-  border: 1px solid rgba(244, 67, 54, 0.3);
   color: #d32f2f !important;
   font-weight: 500;
   transition: all 0.2s;
 }
 
 .delete-btn:hover {
-  background-color: rgba(244, 67, 54, 0.15) !important;
-  border-color: rgba(244, 67, 54, 0.5);
   transform: translateY(-1px);
 }
 
@@ -386,36 +469,27 @@ const confirmDelete = async () => {
   border: 1px solid #e0e0e0;
 }
 
+.contact-text,
+.address-text {
+  transition: font-size 0.3s ease;
+}
+
+.contact-icon {
+  transition: opacity 0.3s ease;
+}
+
 /* Responsive adjustments */
 @media (max-width: 600px) {
+  .accommodation-card:hover .content-section {
+    width: 50%;
+  }
+
   .card-container {
-    flex-direction: column;
-  }
-
-  .image-section {
-    width: 100%;
-    min-width: 100%;
     height: 180px;
-    order: -1;
   }
 
-  .accommodation-image,
-  .no-image-placeholder {
-    border-radius: 0;
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
-  }
-
-  .time-values {
-    flex-direction: column;
-    gap: 8px;
-    text-align: center;
-  }
-
-  .time-labels {
-    flex-direction: column;
-    gap: 4px;
-    text-align: center;
+  .time-section {
+    padding: 8px;
   }
 
   .description-delete-section {

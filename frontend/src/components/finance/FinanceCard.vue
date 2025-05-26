@@ -35,7 +35,7 @@
         </div>
 
         <div v-else class="content-without-image d-flex flex-column align-center justify-center">
-          <v-icon color="grey-lighten-1" size="large">mdi-receipt</v-icon>
+          <SvgIcon type="mdi" :path="receiptIcon" size="28" color="grey-lighten-1" />
           <span class="text-caption text-grey-lighten-1 mt-1">일반 지출</span>
         </div>
       </div>
@@ -45,7 +45,7 @@
       <!-- Category Block -->
       <div class="category-block d-flex align-center justify-center">
         <v-chip size="small" color="primary" variant="flat" class="text-caption">
-          {{ expense.categoryName }}
+          {{ getCategoryDisplayName(expense.categoryId) }}
         </v-chip>
       </div>
 
@@ -84,30 +84,32 @@
         </div>
       </div>
 
-      <v-divider vertical class="divider"></v-divider>
+      <!-- Delete Button Block (only show on finance page) -->
+      <template v-if="isFinancePage">
+        <v-divider vertical class="divider"></v-divider>
 
-      <!-- Delete Button Block -->
-      <div class="delete-block d-flex align-center justify-center">
-        <v-btn
-          icon
-          size="small"
-          color="error"
-          variant="text"
-          class="delete-btn"
-          @click="handleDelete"
-          :loading="deleteLoading"
-          :disabled="deleteLoading"
-        >
-          <v-icon size="small">mdi-delete</v-icon>
-        </v-btn>
-      </div>
+        <div class="delete-block d-flex align-center justify-center">
+          <v-btn
+            icon
+            size="small"
+            color="error"
+            variant="text"
+            class="delete-btn"
+            @click="handleDelete"
+            :loading="deleteLoading"
+            :disabled="deleteLoading"
+          >
+            <SvgIcon type="mdi" :path="deleteIcon" size="18" />
+          </v-btn>
+        </div>
+      </template>
     </div>
 
     <!-- Delete Confirmation Dialog -->
     <v-dialog v-model="showDeleteDialog" max-width="400px" persistent>
       <v-card>
         <v-card-title class="text-h6">
-          <v-icon color="error" class="mr-2">mdi-alert-circle</v-icon>
+          <SvgIcon type="mdi" :path="alertCircleIcon" size="20" color="error" class="mr-2" />
           경비 삭제
         </v-card-title>
 
@@ -152,10 +154,16 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useFinanceStore } from '@/stores/finance'
 import { apiClient } from '@/utils/apiClient'
+import SvgIcon from '@jamescoyle/vue-icon'
+import { mdiReceipt, mdiDelete, mdiAlertCircle } from '@mdi/js'
+
+const receiptIcon = mdiReceipt
+const deleteIcon = mdiDelete
+const alertCircleIcon = mdiAlertCircle
 
 const props = defineProps({
   expense: {
@@ -184,8 +192,28 @@ const financeStore = useFinanceStore()
 const showDeleteDialog = ref(false)
 const deleteLoading = ref(false)
 
+// Check if current route is finance page
+const isFinancePage = computed(() => {
+  return route.path.includes('/finance')
+})
+
 // Get groupId from route
 const groupId = route.params.groupId
+
+// Category display mapping (Korean names)
+const categoryDisplayMap = {
+  1: '교통비',
+  2: '숙박비',
+  3: '식비',
+  4: '레저',
+  5: '공용품',
+  6: '기타'
+}
+
+// Get Korean category name
+const getCategoryDisplayName = (categoryId) => {
+  return categoryDisplayMap[categoryId] || '기타'
+}
 
 // Format date to Korean format
 const formatDate = (datetime) => {
@@ -249,21 +277,29 @@ const confirmDelete = async () => {
 
     let errorMessage = '경비 삭제 중 오류가 발생했습니다.'
 
-    if (error.response?.status === 404) {
-      errorMessage = '삭제하려는 경비를 찾을 수 없습니다.'
-    } else if (error.response?.status === 403) {
-      errorMessage = '이 경비를 삭제할 권한이 없습니다.'
-    } else if (error.response?.data?.message) {
-      errorMessage = error.response.data.message
-    } else if (error.message) {
-      errorMessage = error.message
+    if (error.response) {
+      const status = error.response.status
+      const message = error.response.data?.message || error.message
+
+      if (status === 400) {
+        errorMessage = `입력 데이터 오류: ${message}`
+      } else if (status === 401) {
+        errorMessage = '로그인이 필요합니다.'
+      } else if (status === 403) {
+        errorMessage = '이 경비를 삭제할 권한이 없습니다.'
+      } else if (status === 404) {
+        errorMessage = '삭제하려는 경비를 찾을 수 없습니다.'
+      } else {
+        errorMessage = `서버 오류 (${status}): ${message}`
+      }
+    } else if (error.code === 'ECONNABORTED') {
+      errorMessage = '요청 시간이 초과되었습니다. 다시 시도해주세요.'
+    } else {
+      errorMessage = error.message || errorMessage
     }
 
     // Set error in store
     financeStore.setError(errorMessage)
-
-    // Show error to user
-    alert(errorMessage)
 
   } finally {
     deleteLoading.value = false
@@ -467,4 +503,26 @@ const confirmDelete = async () => {
     opacity: 1;
   }
 }
+
+.content-block {
+  width: 160px; /* previously 120px */
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.image-container {
+  width: 100%;
+  height: 100px; /* optional: slightly taller if you want */
+  margin: 0 auto 8px auto;
+  flex-shrink: 0;
+}
+
+.image-container .v-img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
 </style>
