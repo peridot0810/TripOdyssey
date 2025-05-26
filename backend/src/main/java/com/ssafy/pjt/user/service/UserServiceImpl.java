@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.ssafy.pjt.common.exception.FileUploadIllegalArgumentException;
 import com.ssafy.pjt.group.service.TravelGroupMemberService;
+import com.ssafy.pjt.group.service.TravelGroupService;
 import com.ssafy.pjt.user.dto.request.EditPasswordRequestDto;
 import com.ssafy.pjt.user.dto.request.EditUserInfoRequestDto;
 import com.ssafy.pjt.user.dto.request.GetMyRoleInGroupRequestDto;
@@ -48,6 +49,7 @@ public class UserServiceImpl implements UserService{
 
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
+	private final TravelGroupService travelGroupService;
 	private final TravelGroupMemberService travelGroupMemberService;
 	
 	private final List<String> allowedExtensions = Arrays.asList(".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp");
@@ -102,6 +104,9 @@ public class UserServiceImpl implements UserService{
 	public UserInfoResponseDto getUserInfo(String userId) {
 		UserInfoResponseDto userInfo = userRepository.getUserInfo(userId);
 		if(userInfo != null) {
+			
+			log.debug("userInfo : {}",userInfo);
+			
 			// 유저 정보 조회 성공  
 			return userInfo;
 		}
@@ -176,10 +181,12 @@ public class UserServiceImpl implements UserService{
 	@Override
 	public List<GroupResponseDto> getGroupList(String userId) {
 		List<Group> groupList = userRepository.getGroupList(userId); 
+		log.debug("groupList :{}", groupList);
 		List<GroupResponseDto> retList = new ArrayList<>();
 		
 		for(Group group : groupList) {
 			// 진행 상태 조회 
+			log.debug("group: {}", group);
 			GroupProgressResponseDto progress = userRepository.getGroupProgress(group.getGroupId());
 			
 			// 나의 역할 조회 
@@ -193,18 +200,25 @@ public class UserServiceImpl implements UserService{
 			Integer memberCnt = userRepository.getMemberCntInGroup(group.getGroupId());
 			
 			// 반환 리스트에 추가 
-			retList.add(GroupResponseDto.builder()
+			GroupResponseDto newGroup = GroupResponseDto.builder()
 					.groupId(group.getGroupId())
 					.name(group.getName())
 					.status(group.getStatus())
 					.myRole(myRole)
 					.memberCount(memberCnt)
-					.startDate(LocalDate.parse(group.getStartDate()))
-					.endDate(LocalDate.parse(group.getEndDate()))
 					.imageUrl(group.getProfileImage())
 					.progress(progress)
-					.build()
-					);
+					.build();
+			
+			if(group.getStartDate() != null) {
+				newGroup.setStartDate(LocalDate.parse(group.getStartDate()));
+			}
+			if(group.getEndDate() != null) {
+				newGroup.setEndDate(LocalDate.parse(group.getEndDate()));
+			}
+			
+			retList.add(newGroup);
+			log.debug("newGroup : {}", newGroup);
 		}
 		
 		return retList;
@@ -216,7 +230,15 @@ public class UserServiceImpl implements UserService{
 		
 		String userEmail = this.getUserInfo(userId).getEmail();
 		
-		return userRepository.getInvitaionInfo(userEmail);
+		List<InvitationResponseDto> invitationList = userRepository.getInvitaionInfo(userEmail); 
+		
+		for(InvitationResponseDto invitation :invitationList) {
+			if(invitation.getGroupId() != null) {
+				invitation.setGroupInfo(travelGroupService.getTravelGroupInfo(invitation.getGroupId()).getData());
+				invitation.setMemberCount(userRepository.getMemberCntInGroup(Integer.toString(invitation.getGroupId())));
+			}
+		}
+		return invitationList; 
 	}
 	
 	@Override

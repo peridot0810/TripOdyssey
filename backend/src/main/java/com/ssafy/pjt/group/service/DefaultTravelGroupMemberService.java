@@ -41,8 +41,8 @@ public class DefaultTravelGroupMemberService implements TravelGroupMemberService
 		if(!userValidationService.isUserInGroup(inviterId, groupId)) {
 			throw new UserNotInGroupException("속하지 않은 그룹의 정보를 요청하였습니다.");
 		}
-		if(userValidationService.isUserRoleValid(inviterId, groupId, MemberRole.NORMAL.getId())) {
-			throw new UnauthorizedRoleAccessException("일반 그룹원은 다른 그룹원을 추가할 수 없습니다.");
+		if(!userValidationService.isUserRoleValid(inviterId, groupId, MemberRole.MASTER.getId())) {
+			throw new UnauthorizedRoleAccessException("그룹원 추가는 방장만 할 수 있습니다.");
 		}
 		
 		memberMapper.insertUserToGroup(groupId, userId);
@@ -56,8 +56,8 @@ public class DefaultTravelGroupMemberService implements TravelGroupMemberService
 		if(!userValidationService.isUserInGroup(inviterId, groupId)) {
 			throw new UserNotInGroupException("속하지 않은 그룹의 정보를 요청하였습니다.");
 		}
-		if(userValidationService.isUserRoleValid(inviterId, groupId, MemberRole.NORMAL.getId())) {
-			throw new UnauthorizedRoleAccessException("일반 그룹원은 다른 그룹원을 추가할 수 없습니다.");
+		if(!userValidationService.isUserRoleValid(inviterId, groupId, MemberRole.MASTER.getId())) {
+			throw new UnauthorizedRoleAccessException("그룹원 추가는 방장만 할 수 있습니다.");
 		}
 		
 		memberMapper.insertMemberExpenseInfo(groupId, userId);
@@ -138,7 +138,7 @@ public class DefaultTravelGroupMemberService implements TravelGroupMemberService
 		if(!userValidationService.isUserInGroup(userId, groupId)) {
 			throw new UserNotInGroupException("속하지 않은 그룹의 정보를 요청하였습니다.");
 		}
-		if(userValidationService.isUserRoleValid(userId, groupId, MemberRole.NORMAL.getId())) {
+		if(!userValidationService.isUserRoleValid(userId, groupId, MemberRole.MASTER.getId())) {
 			throw new UnauthorizedRoleAccessException("일반 그룹원은 다른 그룹원을 초대할 수 없습니다.");
 		}
 		
@@ -157,7 +157,7 @@ public class DefaultTravelGroupMemberService implements TravelGroupMemberService
 		if(!userValidationService.isUserInGroup(userId, groupId)) {
 			throw new UserNotInGroupException("속하지 않은 그룹의 정보를 요청하였습니다.");
 		}
-		if(userValidationService.isUserRoleValid(userId, groupId, MemberRole.NORMAL.getId())) {
+		if(!userValidationService.isUserRoleValid(userId, groupId, MemberRole.MASTER.getId())) {
 			throw new UnauthorizedRoleAccessException("일반 그룹원은 초대 목록을 조회할 수 없습니다.");
 		}
 		
