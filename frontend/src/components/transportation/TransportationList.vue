@@ -7,6 +7,7 @@
         교통편 목록
       </h2>
       <v-btn
+        v-if="isLogisticsPage"
         color="primary"
         variant="elevated"
         @click="openCreateModal"
@@ -91,7 +92,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useTransportationStore } from '@/stores/transportation'
 import { apiClient } from '@/utils/apiClient'
@@ -106,6 +107,11 @@ const showCreateModal = ref(false)
 const isInitialLoading = ref(false)
 const isRetrying = ref(false)
 const fetchError = ref(null)
+
+// Check if current route is logistics page
+const isLogisticsPage = computed(() => {
+  return route.path.includes('/logistics')
+})
 
 // Get group ID from route params
 const getGroupId = () => {

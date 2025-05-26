@@ -3,7 +3,7 @@
     <!-- Fixed Header -->
     <div class="finance-header">
       <h2 class="text-h6 font-weight-bold d-flex align-center">
-        <v-icon size="large" color="primary" class="mr-2">mdi-wallet-outline</v-icon>
+        <SvgIcon type="mdi" :path="walletOutlineIcon" size="24" color="primary" class="mr-2" />
         여행 경비 내역
       </h2>
     </div>
@@ -41,7 +41,7 @@
                 <div class="text-h5 font-weight-bold">{{ formatAmount(totalAmount) }}원</div>
                 <div class="text-body-2 opacity-90">총 {{ financeData.length }}건의 지출</div>
               </div>
-              <v-icon size="large" class="opacity-70">mdi-cash-multiple</v-icon>
+              <SvgIcon type="mdi" :path="cashMultipleIcon" size="32" color="white" class="opacity-70" />
             </div>
           </v-card>
         </div>
@@ -57,8 +57,11 @@
                 variant="outlined"
                 density="compact"
                 clearable
-                prepend-inner-icon="mdi-filter-variant"
-              ></v-select>
+              >
+                <template v-slot:prepend-inner>
+                  <SvgIcon type="mdi" :path="filterVariantIcon" size="20" color="grey" />
+                </template>
+              </v-select>
             </v-col>
             <v-col cols="12" sm="6" class="pl-sm-2">
               <v-select
@@ -67,18 +70,13 @@
                 label="정렬 기준"
                 variant="outlined"
                 density="compact"
-                prepend-inner-icon="mdi-sort"
-              ></v-select>
+              >
+                <template v-slot:prepend-inner>
+                  <SvgIcon type="mdi" :path="sortIcon" size="20" color="grey" />
+                </template>
+              </v-select>
             </v-col>
           </v-row>
-        </div>
-
-        <!-- Refresh Button -->
-        <div class="refresh-section mb-4">
-          <v-btn variant="outlined" size="small" @click="fetchExpenses" :loading="refreshing">
-            <v-icon start>mdi-refresh</v-icon>
-            새로고침
-          </v-btn>
         </div>
       </div>
     </div>
@@ -88,7 +86,7 @@
       <div v-if="!loading && !error">
         <!-- Empty State -->
         <div v-if="filteredFinanceData.length === 0" class="empty-state text-center py-8">
-          <v-icon size="x-large" color="grey">mdi-wallet-outline</v-icon>
+          <SvgIcon type="mdi" :path="walletOutlineIcon" size="32" color="grey" />
           <p class="text-body-1 text-grey-darken-1 mt-3">경비 내역이 없습니다</p>
           <p class="text-body-2 text-grey mt-2">첫 번째 경비를 추가해보세요!</p>
         </div>
@@ -120,15 +118,28 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useFinanceStore } from '@/stores/finance'
+import { useScheduleStore } from '@/stores/schedule'
 import FinanceCard from './FinanceCard.vue'
-import { dummyScheduleData } from '@/data/schedule/dummyScheduleData.js'
 import { apiClient } from '@/utils/apiClient'
+import SvgIcon from '@jamescoyle/vue-icon'
+import {
+  mdiWalletOutline,
+  mdiCashMultiple,
+  mdiFilterVariant,
+  mdiSort
+} from '@mdi/js'
+
+const walletOutlineIcon = mdiWalletOutline
+const cashMultipleIcon = mdiCashMultiple
+const filterVariantIcon = mdiFilterVariant
+const sortIcon = mdiSort
 
 // Router
 const route = useRoute()
 
 // Stores
 const financeStore = useFinanceStore()
+const scheduleStore = useScheduleStore()
 
 // Reactive data
 const selectedCategory = ref(null)
@@ -146,10 +157,10 @@ const groupId = computed(() => {
 const financeData = computed(() => financeStore.expenses)
 const totalAmount = computed(() => financeStore.totalAmount)
 
-// Create a map for quick schedule lookup by contentId
+// Create a map for quick schedule lookup by contentId using real schedule data
 const scheduleMap = computed(() => {
   const map = new Map()
-  dummyScheduleData.forEach((schedule) => {
+  scheduleStore.schedules.forEach((schedule) => {
     if (schedule.contentId) {
       map.set(schedule.contentId, schedule)
     }
@@ -157,14 +168,22 @@ const scheduleMap = computed(() => {
   return map
 })
 
+// Korean category names for filter
+const koreanCategoryMap = {
+  1: '교통비',
+  2: '숙박비',
+  3: '식비',
+  4: '레저',
+  5: '공용품',
+  6: '기타'
+}
+
 // Category options for filter
 const categoryOptions = computed(() => {
-  const categories = [
-    ...new Set(financeData.value.map((item) => financeStore.getCategoryName(item.categoryId))),
-  ]
-  return categories.map((category) => ({
-    title: category,
-    value: category,
+  const categoryIds = [...new Set(financeData.value.map((item) => item.categoryId))]
+  return categoryIds.map((categoryId) => ({
+    title: koreanCategoryMap[categoryId] || '기타',
+    value: koreanCategoryMap[categoryId] || '기타',
   }))
 })
 
@@ -184,7 +203,7 @@ const filteredFinanceData = computed(() => {
   // Apply category filter
   if (selectedCategory.value) {
     filtered = filtered.filter(
-      (expense) => financeStore.getCategoryName(expense.categoryId) === selectedCategory.value,
+      (expense) => (koreanCategoryMap[expense.categoryId] || '기타') === selectedCategory.value,
     )
   }
 
@@ -201,9 +220,8 @@ const filteredFinanceData = computed(() => {
         comparison = a.amount - b.amount
         break
       case 'category':
-        comparison = financeStore
-          .getCategoryName(a.categoryId)
-          .localeCompare(financeStore.getCategoryName(b.categoryId))
+        comparison = (koreanCategoryMap[a.categoryId] || '기타')
+          .localeCompare(koreanCategoryMap[b.categoryId] || '기타')
         break
       default:
         comparison = a.expenseId - b.expenseId
@@ -229,6 +247,11 @@ const fetchExpenses = async (isRefresh = false) => {
   try {
     console.log('Fetching expenses for groupId:', groupId.value)
 
+    // Ensure schedule data is loaded first
+    if (scheduleStore.schedules.length === 0) {
+      await scheduleStore.fetchSchedules(groupId.value)
+    }
+
     const response = await apiClient.get(`/financial/expense-tracker/${groupId.value}`)
 
     console.log('Finance API response:', response.data)
@@ -240,7 +263,7 @@ const fetchExpenses = async (isRefresh = false) => {
         datetime: expense.datetime,
         description: expense.description,
         amount: expense.amount,
-        categoryId: financeStore.getCategoryId(expense.categoryName) || 6, // Default to 'Others' if not found
+        categoryId: expense.categoryId, // Use categoryId directly from API
         contentName: expense.contentName,
         contentId: expense.contentId,
       }))
@@ -249,6 +272,7 @@ const fetchExpenses = async (isRefresh = false) => {
       financeStore.setExpenses(storeExpenses)
 
       console.log('Loaded', storeExpenses.length, 'expenses to store')
+      console.log('Schedule map has', scheduleMap.value.size, 'items')
     } else {
       throw new Error(response.data.message || '경비 내역을 불러오는데 실패했습니다.')
     }
@@ -257,14 +281,23 @@ const fetchExpenses = async (isRefresh = false) => {
 
     let errorMessage = '경비 내역을 불러오는 중 오류가 발생했습니다.'
 
-    if (err.response?.status === 404) {
-      errorMessage = '해당 그룹의 경비 내역을 찾을 수 없습니다.'
-    } else if (err.response?.status === 403) {
-      errorMessage = '경비 내역을 볼 권한이 없습니다.'
-    } else if (err.response?.data?.message) {
-      errorMessage = err.response.data.message
-    } else if (err.message) {
-      errorMessage = err.message
+    if (err.response) {
+      const status = err.response.status
+      const message = err.response.data?.message || err.message
+
+      if (status === 401) {
+        errorMessage = '로그인이 필요합니다.'
+      } else if (status === 403) {
+        errorMessage = '경비 내역을 볼 권한이 없습니다.'
+      } else if (status === 404) {
+        errorMessage = '해당 그룹의 경비 내역을 찾을 수 없습니다.'
+      } else {
+        errorMessage = `서버 오류 (${status}): ${message}`
+      }
+    } else if (err.code === 'ECONNABORTED') {
+      errorMessage = '요청 시간이 초과되었습니다. 네트워크 연결을 확인해주세요.'
+    } else {
+      errorMessage = err.message || errorMessage
     }
 
     error.value = errorMessage
@@ -276,22 +309,25 @@ const fetchExpenses = async (isRefresh = false) => {
   }
 }
 
-// Helper functions to get content info from schedule data
+// Helper functions to get content info from REAL schedule data
 const getContentImage = (contentId) => {
   if (!contentId) return null
   const schedule = scheduleMap.value.get(contentId)
+  console.log(`Getting image for contentId ${contentId}:`, schedule?.attractionInfo?.firstImage1)
   return schedule?.attractionInfo?.firstImage1 || null
 }
 
 const getContentName = (contentId) => {
   if (!contentId) return null
   const schedule = scheduleMap.value.get(contentId)
+  console.log(`Getting name for contentId ${contentId}:`, schedule?.attractionInfo?.title || schedule?.name)
   return schedule?.attractionInfo?.title || schedule?.name || null
 }
 
 const getContentAddress = (contentId) => {
   if (!contentId) return null
   const schedule = scheduleMap.value.get(contentId)
+  console.log(`Getting address for contentId ${contentId}:`, schedule?.attractionInfo?.addr1)
   return schedule?.attractionInfo?.addr1 || null
 }
 
@@ -384,11 +420,6 @@ onMounted(() => {
   margin-bottom: 20px;
 }
 
-.refresh-section {
-  text-align: right;
-  margin-bottom: 0;
-}
-
 .empty-state {
   border-radius: 8px;
   background-color: white;
@@ -440,10 +471,6 @@ onMounted(() => {
 
   .filter-section .v-col {
     margin-bottom: 8px;
-  }
-
-  .refresh-section {
-    text-align: center;
   }
 
   .finance-cards-container::-webkit-scrollbar {

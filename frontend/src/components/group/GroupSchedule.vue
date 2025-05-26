@@ -1,110 +1,114 @@
 <template>
   <div class="group-schedule">
     <h2 class="text-h6 font-weight-bold mb-4 d-flex align-center">
-      <v-icon size="large" color="primary" class="mr-2">mdi-calendar-check</v-icon>
+      <SvgIcon type="mdi" :path="calendarCheckIcon" size="24" color="primary" class="mr-2" />
       그룹 일정
     </h2>
 
-    <!-- Day Selection Tabs -->
-    <div class="day-selector mb-4">
-      <v-chip-group v-model="selectedDay" active-class="primary" mandatory class="day-chips">
-        <v-chip
-          v-for="day in availableDays"
-          :key="day"
-          :value="day"
-          variant="outlined"
-          size="large"
-          class="day-chip"
+    <!-- Error Alert -->
+    <v-alert
+      v-if="scheduleStore.error || groupStore.error"
+      type="error"
+      class="mb-4"
+      closable
+      @click:close="clearErrors"
+    >
+      {{ scheduleStore.error || groupStore.error }}
+    </v-alert>
+
+    <!-- Loading State -->
+    <div
+      v-if="scheduleStore.isLoading || groupStore.isLoading"
+      class="loading-state text-center py-8"
+    >
+      <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
+      <p class="text-body-1 mt-3">일정을 불러오는 중...</p>
+    </div>
+
+    <!-- Main Content -->
+    <div v-else-if="availableDays.length > 0">
+      <!-- Day Selection Component -->
+      <DaySelector
+        v-model="selectedDay"
+        :available-days="availableDays"
+      />
+
+      <!-- Schedule Cards for Selected Day -->
+      <div v-if="filteredSchedules.length === 0" class="empty-state text-center py-8">
+        <SvgIcon type="mdi" :path="calendarBlankIcon" size="32" color="grey" />
+        <p class="text-body-1 text-grey-darken-1 mt-3">{{ selectedDay }}일차 일정이 없습니다</p>
+        <p class="text-caption text-grey mt-2">확정된 일정이 없습니다</p>
+      </div>
+
+      <div v-else class="schedule-cards">
+        <!-- Each Schedule Item with Order Badge and Finance Button -->
+        <div
+          v-for="(schedule, index) in filteredSchedules"
+          :key="schedule.contentId"
+          class="schedule-item"
         >
-          <v-icon start>mdi-calendar-today</v-icon>
-          {{ day }}일차
-        </v-chip>
-      </v-chip-group>
-    </div>
+          <div class="schedule-content">
 
-    <!-- Schedule Cards for Selected Day -->
-    <div v-if="filteredSchedules.length === 0" class="empty-state text-center py-8">
-      <v-icon size="x-large" color="grey">mdi-calendar-blank</v-icon>
-      <p class="text-body-1 text-grey-darken-1 mt-3">{{ selectedDay }}일차 일정이 없습니다</p>
-    </div>
+            <!-- Original Schedule Card (unchanged) -->
+            <div class="schedule-card-wrapper">
+              <ScheduleCard :schedule="schedule" />
+            </div>
 
-    <div v-else class="schedule-cards">
-      <div class="day-header mb-3">
-        <v-divider></v-divider>
-        <v-chip color="primary" variant="elevated" class="day-title-chip">
-          <v-icon start>mdi-calendar-star</v-icon>
-          {{ selectedDay }}일차 일정
-        </v-chip>
-        <v-divider></v-divider>
-      </div>
-
-      <!-- Read-only info hint -->
-      <div class="readonly-info-hint mb-3">
-        <v-alert type="success" variant="tonal" density="compact" class="text-caption">
-          <v-icon start>mdi-eye</v-icon>
-          일정을 확인하고 있습니다
-        </v-alert>
-      </div>
-
-      <!-- Each Schedule Item with Order Badge and Finance Button -->
-      <div
-        v-for="(schedule, index) in filteredSchedules"
-        :key="schedule.contentId"
-        class="schedule-item"
-      >
-        <div class="schedule-content">
-          <!-- Order Badge positioned absolutely over the schedule card -->
-          <div class="order-badge-overlay">
-            <v-chip size="small" color="primary" variant="elevated" class="order-chip">
-              {{ index + 1 }}
-              <v-icon end size="small">mdi-check-circle</v-icon>
-            </v-chip>
-          </div>
-
-          <!-- Original Schedule Card (unchanged) -->
-          <div class="schedule-card-wrapper">
-            <ScheduleCard :schedule="schedule" />
-          </div>
-
-          <!-- Finance Button - positioned to the right of the card -->
-          <div v-if="isFinancePage" class="finance-button-container">
-            <v-btn
-              icon
-              color="success"
-              size="large"
-              variant="elevated"
-              @click="openFinanceModal(schedule)"
-              class="finance-add-btn"
-            >
-              <v-icon>mdi-plus</v-icon>
-            </v-btn>
+            <!-- Finance Button - positioned to the right of the card -->
+            <div v-if="isFinancePage" class="finance-button-container">
+              <v-btn
+                icon
+                color="orange"
+                size="large"
+                variant="elevated"
+                @click="openFinanceModal(schedule)"
+                class="finance-add-btn"
+              >
+                <SvgIcon type="mdi" :path="plusIcon" size="20" color="white" />
+              </v-btn>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Create Finance Modal -->
+    <!-- No Group Info State -->
+    <div v-else class="empty-state text-center py-8">
+      <SvgIcon type="mdi" :path="alertCircleIcon" size="32" color="grey" />
+      <p class="text-body-1 text-grey-darken-1 mt-3">그룹 정보를 불러올 수 없습니다</p>
+    </div>
+
+    <!-- Updated Create Finance Modal -->
     <CreateFinanceModal
-      v-model="showFinanceModal"
+      ref="createFinanceModal"
       :schedule="selectedSchedule"
-      @close="closeFinanceModal"
     />
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import ScheduleCard from '../schedule/ScheduleCard.vue'
+import DaySelector from '@/components/schedule/DaySelector.vue'
 import CreateFinanceModal from '../finance/CreateFinanceModal.vue'
-import { dummyScheduleData } from '@/data/schedule/dummyScheduleData.js'
+import { useScheduleStore } from '@/stores/schedule'
+import { useGroupStore } from '@/stores/group'
+import SvgIcon from '@jamescoyle/vue-icon'
+import {
+  mdiCalendarCheck,
+  mdiCalendarBlank,
+  mdiPlus,
+  mdiAlertCircle
+} from '@mdi/js'
 
-// Props
-const props = defineProps({
-  scheduleData: {
-    type: Array,
-    default: () => dummyScheduleData,
-  },
+const calendarCheckIcon = mdiCalendarCheck
+const calendarBlankIcon = mdiCalendarBlank
+const plusIcon = mdiPlus
+const alertCircleIcon = mdiAlertCircle
+
+// Props (keeping for backward compatibility, but not using dummy data anymore)
+defineProps({
   title: {
     type: String,
     default: '그룹 일정',
@@ -114,40 +118,81 @@ const props = defineProps({
 // Router
 const route = useRoute()
 
-// Reactive data
-const schedules = ref([...props.scheduleData])
-const selectedDay = ref(1)
-const showFinanceModal = ref(false)
+// Stores
+const scheduleStore = useScheduleStore()
+const groupStore = useGroupStore()
+
+// Get groupId from route params
+const groupId = route.params.groupId
+
+// Updated modal state (no more v-model)
+const createFinanceModal = ref(null)
 const selectedSchedule = ref(null)
+
+// Use selectedDay from store
+const selectedDay = computed({
+  get: () => scheduleStore.selectedDay,
+  set: (value) => scheduleStore.setSelectedDay(value),
+})
 
 // Check if current route is finance page
 const isFinancePage = computed(() => {
   return route.path.includes('finance')
 })
 
-// Get all available days from the schedule data
+// Calculate available days based on group start and end dates
 const availableDays = computed(() => {
-  const days = [...new Set(schedules.value.map((schedule) => schedule.day))]
-  return days.sort((a, b) => a - b)
+  if (!groupStore.myGroup.startDate || !groupStore.myGroup.endDate) {
+    return [1]
+  }
+
+  const startDate = new Date(groupStore.myGroup.startDate)
+  const endDate = new Date(groupStore.myGroup.endDate)
+  const timeDiff = endDate.getTime() - startDate.getTime()
+  const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1
+
+  return Array.from({ length: Math.max(1, daysDiff) }, (_, i) => i + 1)
+})
+
+// Get only official schedules from store
+const officialSchedules = computed(() => {
+  return scheduleStore.getOfficialSchedules()
 })
 
 // Filter schedules by selected day and sort by order
 const filteredSchedules = computed(() => {
-  return schedules.value
+  return officialSchedules.value
     .filter((schedule) => schedule.day === selectedDay.value)
-    .sort((a, b) => a.order - b.order)
+    .sort((a, b) => (a.order || 0) - (b.order || 0))
 })
 
-// Methods
+// Updated Methods
 const openFinanceModal = (schedule) => {
   selectedSchedule.value = schedule
-  showFinanceModal.value = true
+  // Use the exposed method to open the dialog
+  createFinanceModal.value?.openDialog()
 }
 
-const closeFinanceModal = () => {
-  showFinanceModal.value = false
-  selectedSchedule.value = null
+// Removed closeFinanceModal - not needed anymore since modal manages its own state
+
+// Clear errors from both stores
+const clearErrors = () => {
+  scheduleStore.clearError()
+  groupStore.clearError()
 }
+
+// Fetch data on component mount
+onMounted(async () => {
+  if (groupId) {
+    // Fetch group info if not already loaded or if different group
+    if (!groupStore.hasGroup || groupStore.myGroup.groupId !== parseInt(groupId)) {
+      await groupStore.getGroupInfo(groupId)
+    }
+
+    // Fetch schedules
+    await scheduleStore.fetchSchedules(groupId)
+  }
+})
 </script>
 
 <style scoped>
@@ -155,30 +200,8 @@ const closeFinanceModal = () => {
   padding: 16px;
 }
 
-.day-selector {
-  position: sticky;
-  top: 0;
-  background-color: white;
-  z-index: 10;
-  padding: 8px 0;
-  border-radius: 8px;
-}
-
-.day-chips {
-  justify-content: center;
-}
-
-.day-chip {
-  margin: 0 4px;
-  transition: all 0.3s ease;
-}
-
-.day-chip:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.empty-state {
+.empty-state,
+.loading-state {
   border-radius: 8px;
   background-color: #f5f5f5;
   margin-top: 20px;
@@ -241,24 +264,17 @@ const closeFinanceModal = () => {
 }
 
 .finance-add-btn {
-  box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3) !important;
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 50% !important;
+  min-width: auto !important;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 8px rgba(255, 152, 0, 0.3) !important;
 }
 
-/* Responsive adjustments */
-@media (max-width: 600px) {
-  .day-chips {
-    justify-content: flex-start;
-    overflow-x: auto;
-    padding-bottom: 8px;
-  }
-
-  .day-chip {
-    flex-shrink: 0;
-  }
-
-  .day-header {
-    gap: 8px;
-  }
+.finance-add-btn:hover {
+  transform: translateY(-1px) scale(1.05);
+  box-shadow: 0 6px 12px rgba(255, 152, 0, 0.4) !important;
 }
 
 /* Animation for schedule cards */
@@ -274,6 +290,22 @@ const closeFinanceModal = () => {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .day-header {
+    gap: 8px;
+  }
+
+  .schedule-content {
+    gap: 8px;
+  }
+
+  .finance-add-btn {
+    width: 40px !important;
+    height: 40px !important;
   }
 }
 </style>

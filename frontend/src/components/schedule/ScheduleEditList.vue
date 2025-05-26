@@ -1,20 +1,9 @@
 <template>
   <div class="schedule-edit-list">
     <h2 class="text-h6 font-weight-bold mb-4 d-flex align-center">
-      <v-icon size="large" color="primary" class="mr-2">mdi-calendar-edit</v-icon>
+      <SvgIcon type="mdi" :path="calendarEditIcon" size="24" color="primary" class="mr-2" />
       일정 편집
     </h2>
-
-    <!-- Error Alert -->
-    <v-alert
-      v-if="scheduleStore.error"
-      type="error"
-      class="mb-4"
-      closable
-      @click:close="scheduleStore.clearError()"
-    >
-      {{ scheduleStore.error }}
-    </v-alert>
 
     <!-- Loading State -->
     <div v-if="scheduleStore.isLoading" class="loading-state text-center py-8">
@@ -24,7 +13,7 @@
 
     <!-- Empty State -->
     <div v-else-if="scheduleCandidates.length === 0" class="empty-state text-center py-8">
-      <v-icon size="x-large" color="grey">mdi-calendar-blank</v-icon>
+      <SvgIcon type="mdi" :path="calendarBlankIcon" size="28" color="grey" />
       <p class="text-body-1 text-grey-darken-1 mt-3">등록된 일정이 없습니다</p>
     </div>
 
@@ -39,15 +28,14 @@
         <v-btn
           icon
           size="small"
-          color="success"
-          variant="elevated"
+          variant="flat"
+          color="pink"
           class="make-official-button"
           @click="handleMakeOfficial(schedule)"
           :title="'확정 일정으로 추가'"
         >
-          <v-icon>mdi-plus</v-icon>
+          <SvgIcon type="mdi" :path="leftIcon" size="30" color="white" />
         </v-btn>
-
         <!-- Schedule Card -->
         <ScheduleCard
           :schedule="schedule"
@@ -62,6 +50,16 @@
 import { computed } from 'vue'
 import ScheduleCard from './ScheduleCard.vue'
 import { useScheduleStore } from '@/stores/schedule'
+import SvgIcon from '@jamescoyle/vue-icon'
+import { mdiCalendarEdit, mdiCalendarBlank } from '@mdi/js'
+import { mdiChevronLeft } from '@mdi/js'
+const leftIcon = mdiChevronLeft
+
+
+
+const calendarEditIcon = mdiCalendarEdit
+const calendarBlankIcon = mdiCalendarBlank
+
 
 const scheduleStore = useScheduleStore()
 

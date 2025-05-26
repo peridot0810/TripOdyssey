@@ -4,20 +4,24 @@
       <!-- Top Row: Transportation Type and Delete Button -->
       <div class="d-flex justify-space-between align-start mb-3">
         <div class="transportation-type">
-          <v-chip size="small" color="secondary" variant="flat" class="text-caption">
-            {{ getTransportationType(transportation.typeId) }}
-          </v-chip>
+<v-chip
+  size="large"
+  class="text-white font-weight-bold"
+  style="background-color: #003c78; display: flex; align-items: center; justify-content: center; font-size: 14px; padding: 8px 16px;"
+>
+  {{ getTransportationType(transportation.typeId) }}
+</v-chip>
         </div>
         <v-btn
+          v-if="isLogisticsPage"
           icon
           size="small"
           variant="flat"
-          color="error"
           class="delete-btn"
           @click="handleDelete"
           :loading="isDeleting"
         >
-          <v-icon size="small">mdi-delete</v-icon>
+          <SvgIcon type="mdi" :path="deleteIcon" size="20" color="#d32f2f" />
         </v-btn>
       </div>
 
@@ -29,17 +33,17 @@
 
       <!-- Departure and Arrival Times with Arrow -->
       <div class="time-section d-flex justify-space-between align-center mb-2">
-        <span class="text-h6 font-weight-bold">{{ transportation.departure }}</span>
-        <div class="arrow-container">
-          <v-icon color="primary" size="large">mdi-arrow-right</v-icon>
-        </div>
-        <span class="text-h6 font-weight-bold">{{ transportation.arrival }}</span>
+        <span class="time-text">{{ transportation.departure }}</span>
+          <div class="arrow-container">
+            <img src="/img/barcode.jpg" alt="barcode" style="height: 80px;" />
+          </div>
+        <span class="time-text">{{ transportation.arrival }}</span>
       </div>
 
       <!-- Departure and Arrival Locations -->
       <div class="location-section d-flex justify-space-between mb-3">
-        <span class="text-body-2 text-grey-darken-2">{{ transportation.from }}</span>
-        <span class="text-body-2 text-grey-darken-2">{{ transportation.to }}</span>
+        <span class="location-text">{{ transportation.from }}</span>
+        <span class="location-text">{{ transportation.to }}</span>
       </div>
 
       <!-- Divider -->
@@ -53,13 +57,14 @@
           </p>
         </div>
         <v-btn
+          v-if="isLogisticsPage"
           size="small"
           variant="outlined"
           color="primary"
           class="edit-btn ml-3"
           @click="handleEdit"
         >
-          <v-icon size="small" class="mr-1">mdi-pencil</v-icon>
+          <SvgIcon type="mdi" :path="pencilIcon" size="16" class="mr-1" />
           편집
         </v-btn>
       </div>
@@ -69,7 +74,7 @@
     <v-dialog v-model="showDeleteDialog" max-width="400px">
       <v-card>
         <v-card-title class="text-h6">
-          <v-icon color="error" class="mr-2">mdi-alert-circle</v-icon>
+          <SvgIcon type="mdi" :path="alertIcon" size="20" color="error" class="mr-2" />
           교통편 삭제
         </v-card-title>
         <v-card-text>
@@ -116,11 +121,19 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useTransportationStore } from '@/stores/transportation'
 import { apiClient } from '@/utils/apiClient'
 import EditTransportationModal from '@/components/transportation/EditTransportationModal.vue'
+
+import SvgIcon from '@jamescoyle/vue-icon'
+import { mdiDelete, mdiPencil, mdiAlertCircle } from '@mdi/js'
+
+const deleteIcon = mdiDelete
+const pencilIcon = mdiPencil
+const alertIcon = mdiAlertCircle
+
 
 // Props
 const props = defineProps({
@@ -138,6 +151,11 @@ const transportationStore = useTransportationStore()
 const showDeleteDialog = ref(false)
 const showEditModal = ref(false)
 const isDeleting = ref(false)
+
+// Check if current route is logistics page
+const isLogisticsPage = computed(() => {
+  return route.path.includes('/logistics')
+})
 
 // Helper function to get transportation type name
 const getTransportationType = (typeId) => {
@@ -246,16 +264,12 @@ const handleTransportationUpdated = (updatedTransportation) => {
     box-shadow 0.2s;
   border: 1px solid #e0e0e0;
   position: relative;
+  background-color: rgb(248, 248, 248);
 }
 
 .transportation-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12) !important;
-}
-
-.transportation-card:hover .delete-btn,
-.transportation-card:hover .edit-btn {
-  /* Remove opacity change on hover since delete button is now always visible */
 }
 
 .transportation-type {
@@ -265,13 +279,10 @@ const handleTransportationUpdated = (updatedTransportation) => {
 
 .delete-btn {
   opacity: 1; /* Make more visible */
-  background-color: rgba(244, 67, 54, 0.1) !important;
-  border: 1px solid rgba(244, 67, 54, 0.3);
   transition: all 0.2s;
 }
 
 .delete-btn:hover {
-  background-color: rgba(244, 67, 54, 0.15) !important;
   border-color: rgba(244, 67, 54, 0.5);
   transform: scale(1.05);
 }
@@ -316,9 +327,9 @@ const handleTransportationUpdated = (updatedTransportation) => {
   opacity: 1 !important;
 }
 
-.delete-preview {
+/* .delete-preview {
   border: 1px solid #e0e0e0;
-}
+} */
 
 /* Responsive adjustments */
 @media (max-width: 600px) {
@@ -355,4 +366,15 @@ const handleTransportationUpdated = (updatedTransportation) => {
     align-self: flex-end;
   }
 }
+
+.time-text {
+  font-size: 1.25rem; /* or use 20px */
+  font-weight: 700;
+}
+
+.location-text {
+  font-size: 1rem; /* or 16px */
+  font-weight: 600;
+}
+
 </style>

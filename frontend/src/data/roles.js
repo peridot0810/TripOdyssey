@@ -1,13 +1,9 @@
 // Role background images - using key for background mapping
 export const roleBackgrounds = {
-  normal:
-    'https://fastly.picsum.photos/id/201/5000/3333.jpg?hmac=NE8fOMa8u9PBfkq4AVwEoJdRqoPTNwUsyKvKWuXyNCk',
-  scheduler:
-    'https://fastly.picsum.photos/id/219/5000/3333.jpg?hmac=nQIYAD6CmzCXEG3xtEckzbu3iauIE3DpHiqnQy3gdG4',
-  finance:
-    'https://fastly.picsum.photos/id/237/3500/2095.jpg?hmac=y2n_cflHFKpQwLOL1SSCtVDqL8NmOnBzEW7LYKZ-z_o',
-  logistics:
-    'https://fastly.picsum.photos/id/244/4288/2848.jpg?hmac=R6j9PBP4aBk2vcEIoOPU4R_nuknizryn2Vq8GGtWTrM',
+  normal: '/img/normal.PNG',
+  scheduler: '/img/schedule.PNG', // or whatever your local image filename is
+  finance: '/img/finance.PNG',     // or whatever your local image filename is
+  logistics: '/img/logistics.PNG'  // or whatever your local image filename is
 }
 
 // Role definitions

@@ -8,35 +8,76 @@
         </div>
       </v-col>
 
-      <!-- 2. Official Schedule Container -->
+      <!-- 2. Schedule & Proposal Container -->
       <v-col cols="12" lg="3" md="6" class="schedule-panel">
         <div class="panel-content">
-          <GroupSchedule />
+          <div class="schedule-proposal-container">
+            <!-- Toggle Header -->
+            <div class="toggle-header">
+              <v-btn-toggle
+                v-model="scheduleActiveTab"
+                color="primary"
+                variant="outlined"
+                divided
+                mandatory
+                class="toggle-buttons"
+              >
+                <v-btn value="schedule" class="toggle-btn">
+                  <v-icon size="small" class="mr-1">mdi-calendar-check</v-icon>
+                  일정
+                </v-btn>
+                <v-btn value="proposal" class="toggle-btn">
+                  <v-icon size="small" class="mr-1">mdi-lightbulb-outline</v-icon>
+                  제안
+                </v-btn>
+              </v-btn-toggle>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-area">
+              <div v-if="scheduleActiveTab === 'schedule'" class="tab-content">
+                <GroupSchedule />
+              </div>
+              <div v-if="scheduleActiveTab === 'proposal'" class="tab-content">
+                <ProposalList />
+              </div>
+            </div>
+          </div>
         </div>
       </v-col>
 
       <!-- 3. Transportation & Accommodation Section -->
       <v-col cols="12" lg="3" md="6" class="transport-accommodation-panel">
         <div class="panel-content">
-          <div class="section-placeholder">
-            <div class="placeholder-header">
-              <v-icon size="large" color="primary">mdi-car-multiple</v-icon>
-              <h3 class="text-h6 font-weight-bold mt-2">교통 & 숙박</h3>
-            </div>
-            <div class="placeholder-content">
-              <div class="sub-section mb-4">
-                <h4 class="text-subtitle-1 font-weight-medium mb-2">
+          <div class="transport-accommodation-container">
+            <!-- Toggle Header -->
+            <div class="toggle-header">
+              <v-btn-toggle
+                v-model="activeTab"
+                color="primary"
+                variant="outlined"
+                divided
+                mandatory
+                class="toggle-buttons"
+              >
+                <v-btn value="transportation" class="toggle-btn">
                   <v-icon size="small" class="mr-1">mdi-airplane</v-icon>
                   교통수단
-                </h4>
-                <p class="text-body-2 text-grey-darken-1">교통 정보 컴포넌트</p>
-              </div>
-              <div class="sub-section">
-                <h4 class="text-subtitle-1 font-weight-medium mb-2">
+                </v-btn>
+                <v-btn value="accommodation" class="toggle-btn">
                   <v-icon size="small" class="mr-1">mdi-bed</v-icon>
                   숙박시설
-                </h4>
-                <p class="text-body-2 text-grey-darken-1">숙박 정보 컴포넌트</p>
+                </v-btn>
+              </v-btn-toggle>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-area">
+              <div v-if="activeTab === 'transportation'" class="tab-content">
+                <TransportationList />
+              </div>
+              <div v-if="activeTab === 'accommodation'" class="tab-content">
+                <AccommodationList />
               </div>
             </div>
           </div>
@@ -45,30 +86,8 @@
 
       <!-- 4. Finance Section -->
       <v-col cols="12" lg="3" md="6" class="finance-panel">
-        <div class="panel-content">
-          <div class="section-placeholder finance-placeholder">
-            <div class="placeholder-header">
-              <v-icon size="large" color="primary">mdi-calculator</v-icon>
-              <h3 class="text-h6 font-weight-bold mt-2">예산 관리</h3>
-            </div>
-            <div class="placeholder-content">
-              <div class="finance-summary">
-                <div class="finance-item mb-3">
-                  <div class="finance-label">총 예산</div>
-                  <div class="finance-value">₩ 0</div>
-                </div>
-                <div class="finance-item mb-3">
-                  <div class="finance-label">사용 금액</div>
-                  <div class="finance-value">₩ 0</div>
-                </div>
-                <div class="finance-item">
-                  <div class="finance-label">잔여 예산</div>
-                  <div class="finance-value text-primary">₩ 0</div>
-                </div>
-              </div>
-              <p class="text-caption text-grey-darken-1 mt-3">예산 관리 컴포넌트</p>
-            </div>
-          </div>
+        <div class="panel-content finance-content">
+          <FinanceCardList />
         </div>
       </v-col>
     </v-row>
@@ -76,8 +95,17 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import GroupSchedule from '@/components/group/GroupSchedule.vue'
 import GroupBox from '@/components/group/GroupBox.vue'
+import TransportationList from '@/components/transportation/TransportationList.vue'
+import AccommodationList from '@/components/accommodation/AccommodationList.vue'
+import FinanceCardList from '@/components/finance/FinanceCardList.vue'
+import ProposalList from '@/components/schedule/ProposalList.vue'
+
+// Active tab states
+const activeTab = ref('transportation')
+const scheduleActiveTab = ref('schedule')
 </script>
 
 <style scoped>
@@ -102,6 +130,49 @@ import GroupBox from '@/components/group/GroupBox.vue'
 .panel-content {
   padding: 20px;
   height: 100%;
+}
+
+.transport-accommodation-container,
+.schedule-proposal-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
+  overflow: hidden;
+}
+
+.toggle-header {
+  padding: 16px 16px 0 16px;
+  flex-shrink: 0;
+  background-color: white;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.toggle-buttons {
+  width: 100%;
+}
+
+.toggle-btn {
+  flex: 1;
+  text-transform: none;
+  font-weight: 500;
+}
+
+.content-area {
+  flex: 1;
+  overflow-y: auto;
+  background-color: white;
+}
+
+.tab-content {
+  height: 100%;
+  padding: 16px;
+}
+
+.finance-content {
+  padding: 0 !important;
 }
 
 .section-placeholder {
@@ -216,12 +287,17 @@ import GroupBox from '@/components/group/GroupBox.vue'
     margin-bottom: 0;
   }
 
+  .transport-accommodation-container,
+  .schedule-proposal-container {
+    min-height: 350px;
+  }
+
   .section-placeholder {
     min-height: 300px;
   }
 
-  .finance-placeholder {
-    min-height: 300px;
+  .finance-content {
+    padding: 16px !important;
   }
 }
 
@@ -230,12 +306,20 @@ import GroupBox from '@/components/group/GroupBox.vue'
     padding: 16px;
   }
 
+  .toggle-header {
+    padding: 12px 12px 0 12px;
+  }
+
+  .tab-content {
+    padding: 12px;
+  }
+
   .section-placeholder {
     padding: 16px;
   }
 
-  .finance-summary {
-    padding: 12px;
+  .finance-content {
+    padding: 12px !important;
   }
 }
 
@@ -244,8 +328,21 @@ import GroupBox from '@/components/group/GroupBox.vue'
     padding: 12px;
   }
 
+  .toggle-header {
+    padding: 8px 8px 0 8px;
+  }
+
+  .tab-content {
+    padding: 8px;
+  }
+
   .section-placeholder {
     padding: 12px;
+  }
+
+  .toggle-btn {
+    font-size: 0.75rem;
+    padding: 8px 12px;
   }
 }
 </style>

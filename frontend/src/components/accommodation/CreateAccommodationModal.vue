@@ -2,11 +2,11 @@
   <v-dialog v-model="dialog" max-width="500px" persistent>
     <v-card>
       <v-card-title class="d-flex align-center pa-6">
-        <v-icon size="large" color="primary" class="mr-3">mdi-home-plus</v-icon>
+        <SvgIcon type="mdi" :path="homePlusIcon" size="24" color="primary" class="mr-3" />
         <span class="text-h5 font-weight-bold">숙소 예약</span>
         <v-spacer></v-spacer>
         <v-btn icon variant="text" @click="closeModal">
-          <v-icon>mdi-close</v-icon>
+          <SvgIcon type="mdi" :path="closeIcon" size="20" />
         </v-btn>
       </v-card-title>
 
@@ -32,7 +32,7 @@
               </template>
             </v-img>
             <div v-else class="no-image-placeholder d-flex flex-column align-center justify-center">
-              <v-icon color="grey-lighten-1" size="x-large">mdi-image-off</v-icon>
+              <SvgIcon type="mdi" :path="imageOffIcon" size="32" color="grey-lighten-1" />
               <span class="text-caption text-grey-lighten-1 mt-2">이미지 없음</span>
             </div>
           </div>
@@ -41,13 +41,13 @@
           <div class="location-details pa-4">
             <h3 class="text-h6 font-weight-bold mb-2">{{ selectedLocation.title }}</h3>
             <div class="d-flex align-center mb-2">
-              <v-icon size="small" color="grey-darken-1" class="mr-2">mdi-map-marker</v-icon>
+              <SvgIcon type="mdi" :path="mapMarkerIcon" size="16" color="grey-darken-1" class="mr-2" />
               <span class="text-body-2 text-grey-darken-1">
                 {{ formatAddress(selectedLocation) }}
               </span>
             </div>
             <div v-if="selectedLocation.tel" class="d-flex align-center">
-              <v-icon size="small" color="grey-darken-1" class="mr-2">mdi-phone</v-icon>
+              <SvgIcon type="mdi" :path="phoneIcon" size="16" color="grey-darken-1" class="mr-2" />
               <span class="text-body-2 text-grey-darken-1">{{ selectedLocation.tel }}</span>
             </div>
           </div>
@@ -65,44 +65,78 @@
               placeholder="예: 우리팀 숙소, 1박 2일 여행 등"
               variant="outlined"
               density="comfortable"
-              prepend-inner-icon="mdi-text"
               :rules="[rules.required]"
               class="mb-4"
               required
-            ></v-text-field>
+            >
+              <template v-slot:prepend-inner>
+                <SvgIcon type="mdi" :path="textIcon" size="20" color="grey" />
+              </template>
+            </v-text-field>
 
-            <!-- Check-in and Check-out Times -->
-            <v-row>
-              <v-col cols="6">
-                <v-text-field
-                  v-model="formData.checkInTime"
-                  label="체크인 날짜/시간"
-                  placeholder="2025-06-01 15:00"
-                  variant="outlined"
-                  density="comfortable"
-                  prepend-inner-icon="mdi-calendar-clock"
-                  :rules="[rules.required, rules.datetimeFormat]"
-                  hint="형식: YYYY-MM-DD HH:MM"
-                  persistent-hint
-                  required
-                ></v-text-field>
-              </v-col>
+            <!-- Check-in Date and Time -->
+            <div class="datetime-section mb-4">
+              <h4 class="text-subtitle-1 font-weight-medium mb-3 d-flex align-center">
+                <SvgIcon type="mdi" :path="calendarClockIcon" size="20" color="primary" class="mr-2" />
+                체크인 날짜/시간
+              </h4>
+              <v-row>
+                <v-col cols="7">
+                  <v-text-field
+                    v-model="formData.checkInDate"
+                    label="체크인 날짜"
+                    type="date"
+                    variant="outlined"
+                    density="comfortable"
+                    :rules="[rules.required]"
+                    required
+                  />
+                </v-col>
+                <v-col cols="5">
+                  <v-text-field
+                    v-model="formData.checkInTime"
+                    label="체크인 시간"
+                    type="time"
+                    variant="outlined"
+                    density="comfortable"
+                    :rules="[rules.required]"
+                    required
+                  />
+                </v-col>
+              </v-row>
+            </div>
 
-              <v-col cols="6">
-                <v-text-field
-                  v-model="formData.checkOutTime"
-                  label="체크아웃 날짜/시간"
-                  placeholder="2025-06-02 11:00"
-                  variant="outlined"
-                  density="comfortable"
-                  prepend-inner-icon="mdi-calendar-clock"
-                  :rules="[rules.required, rules.datetimeFormat, rules.checkOutAfterCheckIn]"
-                  hint="형식: YYYY-MM-DD HH:MM"
-                  persistent-hint
-                  required
-                ></v-text-field>
-              </v-col>
-            </v-row>
+            <!-- Check-out Date and Time -->
+            <div class="datetime-section mb-4">
+              <h4 class="text-subtitle-1 font-weight-medium mb-3 d-flex align-center">
+                <SvgIcon type="mdi" :path="calendarClockIcon" size="20" color="primary" class="mr-2" />
+                체크아웃 날짜/시간
+              </h4>
+              <v-row>
+                <v-col cols="7">
+                  <v-text-field
+                    v-model="formData.checkOutDate"
+                    label="체크아웃 날짜"
+                    type="date"
+                    variant="outlined"
+                    density="comfortable"
+                    :rules="[rules.required]"
+                    required
+                  />
+                </v-col>
+                <v-col cols="5">
+                  <v-text-field
+                    v-model="formData.checkOutTime"
+                    label="체크아웃 시간"
+                    type="time"
+                    variant="outlined"
+                    density="comfortable"
+                    :rules="[rules.required, rules.checkOutAfterCheckIn]"
+                    required
+                  />
+                </v-col>
+              </v-row>
+            </div>
 
             <!-- Error Alert -->
             <v-alert
@@ -136,7 +170,7 @@
           :loading="isLoading"
           :disabled="!isFormValid"
         >
-          <v-icon class="mr-2">mdi-plus</v-icon>
+          <SvgIcon type="mdi" :path="plusIcon" size="20" class="mr-2" />
           숙소 예약
         </v-btn>
       </v-card-actions>
@@ -149,55 +183,66 @@ import { ref, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAccommodationStore } from '@/stores/accommodation'
 import { apiClient } from '@/utils/apiClient'
+import SvgIcon from '@jamescoyle/vue-icon'
+import {
+  mdiHomePlus,
+  mdiClose,
+  mdiMapMarker,
+  mdiPhone,
+  mdiImageOff,
+  mdiText,
+  mdiCalendarClock,
+  mdiPlus
+} from '@mdi/js'
 
-// Props and Emits
+const homePlusIcon = mdiHomePlus
+const closeIcon = mdiClose
+const mapMarkerIcon = mdiMapMarker
+const phoneIcon = mdiPhone
+const imageOffIcon = mdiImageOff
+const textIcon = mdiText
+const calendarClockIcon = mdiCalendarClock
+const plusIcon = mdiPlus
+
+// Props (removed modelValue)
 const props = defineProps({
-  modelValue: {
-    type: Boolean,
-    default: false
-  },
   selectedLocation: {
     type: Object,
     required: true
   }
 })
 
-const emit = defineEmits(['update:modelValue', 'accommodation-created'])
-
 // Store and Route
 const route = useRoute()
 const accommodationStore = useAccommodationStore()
+
+// Internal dialog state (no emit needed)
+const dialog = ref(false)
 
 // Form data
 const formRef = ref(null)
 const formData = ref({
   name: '',
+  checkInDate: '',
   checkInTime: '',
+  checkOutDate: '',
   checkOutTime: ''
 })
 
 const isLoading = ref(false)
 const error = ref(null)
 
-// Dialog model
-const dialog = computed({
-  get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value)
-})
-
 // Validation rules
 const rules = {
   required: (value) => !!value || '필수 입력 항목입니다.',
-  datetimeFormat: (value) => {
-    if (!value) return true
-    const datetimePattern = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/
-    return datetimePattern.test(value) || '날짜/시간 형식이 올바르지 않습니다. (예: 2025-06-01 15:00)'
-  },
-  checkOutAfterCheckIn: (value) => {
-    if (!value || !formData.value.checkInTime) return true
+  checkOutAfterCheckIn: () => {
+    if (!formData.value.checkInDate || !formData.value.checkInTime ||
+        !formData.value.checkOutDate || !formData.value.checkOutTime) {
+      return true
+    }
 
-    const checkInDateTime = new Date(formData.value.checkInTime + ':00')
-    const checkOutDateTime = new Date(value + ':00')
+    const checkInDateTime = new Date(`${formData.value.checkInDate}T${formData.value.checkInTime}:00`)
+    const checkOutDateTime = new Date(`${formData.value.checkOutDate}T${formData.value.checkOutTime}:00`)
 
     return checkOutDateTime > checkInDateTime || '체크아웃 시간은 체크인 시간보다 늦어야 합니다.'
   }
@@ -206,11 +251,11 @@ const rules = {
 // Form validation
 const isFormValid = computed(() => {
   return formData.value.name &&
+         formData.value.checkInDate &&
          formData.value.checkInTime &&
+         formData.value.checkOutDate &&
          formData.value.checkOutTime &&
-         rules.datetimeFormat(formData.value.checkInTime) === true &&
-         rules.datetimeFormat(formData.value.checkOutTime) === true &&
-         rules.checkOutAfterCheckIn(formData.value.checkOutTime) === true
+         rules.checkOutAfterCheckIn() === true
 })
 
 // Helper function to format address
@@ -220,20 +265,23 @@ const formatAddress = (location) => {
   return `${addr1} ${addr2}`.trim() || '주소 정보 없음'
 }
 
-// Helper function to format datetime to API format
-const formatDateTimeToAPI = (datetimeString) => {
-  if (!datetimeString) return ''
-
-  try {
-    // Convert "2025-06-01 15:00" to "2025-06-01 15:00:00" format
-    return `${datetimeString}:00`
-  } catch (error) {
-    console.warn('날짜/시간 형식 변환 오류:', error)
-    return datetimeString
-  }
+// Helper function to combine date and time
+const combineDateAndTime = (date, time) => {
+  if (!date || !time) return ''
+  return `${date} ${time}:00`
 }
 
 // Methods
+const openDialog = () => {
+  dialog.value = true
+  resetForm()
+}
+
+const closeModal = () => {
+  dialog.value = false
+  resetForm()
+}
+
 const handleSubmit = async () => {
   // Validate form
   const { valid } = await formRef.value.validate()
@@ -253,8 +301,8 @@ const handleSubmit = async () => {
     const requestData = {
       name: formData.value.name,
       attractionNo: props.selectedLocation.no || props.selectedLocation.attractionNo,
-      checkInTime: formatDateTimeToAPI(formData.value.checkInTime),
-      checkOutTime: formatDateTimeToAPI(formData.value.checkOutTime)
+      checkInTime: combineDateAndTime(formData.value.checkInDate, formData.value.checkInTime),
+      checkOutTime: combineDateAndTime(formData.value.checkOutDate, formData.value.checkOutTime)
     }
 
     // Call API to create accommodation
@@ -262,8 +310,7 @@ const handleSubmit = async () => {
 
     if (response.data.success) {
       // Create the new accommodation object for store
-      const newAccommodation = {
-        accommodationId: response.data.data.accommodationId,
+      const newAccommodationData = {
         groupId: parseInt(groupId),
         attractionsNo: requestData.attractionNo,
         name: formData.value.name,
@@ -285,14 +332,20 @@ const handleSubmit = async () => {
         }
       }
 
-      // Add to store only after successful API call
-      accommodationStore.accommodationList.push(newAccommodation)
+      // Use store method to add accommodation
+      const result = accommodationStore.addAccommodation(newAccommodationData)
 
-      // Emit success event
-      emit('accommodation-created', newAccommodation)
-      resetForm()
+      if (result.success) {
+        // Update the accommodationId from server response if available
+        if (response.data.data?.accommodationId) {
+          result.data.accommodationId = response.data.data.accommodationId
+        }
 
-      console.log('숙소 예약 성공:', response.data.message)
+        console.log('숙소 예약 성공:', response.data.message)
+        closeModal()
+      } else {
+        throw new Error(result.error || '숙소 정보 저장에 실패했습니다.')
+      }
     } else {
       throw new Error(response.data.message || '숙소 예약에 실패했습니다.')
     }
@@ -325,15 +378,12 @@ const handleSubmit = async () => {
   }
 }
 
-const closeModal = () => {
-  dialog.value = false
-  resetForm()
-}
-
 const resetForm = () => {
   formData.value = {
     name: '',
+    checkInDate: '',
     checkInTime: '',
+    checkOutDate: '',
     checkOutTime: ''
   }
   error.value = null
@@ -346,10 +396,17 @@ const clearError = () => {
   error.value = null
 }
 
-// Watch dialog changes to reset form when modal opens
-watch(dialog, (newValue) => {
-  if (newValue) {
-    resetForm()
+// Expose methods to parent if needed
+defineExpose({
+  openDialog,
+  closeModal
+})
+
+// Watch for selectedLocation changes to update form when dialog is open
+watch(() => props.selectedLocation, (newLocation) => {
+  if (dialog.value && newLocation) {
+    // Pre-fill accommodation name with location title
+    formData.value.name = newLocation.title || ''
   }
 })
 </script>
@@ -393,9 +450,16 @@ watch(dialog, (newValue) => {
   background-color: #ffffff;
 }
 
-/* Form styling */
-.v-text-field {
-  margin-bottom: 8px;
+/* DateTime section styling */
+.datetime-section {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid #e9ecef;
+}
+
+.datetime-section h4 {
+  margin-bottom: 12px;
 }
 
 /* Button hover effects */

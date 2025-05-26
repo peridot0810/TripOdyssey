@@ -1,10 +1,5 @@
 <template>
   <v-card class="h-100" elevation="2">
-    <v-card-title class="bg-primary text-white pa-3">
-      <v-icon left class="mr-2">mdi-calendar-range</v-icon>
-      <span class="text-subtitle-1">Your Availability</span>
-    </v-card-title>
-
     <!-- Navigation Tabs -->
     <div class="navigation-tabs">
       <v-btn
@@ -41,31 +36,18 @@
           />
         </div>
 
-        <!-- Selected Date Range Display -->
-        <div v-if="selectedDateRange" class="selected-range-display mb-3">
-          <v-chip color="primary" variant="outlined" class="mb-2">
-            <v-icon left size="small">mdi-calendar-check</v-icon>
-            Selected Range
-          </v-chip>
-          <div class="range-text">
-            {{ formatDateRange(selectedDateRange.startDate, selectedDateRange.endDate) }}
-          </div>
-        </div>
-
-        <!-- Save Button -->
-        <v-btn
-          color="primary"
-          block
-          class="mt-3"
-          prepend-icon="mdi-check"
-          variant="flat"
-          size="small"
-          :disabled="!selectedDateRange || isLoading"
-          :loading="isLoading"
-          @click="saveAvailability"
-        >
-          {{ isLoading ? 'Saving...' : 'Save Availability' }}
-        </v-btn>
+      <v-btn
+        color="primary"
+        variant="flat"
+        size="large"
+        rounded="lg"
+        class="mt-3 save-btn"
+        :disabled="!selectedDateRange || isLoading"
+        :loading="isLoading"
+        @click="saveAvailability"
+      >
+        등록
+      </v-btn>
 
         <!-- Error Display -->
         <v-alert
@@ -95,6 +77,7 @@
         <UserDatesList />
       </div>
     </v-card-text>
+    <MeetingRecommendations/>
   </v-card>
 </template>
 
@@ -106,6 +89,7 @@ import { useWhen2MeetStore } from '@/stores/when2meet'
 import { apiClient } from '@/utils/apiClient'
 import DatePicker from '@/components/meet/DatePicker.vue'
 import UserDatesList from '@/components/meet/UserDatesList.vue'
+import MeetingRecommendations from '@/components/meet/MeetingRecommendations.vue'
 
 // Stores
 const userStore = useUserStore()
@@ -248,24 +232,6 @@ const formatDateForAPI = (date) => {
   return `${year}-${month}-${day}`
 }
 
-const formatDateRange = (startDate, endDate) => {
-  if (!startDate || !endDate) return ''
-
-  const formatDate = (date) => {
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    })
-  }
-
-  if (startDate.toDateString() === endDate.toDateString()) {
-    return formatDate(startDate)
-  } else {
-    return `${formatDate(startDate)} → ${formatDate(endDate)}`
-  }
-}
-
 const clearMessages = () => {
   errorMessage.value = ''
   successMessage.value = ''
@@ -356,6 +322,23 @@ onMounted(async () => {
   font-weight: 500;
   color: #333;
   margin-top: 4px;
+}
+
+.save-btn {
+  font-weight: 500;
+  text-transform: none;
+  background: linear-gradient(45deg, #508aff, #2e4db3) !important;
+  color: white !important;
+  border-radius: 25px !important;
+  transition: all 0.3s ease;
+  font-size: 1.1rem;
+  padding: 12px 24px;
+  width: 200px;
+}
+
+.save-btn:hover {
+  transform: translateY(-3px);
+  background: linear-gradient(45deg, #4fa1ff, #3f9cff) !important;
 }
 
 .v-alert {
