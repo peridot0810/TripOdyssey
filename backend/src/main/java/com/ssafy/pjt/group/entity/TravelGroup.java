@@ -16,4 +16,5 @@ public class TravelGroup {
 	private LocalDateTime createdAt;
 	private LocalDate startDate;
 	private LocalDate endDate;
+	private String profileImage;
 }

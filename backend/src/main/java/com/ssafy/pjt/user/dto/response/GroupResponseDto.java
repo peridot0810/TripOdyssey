@@ -18,4 +18,5 @@ public class GroupResponseDto {
 	private LocalDate startDate;
 	private LocalDate endDate;
 	private GroupProgressResponseDto progress;
+	private String imageUrl;
 }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.ssafy.pjt.common.dto.response.CommonResponse;
 import com.ssafy.pjt.financial.dto.request.MemberInviteRequestDto;
+import com.ssafy.pjt.group.dto.request.AssignMemberRoleRequestDto;
 import com.ssafy.pjt.group.dto.request.RoleRequestDto;
 import com.ssafy.pjt.group.dto.response.InvitedMemberResponseDto;
 import com.ssafy.pjt.group.dto.response.RoleRequestResponseDto;
@@ -19,4 +20,5 @@ public interface TravelGroupMemberService {
 	public List<InvitedMemberResponseDto> getInvitedMemberList(Integer groupId, String userId);
 	public CommonResponse<Void> roleRequest(Integer groupId, String userId, RoleRequestDto roleRequest);
 	public List<RoleRequestResponseDto> getRoleRequestList(Integer groupId, String userId);
+	public void AssignMemberRole(Integer groupId, String masterId, AssignMemberRoleRequestDto assignMemberRoleRequest);
 }

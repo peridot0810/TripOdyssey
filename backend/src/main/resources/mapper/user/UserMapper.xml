@@ -98,7 +98,7 @@
     
     <!-- 그룹 조회 -->
     <select id="getGroupList">
-    	SELECT group_id, name, created_at, status, start_date, end_date
+    	SELECT group_id, name, created_at, status, start_date, end_date, profile_image
     	FROM group_user_info gui
     		INNER JOIN travel_group tg USING (group_id)
     	WHERE user_id=#{userId}
