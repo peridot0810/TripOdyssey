@@ -1,46 +1,72 @@
 <template>
   <div class="group-info-display">
     <div v-if="groupStore.hasGroup" class="content">
-      <!-- Group Name -->
-      <div class="form-group">
-        <label>그룹명</label>
-        <div class="form-display">
-          {{ groupStore.myGroup.name || '그룹명 없음' }}
-        </div>
-      </div>
+      <!-- Left Side - Image and Upload -->
+      <div class="image-section">
+        <div class="image-container">
+          <img v-if="groupImage" :src="groupImage" alt="Group Image" class="group-image" />
+          <div v-else class="image-placeholder">
+            <div class="placeholder-icon">📷</div>
+            <div class="placeholder-text">그룹 이미지</div>
+          </div>
 
-      <!-- Description -->
-      <div class="form-group">
-        <label>설명</label>
-        <div class="form-display">
-          {{ groupStore.myGroup.description || '설명 없음' }}
-        </div>
-      </div>
-
-      <!-- Date Range -->
-      <div class="date-group">
-        <div class="form-group">
-          <label>시작일</label>
-          <div class="form-display">
-            {{ formatDate(groupStore.myGroup.startDate) }}
+          <!-- Loading overlay -->
+          <div v-if="isUploading" class="upload-overlay">
+            <div class="upload-spinner">⟳</div>
+            <div class="upload-text">업로드 중...</div>
           </div>
         </div>
 
-        <div class="form-group">
-          <label>종료일</label>
-          <div class="form-display">
+        <!-- Upload Button -->
+        <button class="upload-btn" :disabled="isUploading" @click="triggerFileInput">
+          {{ groupImage ? '이미지 변경' : '이미지 업로드' }}
+        </button>
+
+        <!-- Hidden File Input -->
+        <input
+          ref="fileInput"
+          type="file"
+          accept="image/*"
+          style="display: none"
+          @change="handleFileSelect"
+        />
+      </div>
+
+      <!-- Right Side - Group Info -->
+      <div class="info-section">
+        <!-- Group Name -->
+        <div class="info-item">
+          <h3 class="group-name">{{ groupStore.myGroup.name || '그룹명 없음' }}</h3>
+        </div>
+
+        <!-- Description -->
+        <div class="info-item">
+          <label>설명</label>
+          <div class="info-value">
+            {{ groupStore.myGroup.description || '설명 없음' }}
+          </div>
+        </div>
+
+        <!-- Date Range -->
+        <div class="info-item">
+          <label>여행 기간</label>
+          <div class="info-value date-range">
+            📅 {{ formatDate(groupStore.myGroup.startDate) }} ~
             {{ formatDate(groupStore.myGroup.endDate) }}
           </div>
         </div>
-      </div>
 
-      <!-- Role Limits -->
-      <div class="form-group">
-        <label>역할 제한</label>
-        <div class="role-limits-display">
-          <div v-for="(limit, roleKey) in groupStore.myGroup.roleLimits" :key="roleKey" class="role-limit-display">
-            <span class="role-name">{{ getRoleText(roleKey) }}</span>
-            <span class="role-count">{{ limit }}명</span>
+        <!-- Role Limits -->
+        <div class="info-item">
+          <label>역할 제한</label>
+          <div class="role-chips">
+            <div
+              v-for="(limit, roleKey) in groupStore.myGroup.roleLimits"
+              :key="roleKey"
+              class="role-chip"
+            >
+              {{ getRoleText(roleKey) }} {{ limit }}명
+            </div>
           </div>
         </div>
       </div>
@@ -54,17 +80,109 @@
 </template>
 
 <script setup>
+import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { useGroupStore } from '@/stores/group'
+import { apiClient } from '@/utils/apiClient'
 
 const groupStore = useGroupStore()
+const route = useRoute()
 
+// State
+const fileInput = ref(null)
+const isUploading = ref(false)
+const groupImage = ref(null) // Will store the full image URL
+
+// API Base URL for constructing full image URLs
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
+
+// Computed
+const groupId = computed(() => route.params.groupId)
+
+// Methods
 const formatDate = (dateString) => {
   return dateString ? new Date(dateString).toLocaleDateString('ko-KR') : '날짜 없음'
 }
 
 const getRoleText = (roleKey) => {
-  const map = { finance: '재정 관리자', schedule: '일정 관리자', logistics: '물류 관리자' }
+  const map = {
+    finance: '재정',
+    schedule: '일정',
+    logistics: '물류',
+  }
   return map[roleKey] || roleKey
+}
+
+const triggerFileInput = () => {
+  if (fileInput.value) {
+    fileInput.value.click()
+  }
+}
+
+const handleFileSelect = async (event) => {
+  const file = event.target.files[0]
+  if (!file) return
+
+  // Validate file type
+  if (!file.type.startsWith('image/')) {
+    alert('이미지 파일만 업로드 가능합니다.')
+    return
+  }
+
+  // Validate file size (5MB limit)
+  if (file.size > 5 * 1024 * 1024) {
+    alert('파일 크기는 5MB 이하여야 합니다.')
+    return
+  }
+
+  await uploadImage(file)
+}
+
+const uploadImage = async (file) => {
+  if (!groupId.value) {
+    alert('그룹 ID를 찾을 수 없습니다.')
+    return
+  }
+
+  isUploading.value = true
+
+  try {
+    // Create FormData for multipart upload
+    const formData = new FormData()
+    formData.append('file', file)
+
+    const response = await apiClient.post(`/group/${groupId.value}/upload-group-image`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+
+    console.log('Image upload response:', response.data)
+
+    // If upload successful, update the image display
+    if (response.data.success) {
+      // Construct full URL from relative path
+      const relativePath = response.data.data
+      const fullImageUrl = `${API_BASE_URL}${relativePath}`
+
+      groupImage.value = fullImageUrl
+      console.log('Image uploaded successfully. Full URL:', fullImageUrl)
+      alert('이미지 업로드가 완료되었습니다!')
+    } else {
+      throw new Error(response.data.message || '업로드에 실패했습니다.')
+    }
+  } catch (error) {
+    console.error('Image upload error:', error)
+    const errorMessage =
+      error.response?.data?.message || error.message || '이미지 업로드에 실패했습니다.'
+    alert(errorMessage)
+  } finally {
+    isUploading.value = false
+    // Clear the file input
+    if (fileInput.value) {
+      fileInput.value.value = ''
+    }
+  }
 }
 </script>
 
@@ -78,7 +196,7 @@ const getRoleText = (roleKey) => {
 .content {
   height: 100%;
   display: flex;
-  flex-direction: column;
+  gap: 1.5rem;
   overflow-y: auto;
 }
 
@@ -90,61 +208,178 @@ const getRoleText = (roleKey) => {
   color: #666;
 }
 
-.form-group {
-  margin-bottom: 1rem;
-}
-
-.form-group label {
-  display: block;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  font-size: 0.9rem;
-}
-
-.form-display {
-  padding: 0.75rem 0;
-  font-size: 0.9rem;
-  min-height: 1.5rem;
-}
-
-.date-group {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-}
-
-.role-limits-display {
+/* Left Side - Image Section */
+.image-section {
+  flex: 0 0 160px;
   display: flex;
+  flex-direction: column;
   gap: 1rem;
-  flex-wrap: wrap;
 }
 
-.role-limit-display {
+.image-container {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid #e0e0e0;
+}
+
+.group-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-placeholder {
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 0.75rem;
+  justify-content: center;
   background: #f8f9fa;
-  border-radius: 4px;
-  min-width: 100px;
-  flex: 1;
+  border: 2px dashed #dee2e6;
+  color: #6c757d;
 }
 
-.role-name {
+.placeholder-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.placeholder-text {
   font-size: 0.8rem;
-  color: #666;
-  margin-bottom: 0.25rem;
+  text-align: center;
 }
 
-.role-count {
+.upload-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.upload-spinner {
+  font-size: 1.5rem;
+  animation: spin 1s linear infinite;
+  margin-bottom: 0.5rem;
+}
+
+.upload-text {
+  font-size: 0.9rem;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.upload-btn {
+  width: 100%;
+  padding: 0.75rem;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.upload-btn:hover:not(:disabled) {
+  background: #0056b3;
+}
+
+.upload-btn:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+/* Right Side - Info Section */
+.info-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.group-name {
+  font-size: 1.2rem;
   font-weight: 600;
-  color: #007bff;
-  font-size: 1rem;
+  margin: 0;
+  color: #333;
 }
 
+.info-item label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+}
+
+.info-value {
+  font-size: 0.95rem;
+  color: #333;
+  line-height: 1.4;
+}
+
+.date-range {
+  color: #495057;
+}
+
+.role-chips {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.role-chip {
+  background: #e9ecef;
+  color: #495057;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
-  .date-group {
-    grid-template-columns: 1fr;
+  .content {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .image-section {
+    flex: none;
+    align-items: center;
+  }
+
+  .image-container {
+    width: 120px;
+    height: 120px;
+  }
+
+  .upload-btn {
+    max-width: 160px;
   }
 }
 </style>
