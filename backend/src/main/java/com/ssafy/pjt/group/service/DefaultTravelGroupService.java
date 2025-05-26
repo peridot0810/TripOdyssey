@@ -20,8 +20,10 @@ import com.ssafy.pjt.common.entity.MemberRole;
 import com.ssafy.pjt.common.exception.FileUploadIllegalArgumentException;
 import com.ssafy.pjt.group.dto.request.TravelGroupPostRequest;
 import com.ssafy.pjt.group.dto.request.TravelGroupUpdateRequest;
+import com.ssafy.pjt.group.dto.request.UpdateProgressRequestDto;
 import com.ssafy.pjt.group.dto.response.TravelGroupInfoResponse;
 import com.ssafy.pjt.group.dto.response.TravelGroupPostResponse;
+import com.ssafy.pjt.group.entity.GroupProgress;
 import com.ssafy.pjt.group.entity.GroupRoleLimit;
 import com.ssafy.pjt.group.entity.RoleLimits;
 import com.ssafy.pjt.group.entity.TravelGroup;
@@ -150,6 +152,7 @@ public class DefaultTravelGroupService implements TravelGroupService {
 	public CommonResponse<TravelGroupInfoResponse> getTravelGroupInfo(Integer groupId) {
 		TravelGroup group = travelGroupMapper.selectTravelGroupById(groupId);
 		List<GroupRoleLimit> limitList = travelGroupMapper.selectGroupRoleLimits(groupId);
+		GroupProgress progress = travelGroupMapper.selectGroupProgress(groupId);
 
 		RoleLimits roleLimits = new RoleLimits();
 		for (GroupRoleLimit r : limitList) {
@@ -168,7 +171,9 @@ public class DefaultTravelGroupService implements TravelGroupService {
 				.createdAt(group.getCreatedAt())
 				.startDate(group.getStartDate())
 				.endDate(group.getEndDate())
+				.imageUrl(group.getProfileImage())
 				.roleLimits(roleLimits)
+				.progress(progress)
 				.build();
 		
 		return new CommonResponse<TravelGroupInfoResponse>(true, "그룹 조회 성공", groupInfo);
@@ -219,6 +224,13 @@ public class DefaultTravelGroupService implements TravelGroupService {
 		travelGroupMapper.updateGroupImage(groupId, imageUrl);
 		
 		return imageUrl;
+	}
+	
+	
+	@Override
+	public void updateProgress(Integer groupId, UpdateProgressRequestDto updateProgressRequest) {
+		updateProgressRequest.setGroupId(groupId);
+		travelGroupMapper.updateGroupProgress(updateProgressRequest);
 	}
 	
 }

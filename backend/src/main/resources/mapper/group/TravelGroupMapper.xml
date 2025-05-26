@@ -58,7 +58,7 @@
   </update>
   
 	<select id="selectTravelGroupById">
-	  SELECT group_id, name, description, status, created_at, start_date, end_date
+	  SELECT group_id, name, description, status, created_at, start_date, end_date, profile_image
 	  FROM travel_group
 	  WHERE group_id = #{groupId}
  	</select>
@@ -68,10 +68,28 @@
 	  FROM group_role_limit
 	  WHERE group_id = #{groupId}
 	</select>
+	
+	<select id="selectGroupProgress">
+		SELECT schedule_coordination, role_assignment, trip_planning, on_trip, settlement, finished
+		FROM group_progress
+		WHERE group_id=#{groupId}
+	</select>
   
   	<update id="updateGroupImage">
   		UPDATE travel_group
   		SET profile_image=#{imgUrl}
+  		WHERE group_id=#{groupId}
+  	</update>
+  	
+  	<update id="updateGroupProgress">
+  		UPDATE group_progress
+  		SET 
+  			schedule_coordination=#{scheduleCoordination},
+  			role_assignment=#{roleAssignment},
+  			trip_planning=#{tripPlanning},
+  			on_trip=#{onTrip},
+  			settlement=#{settlement},
+  			finished=#{finished}
   		WHERE group_id=#{groupId}
   	</update>
 

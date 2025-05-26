@@ -11,7 +11,10 @@ import com.ssafy.pjt.common.exception.UserNotInGroupException;
 import com.ssafy.pjt.common.service.UserValidationService;
 import com.ssafy.pjt.config.OpenApiConfig;
 import com.ssafy.pjt.financial.dto.request.MemberInviteRequestDto;
+import com.ssafy.pjt.group.dto.request.AssignMemberRoleRequestDto;
 import com.ssafy.pjt.group.dto.request.HandleRoleRequestDto;
+import com.ssafy.pjt.group.dto.request.RoleAssignRequestDto;
+import com.ssafy.pjt.group.dto.request.RoleRemovalRequestDto;
 import com.ssafy.pjt.group.dto.request.RoleRequestDto;
 import com.ssafy.pjt.group.dto.response.InvitedMemberResponseDto;
 import com.ssafy.pjt.group.dto.response.RoleRequestResponseDto;
@@ -184,9 +187,45 @@ public class DefaultTravelGroupMemberService implements TravelGroupMemberService
 		if(!userValidationService.isUserInGroup(userId, groupId)) {
 			throw new UserNotInGroupException("속하지 않은 그룹의 정보를 요청하였습니다.");
 		}
-		if(userValidationService.isUserRoleValid(userId, groupId, MemberRole.NORMAL.getId())) {
-			throw new UnauthorizedRoleAccessException("일반 그룹원은 역할 신청 목록을 조회할 수 없습니다.");
+		if(!userValidationService.isUserRoleValid(userId, groupId, MemberRole.MASTER.getId())) {
+			throw new UnauthorizedRoleAccessException("역할 신청 목록은 방장만 조회 가능합니다.");
 		}
 		return memberMapper.getRoleRequestList(groupId);
+	}
+	
+	@Override
+	public void AssignMemberRole(Integer groupId, String masterId, AssignMemberRoleRequestDto assignMemberRoleRequest) {
+		
+		// 유저 확인
+		if(!userValidationService.isUserInGroup(masterId, groupId)) {
+			throw new UserNotInGroupException("속하지 않은 그룹의 정보를 요청하였습니다.");
+		}
+		if(!userValidationService.isUserRoleValid(masterId, groupId, MemberRole.MASTER.getId())) {
+			throw new UnauthorizedRoleAccessException("역할 임명은 방장만 할 수 있습니다.");
+		}
+		
+		//비즈니스 로직
+		// 역할 임명
+		RoleAssignRequestDto roleAssignment = RoleAssignRequestDto.builder()
+					.userId(assignMemberRoleRequest.getUserId())
+					.groupId(groupId)
+					.build();
+		
+		for(Integer assignRole : assignMemberRoleRequest.getAssignRoleIdList()) {
+			roleAssignment.setRoleId(assignRole);
+			memberMapper.roleAssignment(roleAssignment);
+		}
+		
+		// 역할 박탈
+		RoleRemovalRequestDto roleRemoval = RoleRemovalRequestDto.builder()
+				.userId(assignMemberRoleRequest.getUserId())
+				.groupId(groupId)
+				.build();
+		for(Integer removalRole : assignMemberRoleRequest.getRemovalRoleIdList()) {
+			roleRemoval.setRoleId(removalRole);
+			memberMapper.roleRemoval(roleRemoval);
+		}
+		
+		
 	}
 }

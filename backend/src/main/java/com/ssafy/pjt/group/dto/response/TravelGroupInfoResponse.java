@@ -3,6 +3,7 @@ package com.ssafy.pjt.group.dto.response;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import com.ssafy.pjt.group.entity.GroupProgress;
 import com.ssafy.pjt.group.entity.RoleLimits;
 import com.ssafy.pjt.group.entity.TravelGroupStatus;
 
@@ -20,4 +21,6 @@ public class TravelGroupInfoResponse {
     private LocalDate startDate;
     private LocalDate endDate;
     private RoleLimits roleLimits;
+    private GroupProgress progress;
+    private String imageUrl;
 }

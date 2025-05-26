@@ -6,7 +6,10 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import com.ssafy.pjt.financial.dto.request.MemberInviteRequestDto;
+import com.ssafy.pjt.group.dto.request.AssignMemberRoleRequestDto;
 import com.ssafy.pjt.group.dto.request.HandleRoleRequestDto;
+import com.ssafy.pjt.group.dto.request.RoleAssignRequestDto;
+import com.ssafy.pjt.group.dto.request.RoleRemovalRequestDto;
 import com.ssafy.pjt.group.dto.request.RoleRequestDto;
 import com.ssafy.pjt.group.dto.response.InvitedMemberResponseDto;
 import com.ssafy.pjt.group.dto.response.RoleRequestResponseDto;
@@ -42,4 +45,6 @@ public interface TravelGroupMemberMapper {
 	public void roleRequest(RoleRequestDto roleRequest);
 	public List<RoleRequestResponseDto> getRoleRequestList(Integer groupId);
 	public Integer handleRoleRequest(HandleRoleRequestDto handleRoleRequest);
+	public void roleAssignment(RoleAssignRequestDto roleAssignRequest);
+	public void roleRemoval(RoleRemovalRequestDto roleRemovalRequest);
 }

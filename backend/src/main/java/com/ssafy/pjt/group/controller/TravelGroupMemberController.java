@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import com.ssafy.pjt.common.dto.response.CommonResponse;
 import com.ssafy.pjt.common.service.UserValidationService;
 import com.ssafy.pjt.financial.dto.request.MemberInviteRequestDto;
+import com.ssafy.pjt.group.dto.request.AssignMemberRoleRequestDto;
 import com.ssafy.pjt.group.dto.request.RoleRequestDto;
 import com.ssafy.pjt.group.entity.GroupMemberInfo;
 import com.ssafy.pjt.group.service.TravelGroupMemberService;
@@ -66,11 +67,11 @@ public class TravelGroupMemberController {
 		return ResponseEntity.ok(response);
 	}
 
-	// 4. 역할 임명
-	@Operation(summary = "그룹원 역할 임명", description = "그룹원의 역할을 임명합니다.")
-	@ApiResponse(responseCode = "200", description = "그룹원 역할 임명 성공")
+	// 4. 역할 신청 수락
+	@Operation(summary = "그룹원 역할 신청 수락/거절", description = "그룹원의 역할 신청을 수락/거절합니다.")
+	@ApiResponse(responseCode = "200", description = "그룹원 역할 신청 수락/거절 성공")
 	@PostMapping("/{groupId}/member/{userId}/role")
-	public ResponseEntity<CommonResponse<Void>> assignMemberRole(
+	public ResponseEntity<CommonResponse<Void>> acceptMemberRoleRequest(
 			@PathVariable Integer groupId,
 			@PathVariable String userId,
 			@RequestParam Integer roleId,
@@ -80,6 +81,23 @@ public class TravelGroupMemberController {
 		CommonResponse<Void> response = memberService.assignMemberRole(requesterId, groupId, userId, roleId, accept);
 		return ResponseEntity.ok(response);
 	}
+	
+	// 4-2. 역할 임명/박탈
+	@Operation(summary = "그룹원 역할 임명/박탈", description = "그룹원의 역할을 임명/박탈합니다.")
+	@ApiResponse(responseCode = "200", description = "그룹원 역할 임명/박탈 성공")
+	@PostMapping("/{groupId}/member/{userId}/role-assign")
+	public ResponseEntity<?> assignMemberRole(
+			@AuthenticationPrincipal UserDetails userDetails,
+			@PathVariable Integer groupId,
+			@PathVariable String userId,
+			@RequestBody AssignMemberRoleRequestDto assignMemberRoleRequest){
+		
+		String masterId = userDetails.getUsername();
+		assignMemberRoleRequest.setUserId(userId);
+		memberService.AssignMemberRole(groupId, masterId, assignMemberRoleRequest);
+		return ResponseEntity.ok(new CommonResponse<>(true, "그룹원 역할 임명/박탈 성공했습니다.", null));
+	}
+	
 	
 	// 5. 그룹원 초대
 	@Operation(summary = "그룹원 초대", description = "함께할 그룹원을 초대합니다.")
