@@ -67,6 +67,7 @@ const loadGroups = async () => {
   try {
     const response = await apiClient.get('/user/groups')
 
+    console.log("response : ", response)
     // Transform API response to match expected format
     const transformedGroups = response.data.map((group) => ({
       groupId: group.groupId,

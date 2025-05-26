@@ -55,6 +55,8 @@ export const useUserStore = defineStore('user', () => {
         age: response.data.user.age
       }
 
+      console.log(userInfo.value);
+
       // Store in localStorage for persistence
       localStorage.setItem('accessToken', response.data.accessToken)
       localStorage.setItem('userInfo', JSON.stringify(userInfo.value))
