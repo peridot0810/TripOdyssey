@@ -102,6 +102,7 @@
     	FROM group_user_info gui
     		INNER JOIN travel_group tg USING (group_id)
     	WHERE user_id=#{userId}
+    	GROUP BY group_id
     </select>
     
     <select id="getGroupProgress">

@@ -35,12 +35,7 @@
 
     <!-- Create Group Button -->
     <div class="create-group-section">
-      <v-btn
-        class="create-group-btn"
-        @click="openCreateGroupDialog"
-        rounded
-        elevation="0"
-      >
+      <v-btn class="create-group-btn" @click="openCreateGroupDialog" rounded elevation="0">
         CREATE NEW GROUP
       </v-btn>
     </div>
@@ -117,7 +112,9 @@ const openCreateGroupDialog = () => {
 }
 
 const handleGroupCreated = (newGroup) => {
-  groupStore.addGroup(newGroup)
+  // The group is already added to the store by CreateGroupDialog
+  // Just close the dialog here
+  console.log('Group created successfully:', newGroup)
   showCreateDialog.value = false
 }
 
@@ -185,8 +182,8 @@ onMounted(async () => {
 }
 
 .create-group-btn {
-  background-color: #2D2D2D !important;
-  color: #EBEBEB !important;
+  background-color: #2d2d2d !important;
+  color: #ebebeb !important;
   border-radius: 40px !important;
   width: 252px !important;
   height: 68px !important;

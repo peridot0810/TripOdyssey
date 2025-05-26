@@ -7,62 +7,61 @@
 
   <!-- Error State -->
   <div v-else-if="error" class="error-container">
-    <v-alert
-      type="error"
-      variant="tonal"
-      class="mb-4"
-      :text="error"
-    >
+    <v-alert type="error" variant="tonal" class="mb-4" :text="error">
       <template #append>
-        <v-btn
-          variant="text"
-          size="small"
-          @click="loadGroupInfo"
-        >
-          다시 시도
-        </v-btn>
+        <v-btn variant="text" size="small" @click="loadGroupInfo"> 다시 시도 </v-btn>
       </template>
     </v-alert>
 
-    <v-btn
-      to="/"
-      variant="outlined"
-      prepend-icon="mdi-arrow-left"
-    >
-      홈으로 돌아가기
-    </v-btn>
+    <v-btn to="/" variant="outlined" prepend-icon="mdi-arrow-left"> 홈으로 돌아가기 </v-btn>
   </div>
 
   <!-- Main Content -->
-  <div v-else-if="groupStore.hasGroup" class="group-layout">
-    <!-- Navigation Drawer -->
-    <v-navigation-drawer app width="220" permanent class="pa-3">
-      <!-- Navigation Links -->
-      <v-list density="comfortable" nav>
-        <v-list-item
-          v-for="item in links"
-          :key="item.label"
-          :to="`/group/${groupId}/${item.path}`"
-          :title="item.label"
-          :prepend-icon="item.icon"
-          exact
-          router
-        />
-      </v-list>
-    </v-navigation-drawer>
+  <div v-else-if="groupStore.hasGroup" class="group-layout-container">
+    <div class="group-layout">
+      <!-- Left Sidebar Navigation -->
+      <div class="sidebar">
+        <v-list density="comfortable" nav class="sidebar-nav">
+          <v-list-item
+            v-for="item in links"
+            :key="item.label"
+            :to="`/group/${groupId}/${item.path}`"
+            :title="item.label"
+            :prepend-icon="item.icon"
+            exact
+            router
+            class="nav-item"
+          />
+        </v-list>
 
-    <!-- Main Content Area -->
-    <v-main class="pa-4">
-      <RouterView />
-    </v-main>
+        <!-- AI Helper - Only show on schedule page -->
+        <div v-if="isSchedulePage" class="ai-helper-container">
+          <ScheduleAiHelper />
+        </div>
+      </div>
+
+      <!-- Main Content Area -->
+      <div class="content-area">
+        <RouterView />
+      </div>
+    </div>
+
+    <!-- Transportation AI Helper - Only show on logistics page -->
+    <TransportationAiHelper v-if="isLogisticsPage" />
+
+    <!-- Finance AI Helper - Only show on finance page -->
+    <FinanceAiHelper v-if="isFinancePage" />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, watch, onUnmounted } from 'vue'
+import { ref, onMounted, watch, onUnmounted, computed } from 'vue'
 import { useRoute, useRouter, RouterView } from 'vue-router'
 import { useGroupStore } from '@/stores/group'
 import { apiClient } from '@/utils/apiClient'
+import ScheduleAiHelper from '@/components/ai/AiHelperSchedule.vue'
+import TransportationAiHelper from '@/components/ai/TransportationAiHelper.vue'
+import FinanceAiHelper from '@/components/ai/FinanceAiHelper.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -83,6 +82,21 @@ const links = [
   { label: '채팅', path: 'chat', icon: 'mdi-chat' },
   { label: '역할', path: 'role', icon: 'mdi-role' },
 ]
+
+// Check if current page is schedule page
+const isSchedulePage = computed(() => {
+  return route.path.includes('/schedule')
+})
+
+// Check if current page is logistics page
+const isLogisticsPage = computed(() => {
+  return route.path.includes('/logistics')
+})
+
+// Check if current page is finance page
+const isFinancePage = computed(() => {
+  return route.path.includes('/finance')
+})
 
 // Load group information and store in pinia
 const loadGroupInfo = async () => {
@@ -122,7 +136,7 @@ watch(
     if (newGroupId && newGroupId !== oldGroupId) {
       loadGroupInfo()
     }
-  }
+  },
 )
 
 onMounted(() => {
@@ -148,17 +162,69 @@ onUnmounted(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
   padding: 32px;
+  min-height: 400px;
+}
+
+.group-layout-container {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
 }
 
 .group-layout {
-  min-height: 100vh;
+  display: flex;
+  height: 100%;
+  width: 100%;
 }
 
-/* Navigation active state styling */
-.v-list-item--active {
-  background-color: rgba(var(--v-theme-primary), 0.1);
-  color: rgb(var(--v-theme-primary));
+.sidebar {
+  width: 220px;
+  min-width: 220px;
+  background-color: #fafafa;
+  border-right: 1px solid #e0e0e0;
+  height: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-nav {
+  padding: 12px;
+  flex: 1;
+}
+
+.ai-helper-container {
+  margin-top: auto;
+  border-top: 1px solid #e0e0e0;
+  background-color: #f5f5f5;
+}
+
+.content-area {
+  flex: 1;
+  height: 100%;
+  overflow-y: auto;
+  background-color: #ffffff;
+}
+
+/* Navigation item styling */
+.nav-item {
+  margin-bottom: 4px;
+  border-radius: 8px;
+}
+
+/* Active navigation item styling */
+:deep(.v-list-item--active) {
+  background-color: rgba(25, 118, 210, 0.1) !important;
+  color: rgb(25, 118, 210) !important;
+}
+
+:deep(.v-list-item--active .v-icon) {
+  color: rgb(25, 118, 210) !important;
+}
+
+/* Hover effects */
+.nav-item:hover {
+  background-color: rgba(0, 0, 0, 0.04);
 }
 </style>
