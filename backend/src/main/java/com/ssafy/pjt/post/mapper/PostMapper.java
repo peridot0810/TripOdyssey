@@ -34,4 +34,7 @@ public interface PostMapper {
 	// like
 	void likePost(LikePostRequestDto likePostRequest);
 	void unlikePost(LikePostRequestDto likePostRequest);
+	
+	// update
+	void addViewCount(Integer postId);
 }

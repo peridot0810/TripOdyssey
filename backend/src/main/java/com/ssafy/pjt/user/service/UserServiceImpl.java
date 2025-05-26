@@ -183,7 +183,7 @@ public class UserServiceImpl implements UserService{
 			GroupProgressResponseDto progress = userRepository.getGroupProgress(group.getGroupId());
 			
 			// 나의 역할 조회 
-			String myRole = userRepository.getMyRoleInGroup(GetMyRoleInGroupRequestDto.builder()
+			List<String> myRole = userRepository.getMyRoleInGroup(GetMyRoleInGroupRequestDto.builder()
 					.userId(userId)
 					.groupId(group.getGroupId())
 					.build()

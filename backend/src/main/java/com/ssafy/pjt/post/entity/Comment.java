@@ -8,5 +8,6 @@ public class Comment {
 	private Integer postId;
 	private String content;
 	private String writer;
+	private String writerId;
 	private String createdAt;
 }

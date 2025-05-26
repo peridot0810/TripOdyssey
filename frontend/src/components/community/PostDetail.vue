@@ -191,7 +191,6 @@ function deleteComment(commentId) {
 
 function toggleLike() {
   isLiked.value = !isLiked.value
-  // In real app, this would call API
 }
 </script>
 

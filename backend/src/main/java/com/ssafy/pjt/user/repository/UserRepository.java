@@ -42,7 +42,7 @@ public interface UserRepository {
 	// 그룹 조회
 	public List<Group> getGroupList(String userId);
 	public GroupProgressResponseDto getGroupProgress(String groupId);
-	public String getMyRoleInGroup(GetMyRoleInGroupRequestDto myRoleRequest);
+	public List<String> getMyRoleInGroup(GetMyRoleInGroupRequestDto myRoleRequest);
 	public Integer getMemberCntInGroup(String groupId);
 	
 	// 프로필 이미지

@@ -120,8 +120,12 @@
     
     <select id="getMemberCntInGroup">
     	SELECT COUNT(*)
-    	FROM group_user_info
-    	WHERE group_id=#{groupId}
+    	FROM (
+			SELECT user_id, group_id FROM group_user_info
+            WHERE group_id = #{groupId}
+            GROUP BY user_id
+        ) as T
+        GROUP BY group_id;
     </select>
     
 	<update id="updateProfileImage">
