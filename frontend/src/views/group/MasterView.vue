@@ -3,35 +3,26 @@
     <h1 class="page-title">MASTER DASHBOARD</h1>
 
     <div class="dashboard-grid">
-      <!-- TOP LEFT - GROUP INFO -->
+      <!-- LEFT - GROUP INFO -->
       <div class="section group-info">
         <h2 class="section-title">GROUP INFO</h2>
         <div class="section-content">
-          <GroupInfoContainer />
+          <div class="left-column-container">
+            <div class="group-info-container">
+              <GroupInfoContainer />
+            </div>
+            <div class="trip-progress-container">
+              <TripProgress />
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- TOP RIGHT - MEMBER MANAGEMENT -->
+      <!-- RIGHT - MEMBER MANAGEMENT -->
       <div class="section member-management">
         <h2 class="section-title">MEMBER MANAGEMENT</h2>
         <div class="section-content">
-          <!-- Member list, invite button, role dropdowns will go here -->
-        </div>
-      </div>
-
-      <!-- BOTTOM LEFT - ROLE REQUESTS -->
-      <div class="section role-requests">
-        <h2 class="section-title">ROLE REQUESTS</h2>
-        <div class="section-content">
-          <!-- Finance, Schedule, Logistics request grids will go here -->
-        </div>
-      </div>
-
-      <!-- BOTTOM RIGHT - TRIP PROGRESS -->
-      <div class="section trip-progress">
-        <h2 class="section-title">TRIP PROGRESS</h2>
-        <div class="section-content">
-          <!-- Progress stages and advance button will go here -->
+          <GroupMemberList />
         </div>
       </div>
     </div>
@@ -40,6 +31,8 @@
 
 <script setup>
 import GroupInfoContainer from '@/components/master/GroupInfoContainer.vue'
+import GroupMemberList from '@/components/master/GroupMemberList.vue'
+import TripProgress from '@/components/master/TripProgress.vue'
 </script>
 
 <style scoped>
@@ -60,7 +53,7 @@ import GroupInfoContainer from '@/components/master/GroupInfoContainer.vue'
 .dashboard-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
+  grid-template-rows: 1fr;
   gap: 1.5rem;
   height: calc(100vh - 200px);
   min-height: 600px;
@@ -92,11 +85,28 @@ import GroupInfoContainer from '@/components/master/GroupInfoContainer.vue'
   overflow-y: auto;
 }
 
+/* Left column layout */
+.left-column-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 1.5rem;
+}
+
+.group-info-container {
+  flex: 0 0 auto; /* Take only needed space */
+}
+
+.trip-progress-container {
+  flex: 1; /* Take remaining space */
+  min-height: 0; /* Allow flex shrinking */
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   .dashboard-grid {
     grid-template-columns: 1fr;
-    grid-template-rows: repeat(4, auto);
+    grid-template-rows: repeat(2, auto);
     height: auto;
   }
 

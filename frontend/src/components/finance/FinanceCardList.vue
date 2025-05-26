@@ -1,106 +1,115 @@
 <template>
   <div class="finance-list">
-    <h2 class="text-h6 font-weight-bold mb-4 d-flex align-center">
-      <v-icon size="large" color="primary" class="mr-2">mdi-wallet-outline</v-icon>
-      여행 경비 내역
-    </h2>
-
-    <!-- Loading State -->
-    <div v-if="loading" class="loading-section text-center py-8">
-      <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
-      <p class="text-body-1 mt-3">경비 내역을 불러오는 중...</p>
+    <!-- Fixed Header -->
+    <div class="finance-header">
+      <h2 class="text-h6 font-weight-bold d-flex align-center">
+        <v-icon size="large" color="primary" class="mr-2">mdi-wallet-outline</v-icon>
+        여행 경비 내역
+      </h2>
     </div>
 
-    <!-- Error State -->
-    <div v-else-if="error" class="error-section">
-      <v-alert type="error" variant="tonal" class="mb-4">
-        <div class="d-flex align-center justify-space-between">
-          <div>
-            <strong>오류 발생</strong>
-            <div class="text-body-2 mt-1">{{ error }}</div>
+    <!-- Fixed Controls Section -->
+    <div class="finance-controls">
+      <!-- Loading State -->
+      <div v-if="loading" class="loading-section text-center py-8">
+        <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
+        <p class="text-body-1 mt-3">경비 내역을 불러오는 중...</p>
+      </div>
+
+      <!-- Error State -->
+      <div v-else-if="error" class="error-section mb-4">
+        <v-alert type="error" variant="tonal">
+          <div class="d-flex align-center justify-space-between">
+            <div>
+              <strong>오류 발생</strong>
+              <div class="text-body-2 mt-1">{{ error }}</div>
+            </div>
+            <v-btn color="error" variant="outlined" size="small" @click="fetchExpenses">
+              다시 시도
+            </v-btn>
           </div>
-          <v-btn color="error" variant="outlined" size="small" @click="fetchExpenses">
-            다시 시도
+        </v-alert>
+      </div>
+
+      <!-- Main Controls -->
+      <div v-else>
+        <!-- Summary Section -->
+        <div class="summary-section mb-4">
+          <v-card color="primary" variant="flat" class="pa-4 text-white">
+            <div class="d-flex justify-space-between align-center">
+              <div>
+                <div class="text-h5 font-weight-bold">{{ formatAmount(totalAmount) }}원</div>
+                <div class="text-body-2 opacity-90">총 {{ financeData.length }}건의 지출</div>
+              </div>
+              <v-icon size="large" class="opacity-70">mdi-cash-multiple</v-icon>
+            </div>
+          </v-card>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="filter-section mb-4">
+          <v-row no-gutters>
+            <v-col cols="12" sm="6" class="pr-sm-2">
+              <v-select
+                v-model="selectedCategory"
+                :items="categoryOptions"
+                label="카테고리 필터"
+                variant="outlined"
+                density="compact"
+                clearable
+                prepend-inner-icon="mdi-filter-variant"
+              ></v-select>
+            </v-col>
+            <v-col cols="12" sm="6" class="pl-sm-2">
+              <v-select
+                v-model="sortBy"
+                :items="sortOptions"
+                label="정렬 기준"
+                variant="outlined"
+                density="compact"
+                prepend-inner-icon="mdi-sort"
+              ></v-select>
+            </v-col>
+          </v-row>
+        </div>
+
+        <!-- Refresh Button -->
+        <div class="refresh-section mb-4">
+          <v-btn variant="outlined" size="small" @click="fetchExpenses" :loading="refreshing">
+            <v-icon start>mdi-refresh</v-icon>
+            새로고침
           </v-btn>
         </div>
-      </v-alert>
+      </div>
     </div>
 
-    <!-- Main Content -->
-    <div v-else>
-      <!-- Summary Section -->
-      <div class="summary-section mb-4">
-        <v-card color="primary" variant="flat" class="pa-4 text-white">
-          <div class="d-flex justify-space-between align-center">
-            <div>
-              <div class="text-h5 font-weight-bold">{{ formatAmount(totalAmount) }}원</div>
-              <div class="text-body-2 opacity-90">총 {{ financeData.length }}건의 지출</div>
-            </div>
-            <v-icon size="large" class="opacity-70">mdi-cash-multiple</v-icon>
+    <!-- Scrollable Cards Section -->
+    <div class="finance-cards-container">
+      <div v-if="!loading && !error">
+        <!-- Empty State -->
+        <div v-if="filteredFinanceData.length === 0" class="empty-state text-center py-8">
+          <v-icon size="x-large" color="grey">mdi-wallet-outline</v-icon>
+          <p class="text-body-1 text-grey-darken-1 mt-3">경비 내역이 없습니다</p>
+          <p class="text-body-2 text-grey mt-2">첫 번째 경비를 추가해보세요!</p>
+        </div>
+
+        <!-- Finance Cards - Only This Part Scrolls -->
+        <div v-else class="finance-cards">
+          <div
+            v-for="expense in filteredFinanceData"
+            :key="expense.expenseId"
+            class="finance-card-wrapper"
+          >
+            <FinanceCard
+              :expense="{
+                ...expense,
+                categoryName: financeStore.getCategoryName(expense.categoryId),
+              }"
+              :content-image="getContentImage(expense.contentId)"
+              :content-name="getContentName(expense.contentId)"
+              :content-address="getContentAddress(expense.contentId)"
+            />
           </div>
-        </v-card>
-      </div>
-
-      <!-- Filter Section -->
-      <div class="filter-section mb-4">
-        <v-row no-gutters>
-          <v-col cols="12" sm="6" class="pr-sm-2">
-            <v-select
-              v-model="selectedCategory"
-              :items="categoryOptions"
-              label="카테고리 필터"
-              variant="outlined"
-              density="compact"
-              clearable
-              prepend-inner-icon="mdi-filter-variant"
-            ></v-select>
-          </v-col>
-          <v-col cols="12" sm="6" class="pl-sm-2">
-            <v-select
-              v-model="sortBy"
-              :items="sortOptions"
-              label="정렬 기준"
-              variant="outlined"
-              density="compact"
-              prepend-inner-icon="mdi-sort"
-            ></v-select>
-          </v-col>
-        </v-row>
-      </div>
-
-      <!-- Refresh Button -->
-      <div class="refresh-section mb-3">
-        <v-btn
-          variant="outlined"
-          size="small"
-          @click="fetchExpenses"
-          :loading="refreshing"
-        >
-          <v-icon start>mdi-refresh</v-icon>
-          새로고침
-        </v-btn>
-      </div>
-
-      <!-- Empty State -->
-      <div v-if="filteredFinanceData.length === 0" class="empty-state text-center py-8">
-        <v-icon size="x-large" color="grey">mdi-wallet-outline</v-icon>
-        <p class="text-body-1 text-grey-darken-1 mt-3">경비 내역이 없습니다</p>
-        <p class="text-body-2 text-grey mt-2">첫 번째 경비를 추가해보세요!</p>
-      </div>
-
-      <!-- Finance Cards -->
-      <div v-else class="finance-cards">
-        <div
-          v-for="expense in filteredFinanceData"
-          :key="expense.expenseId"
-          class="finance-card-wrapper"
-        >
-          <FinanceCard
-            :expense="{ ...expense, categoryName: financeStore.getCategoryName(expense.categoryId) }"
-            :content-image="getContentImage(expense.contentId)"
-            :content-name="getContentName(expense.contentId)"
-            :content-address="getContentAddress(expense.contentId)"
-          />
         </div>
       </div>
     </div>
@@ -136,8 +145,6 @@ const groupId = computed(() => {
 // Get data from Pinia store
 const financeData = computed(() => financeStore.expenses)
 const totalAmount = computed(() => financeStore.totalAmount)
-// const storeError = computed(() => financeStore.error)
-// const storeLoading = computed(() => financeStore.isLoading)
 
 // Create a map for quick schedule lookup by contentId
 const scheduleMap = computed(() => {
@@ -152,7 +159,9 @@ const scheduleMap = computed(() => {
 
 // Category options for filter
 const categoryOptions = computed(() => {
-  const categories = [...new Set(financeData.value.map((item) => financeStore.getCategoryName(item.categoryId)))]
+  const categories = [
+    ...new Set(financeData.value.map((item) => financeStore.getCategoryName(item.categoryId))),
+  ]
   return categories.map((category) => ({
     title: category,
     value: category,
@@ -170,15 +179,38 @@ const sortOptions = [
 
 // Computed properties
 const filteredFinanceData = computed(() => {
-  let filtered = financeData.value
+  let filtered = [...financeData.value]
 
   // Apply category filter
   if (selectedCategory.value) {
-    filtered = filtered.filter((expense) => financeStore.getCategoryName(expense.categoryId) === selectedCategory.value)
+    filtered = filtered.filter(
+      (expense) => financeStore.getCategoryName(expense.categoryId) === selectedCategory.value,
+    )
   }
 
-  // Apply sorting using store method
-  filtered = financeStore.sortExpenses(sortBy.value.split('-')[0], sortBy.value.split('-')[1] || 'desc')
+  // Apply sorting
+  const [sortField, sortOrder] = sortBy.value.split('-')
+  filtered = filtered.sort((a, b) => {
+    let comparison = 0
+
+    switch (sortField) {
+      case 'datetime':
+        comparison = new Date(a.datetime) - new Date(b.datetime)
+        break
+      case 'amount':
+        comparison = a.amount - b.amount
+        break
+      case 'category':
+        comparison = financeStore
+          .getCategoryName(a.categoryId)
+          .localeCompare(financeStore.getCategoryName(b.categoryId))
+        break
+      default:
+        comparison = a.expenseId - b.expenseId
+    }
+
+    return sortOrder === 'asc' ? comparison : -comparison
+  })
 
   return filtered
 })
@@ -203,14 +235,14 @@ const fetchExpenses = async (isRefresh = false) => {
 
     if (response.data.success) {
       // Convert API data to store format
-      const storeExpenses = response.data.data.map(expense => ({
+      const storeExpenses = response.data.data.map((expense) => ({
         expenseId: expense.expenseId,
         datetime: expense.datetime,
         description: expense.description,
         amount: expense.amount,
         categoryId: financeStore.getCategoryId(expense.categoryName) || 6, // Default to 'Others' if not found
         contentName: expense.contentName,
-        contentId: expense.contentId
+        contentId: expense.contentId,
       }))
 
       // Set expenses in store
@@ -220,7 +252,6 @@ const fetchExpenses = async (isRefresh = false) => {
     } else {
       throw new Error(response.data.message || '경비 내역을 불러오는데 실패했습니다.')
     }
-
   } catch (err) {
     console.error('Error fetching expenses:', err)
 
@@ -271,7 +302,7 @@ const formatAmount = (amount) => {
 
 // Expose methods to parent component
 defineExpose({
-  refreshExpenses: () => fetchExpenses(true)
+  refreshExpenses: () => fetchExpenses(true),
 })
 
 // Lifecycle
@@ -282,7 +313,57 @@ onMounted(() => {
 
 <style scoped>
 .finance-list {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.finance-header {
+  flex-shrink: 0;
+  padding: 16px 16px 12px 16px;
+  background-color: white;
+  border-bottom: 1px solid #e0e0e0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  z-index: 10;
+}
+
+.finance-controls {
+  flex-shrink: 0;
   padding: 16px;
+  background-color: white;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.finance-cards-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  background-color: #fafafa;
+}
+
+/* Custom scrollbar styling for cards container */
+.finance-cards-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.finance-cards-container::-webkit-scrollbar-track {
+  background-color: #f1f1f1;
+  border-radius: 4px;
+}
+
+.finance-cards-container::-webkit-scrollbar-thumb {
+  background-color: #c1c1c1;
+  border-radius: 4px;
+}
+
+.finance-cards-container::-webkit-scrollbar-thumb:hover {
+  background-color: #a8a8a8;
+}
+
+/* Firefox scrollbar styling */
+.finance-cards-container {
+  scrollbar-width: thin;
+  scrollbar-color: #c1c1c1 #f1f1f1;
 }
 
 .loading-section {
@@ -305,13 +386,14 @@ onMounted(() => {
 
 .refresh-section {
   text-align: right;
-  margin-bottom: 16px;
+  margin-bottom: 0;
 }
 
 .empty-state {
   border-radius: 8px;
-  background-color: #f5f5f5;
-  margin-top: 20px;
+  background-color: white;
+  margin: 20px 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .finance-cards {
@@ -320,6 +402,10 @@ onMounted(() => {
 
 .finance-card-wrapper {
   margin-bottom: 12px;
+}
+
+.finance-card-wrapper:last-child {
+  margin-bottom: 16px;
 }
 
 /* Animation for finance cards */
@@ -340,12 +426,28 @@ onMounted(() => {
 
 /* Responsive adjustments */
 @media (max-width: 600px) {
+  .finance-header {
+    padding: 12px 12px 8px 12px;
+  }
+
+  .finance-controls {
+    padding: 12px;
+  }
+
+  .finance-cards-container {
+    padding: 12px;
+  }
+
   .filter-section .v-col {
     margin-bottom: 8px;
   }
 
   .refresh-section {
     text-align: center;
+  }
+
+  .finance-cards-container::-webkit-scrollbar {
+    width: 6px;
   }
 }
 </style>
