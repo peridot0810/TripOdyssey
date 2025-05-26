@@ -55,8 +55,17 @@
           <p class="text-caption text-grey">선택한 후에도 설정에서 역할을 변경할 수 있습니다.</p>
         </v-card-text>
         <v-card-actions class="justify-center">
-          <v-btn variant="text" @click="confirmDialog = false"> 취소 </v-btn>
-          <v-btn color="primary" variant="elevated" @click="finalConfirm" class="px-6">
+          <v-btn variant="text" @click="confirmDialog = false" :disabled="isSubmitting">
+            취소
+          </v-btn>
+          <v-btn
+            color="primary"
+            variant="elevated"
+            @click="finalConfirm"
+            class="px-6"
+            :loading="isSubmitting"
+            :disabled="isSubmitting"
+          >
             확정
           </v-btn>
         </v-card-actions>
@@ -67,19 +76,22 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import RoleCard from '@/components/role/RoleCard.vue'
 import RoleDetails from '@/components/role/RoleDetails.vue'
 import { roleBackgrounds, rolesData } from '@/data/roles.js'
+import { apiClient } from '@/utils/apiClient.js'
 
 const router = useRouter()
+const route = useRoute()
 
 // State
 const roles = ref(rolesData)
-const selectedRoleId = ref('normal') // Default to normal
+const selectedRoleId = ref(5) // Default to normal (id: 5)
 const showDetails = ref(false)
 const confirmDialog = ref(false)
 const currentBackground = ref(roleBackgrounds.normal)
+const isSubmitting = ref(false)
 
 // Computed
 const selectedRole = computed(() => {
@@ -101,29 +113,53 @@ function confirmRole() {
   confirmDialog.value = true
 }
 
-function finalConfirm() {
-  confirmDialog.value = false
+async function finalConfirm() {
+  if (isSubmitting.value) return
 
-  // Here you would typically save the role selection to your backend
-  console.log('Selected role:', selectedRole.value)
+  isSubmitting.value = true
+  const groupId = route.params.groupId
 
-  // Show success message and navigate back
-  // You can add a toast notification here
-  router.push({ name: 'group-main', params: { groupId: router.currentRoute.value.params.groupId } })
+  try {
+    const response = await apiClient.post(`/group/${groupId}/member/role-request`, {
+      roleId: selectedRoleId.value,
+    })
+
+    console.log('Role selection successful:', response.data)
+
+    confirmDialog.value = false
+
+    // Show success message and navigate back
+    // You can add a toast notification here
+    router.push({ name: 'group-main', params: { groupId } })
+  } catch (error) {
+    console.error('Role selection failed:', error)
+
+    // Handle error - you can show an error toast here
+    if (error.response?.status === 401) {
+      console.error('Unauthorized - please login again')
+    } else {
+      console.error('Failed to select role. Please try again.')
+    }
+  } finally {
+    isSubmitting.value = false
+  }
 }
 
 // Watch for role changes to update background
 watch(
   selectedRoleId,
   (newRoleId) => {
-    currentBackground.value = roleBackgrounds[newRoleId]
+    const selectedRoleData = roles.value.find((role) => role.id === newRoleId)
+    if (selectedRoleData) {
+      currentBackground.value = roleBackgrounds[selectedRoleData.key]
+    }
   },
   { immediate: true },
 )
 
 // Initialize
 onMounted(() => {
-  // Set initial background
+  // Set initial background for default selection (normal)
   currentBackground.value = roleBackgrounds.normal
 
   // Show details for default selection after a short delay

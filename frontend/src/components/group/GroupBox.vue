@@ -9,11 +9,6 @@
     <div class="group-member-section">
       <GroupMemberList :members="groupMembers" :groupInfo="groupInformation.groupInfo" />
     </div>
-
-    <!-- 3. Group Chat -->
-    <div class="group-chat-section">
-      <GroupChat />
-    </div>
   </div>
 </template>
 

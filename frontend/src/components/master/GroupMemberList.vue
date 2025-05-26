@@ -14,6 +14,24 @@
       </div>
     </div>
 
+    <!-- View toggle controls - moved to top -->
+    <div class="view-controls">
+      <button
+        class="view-toggle-btn"
+        :class="{ active: currentView === 'members' && !showRoleGrouping }"
+        @click="setView('members', false)"
+      >
+        📋 전체 목록
+      </button>
+      <button
+        class="view-toggle-btn"
+        :class="{ active: currentView === 'requests' }"
+        @click="setView('requests')"
+      >
+        📝 역할 신청
+      </button>
+    </div>
+
     <!-- Loading state -->
     <div v-if="isLoading" class="loading-container">
       <div class="loading-spinner">🔄</div>
@@ -72,23 +90,12 @@
       </div>
     </div>
 
-    <!-- View toggle controls -->
-    <div class="view-controls">
-      <button
-        class="view-toggle-btn"
-        :class="{ active: currentView === 'members' && !showRoleGrouping }"
-        @click="setView('members', false)"
-      >
-        📋 전체 목록
-      </button>
-      <button
-        class="view-toggle-btn"
-        :class="{ active: currentView === 'requests' }"
-        @click="setView('requests')"
-      >
-        📝 역할 신청
-      </button>
-    </div>
+    <!-- Invitation Modal -->
+    <InvitationModal
+      v-if="showInviteModal"
+      @close="closeInviteModal"
+      @invitation-sent="handleInvitationSent"
+    />
   </div>
 </template>
 
@@ -99,6 +106,7 @@ import { useMemberListStore } from '@/stores/memberList'
 import { apiClient } from '@/utils/apiClient'
 import MemberCard from './MemberCard.vue'
 import RoleRequestList from './RoleRequestList.vue'
+import InvitationModal from './InvitationModal.vue'
 
 // Stores and router
 const memberListStore = useMemberListStore()
@@ -109,6 +117,7 @@ const isLoading = ref(false)
 const error = ref(null)
 const showRoleGrouping = ref(true) // Default to role grouping
 const currentView = ref('members') // 'members' or 'requests'
+const showInviteModal = ref(false)
 
 // Computed
 const groupId = computed(() => route.params.groupId)
@@ -146,9 +155,16 @@ const fetchMembers = async () => {
 }
 
 const openInviteModal = () => {
-  // TODO: Implement invite modal
-  console.log('Opening invite modal...')
-  alert('멤버 초대 기능은 아직 구현되지 않았습니다')
+  showInviteModal.value = true
+}
+
+const closeInviteModal = () => {
+  showInviteModal.value = false
+}
+
+const handleInvitationSent = () => {
+  // Refresh member list after successful invitation
+  fetchMembers()
 }
 
 const setView = (view, roleGrouping = true) => {
@@ -169,6 +185,8 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   height: 100%;
+  min-height: 0; /* Allow shrinking */
+  flex: 1; /* Take available space in parent */
 }
 
 /* Header */
@@ -299,19 +317,25 @@ onMounted(() => {
 .content-area {
   flex: 1;
   overflow: hidden;
-  margin-bottom: 1rem;
+  min-height: 0; /* Critical for proper flex behavior */
+  display: flex;
+  flex-direction: column;
 }
 
 .member-content,
 .request-content {
   height: 100%;
+  max-height: 100%; /* Prevent overflow */
   overflow-y: auto;
+  min-height: 0; /* Important for flex children */
 }
 
 /* Member list container */
 .member-list-container {
   height: 100%;
+  max-height: 100%; /* Constrain to parent */
   overflow-y: auto;
+  min-height: 0; /* Allow shrinking */
 }
 
 /* Role grouping */
@@ -373,7 +397,7 @@ onMounted(() => {
   padding: 0.5rem;
   background: #f8f9fa;
   border-radius: 6px;
-  margin-top: auto;
+  margin-bottom: 1rem;
 }
 
 .view-toggle-btn {

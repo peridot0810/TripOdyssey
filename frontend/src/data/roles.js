@@ -1,4 +1,4 @@
-// Role background images
+// Role background images - using key for background mapping
 export const roleBackgrounds = {
   normal:
     'https://fastly.picsum.photos/id/201/5000/3333.jpg?hmac=NE8fOMa8u9PBfkq4AVwEoJdRqoPTNwUsyKvKWuXyNCk',
@@ -13,7 +13,8 @@ export const roleBackgrounds = {
 // Role definitions
 export const rolesData = [
   {
-    id: 'scheduler',
+    id: 2,
+    key: 'scheduler',
     name: '일정 담당',
     subtitle: 'Schedule Manager',
     icon: 'mdi-calendar-clock',
@@ -29,7 +30,8 @@ export const rolesData = [
     difficultyDescription: '다양한 정보를 종합하여 최적의 일정을 짜는 능력이 필요합니다.',
   },
   {
-    id: 'finance',
+    id: 3,
+    key: 'finance',
     name: '재무 담당',
     subtitle: 'Finance Manager',
     icon: 'mdi-currency-usd',
@@ -45,7 +47,8 @@ export const rolesData = [
     difficultyDescription: '기본적인 계산 능력과 꼼꼼함만 있으면 충분합니다.',
   },
   {
-    id: 'logistics',
+    id: 4,
+    key: 'logistics',
     name: '교통/숙소 담당',
     subtitle: 'Logistics Coordinator',
     icon: 'mdi-car-multiple',
@@ -61,7 +64,8 @@ export const rolesData = [
     difficultyDescription: '다양한 교통수단과 숙소 정보를 비교 분석하는 능력이 필요합니다.',
   },
   {
-    id: 'normal',
+    id: 5,
+    key: 'normal',
     name: '일반 멤버',
     subtitle: 'General Member',
     icon: 'mdi-account-group',
