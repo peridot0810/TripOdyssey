@@ -9,22 +9,10 @@
     </div>
 
     <!-- Error State -->
-    <v-alert
-      v-else-if="error"
-      type="error"
-      class="mb-6"
-      closable
-      @click:close="clearError"
-    >
+    <v-alert v-else-if="error" type="error" class="mb-6" closable @click:close="clearError">
       {{ error }}
       <template #append>
-        <v-btn
-          variant="text"
-          size="small"
-          @click="loadGroups"
-        >
-          다시 시도
-        </v-btn>
+        <v-btn variant="text" size="small" @click="loadGroups"> 다시 시도 </v-btn>
       </template>
     </v-alert>
 
@@ -37,57 +25,18 @@
         <p class="text-body-1 text-grey mb-6">새로운 그룹을 만들어 여행을 계획해보세요!</p>
       </div>
 
-      <!-- Group Cards Carousel -->
-      <div v-else class="group-carousel-container">
-        <div class="carousel-wrapper">
-          <!-- Left Arrow -->
-          <v-btn
-            icon
-            variant="text"
-            class="carousel-arrow left-arrow"
-            @click="scrollLeft"
-            :disabled="currentIndex === 0"
-          >
-            <v-icon>mdi-chevron-left</v-icon>
-          </v-btn>
-
-          <!-- Group Cards Container -->
-          <div class="group-cards-container" ref="carouselContainer">
-            <div
-              class="group-cards-track"
-              :style="{ transform: `translateX(-${currentIndex * cardWidth}px)` }"
-            >
-              <div v-for="group in groupStore.groups" :key="group.groupId" class="group-card-slot">
-                <GroupInfoCard :group="group" />
-              </div>
-            </div>
-          </div>
-
-          <!-- Right Arrow -->
-          <v-btn
-            icon
-            variant="text"
-            class="carousel-arrow right-arrow"
-            @click="scrollRight"
-            :disabled="currentIndex >= maxIndex"
-          >
-            <v-icon>mdi-chevron-right</v-icon>
-          </v-btn>
+      <!-- Group Cards Grid Layout -->
+      <div v-else class="group-cards-grid">
+        <div v-for="group in groupStore.groups" :key="group.groupId" class="group-card-slot">
+          <GroupInfoCard :group="group" />
         </div>
       </div>
     </div>
 
     <!-- Create Group Button -->
     <div class="create-group-section">
-      <v-btn
-        size="large"
-        color="primary"
-        variant="elevated"
-        class="create-group-btn"
-        @click="openCreateGroupDialog"
-      >
-        <v-icon left>mdi-plus</v-icon>
-        Create New Group
+      <v-btn class="create-group-btn" @click="openCreateGroupDialog" rounded elevation="0">
+        CREATE NEW GROUP
       </v-btn>
     </div>
 
@@ -97,28 +46,18 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useGroupListStore } from '@/stores/groupList'
 import { apiClient } from '@/utils/apiClient'
 import GroupInfoCard from '@/components/group/GroupInfoCard.vue'
 import CreateGroupDialog from '@/components/group/CreateGroupDialog.vue'
 
 const groupStore = useGroupListStore()
-
-const currentIndex = ref(0)
-const cardWidth = ref(380) // Width of each card + gap
-const carouselContainer = ref(null)
 const showCreateDialog = ref(false)
 
 // Local loading and error states for this component
 const isLoading = ref(false)
 const error = ref(null)
-
-// Calculate maximum index for navigation
-const maxIndex = computed(() => {
-  const visibleCards = Math.floor(window.innerWidth / cardWidth.value) || 3
-  return Math.max(0, groupStore.groupCount - visibleCards)
-})
 
 // Load groups from API
 const loadGroups = async () => {
@@ -129,7 +68,7 @@ const loadGroups = async () => {
     const response = await apiClient.get('/user/groups')
 
     // Transform API response to match expected format
-    const transformedGroups = response.data.map(group => ({
+    const transformedGroups = response.data.map((group) => ({
       groupId: group.groupId,
       name: group.name,
       description: '', // API doesn't provide description, set empty
@@ -142,12 +81,11 @@ const loadGroups = async () => {
       roleLimits: {
         finance: 1, // Default values since API doesn't provide these
         schedule: 1,
-        logistics: 1
-      }
+        logistics: 1,
+      },
     }))
 
     groupStore.setGroups(transformedGroups)
-
   } catch (err) {
     console.error('Failed to load groups:', err)
 
@@ -169,43 +107,20 @@ const clearError = () => {
   error.value = null
 }
 
-const scrollLeft = () => {
-  if (currentIndex.value > 0) {
-    currentIndex.value--
-  }
-}
-
-const scrollRight = () => {
-  if (currentIndex.value < maxIndex.value) {
-    currentIndex.value++
-  }
-}
-
 const openCreateGroupDialog = () => {
   showCreateDialog.value = true
 }
 
 const handleGroupCreated = (newGroup) => {
-  groupStore.addGroup(newGroup)
+  // The group is already added to the store by CreateGroupDialog
+  // Just close the dialog here
+  console.log('Group created successfully:', newGroup)
   showCreateDialog.value = false
 }
 
-// Handle window resize
-const handleResize = () => {
-  // Reset current index if needed when window resizes
-  if (currentIndex.value > maxIndex.value) {
-    currentIndex.value = maxIndex.value
-  }
-}
-
 onMounted(async () => {
-  window.addEventListener('resize', handleResize)
   // Load groups when component mounts
   await loadGroups()
-})
-
-onUnmounted(() => {
-  window.removeEventListener('resize', handleResize)
 })
 </script>
 
@@ -217,7 +132,6 @@ onUnmounted(() => {
   min-height: calc(100vh - 64px); /* Full height minus app bar */
   display: flex;
   flex-direction: column;
-  justify-content: center;
 }
 
 .page-title {
@@ -245,67 +159,51 @@ onUnmounted(() => {
   text-align: center;
 }
 
-.group-carousel-container {
-  margin-bottom: 48px;
-  flex: 0 0 auto;
-}
-
-.carousel-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.carousel-arrow {
-  flex-shrink: 0;
-  width: 48px;
-  height: 48px;
-  background-color: white;
-  border: 1px solid #e0e0e0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.carousel-arrow:hover {
-  background-color: #f5f5f5;
-}
-
-.carousel-arrow:disabled {
-  opacity: 0.3;
-}
-
-.group-cards-container {
-  flex: 1;
-  overflow: hidden;
-  position: relative;
-}
-
-.group-cards-track {
-  display: flex;
-  gap: 20px;
-  transition: transform 0.3s ease;
-  will-change: transform;
+.group-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 1300px;
 }
 
 .group-card-slot {
-  flex-shrink: 0;
-  width: 360px;
+  width: 100%;
+  min-width: 300px;
+  max-width: 415px;
+  margin: 0 auto;
 }
 
 .create-group-section {
   display: flex;
   justify-content: center;
-  margin-top: 32px;
-  flex: 0 0 auto;
+  margin-top: 40px;
 }
 
 .create-group-btn {
-  padding: 16px 32px;
-  font-size: 1.1rem;
-  font-weight: 500;
+  background-color: #2d2d2d !important;
+  color: #ebebeb !important;
+  border-radius: 40px !important;
+  width: 252px !important;
+  height: 68px !important;
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 700 !important;
+  font-size: 20px !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
 }
 
-/* Responsive adjustments */
+/* 반응형 디자인 */
+@media (max-width: 1200px) {
+  .group-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 768px) {
   .home-container {
     padding: 16px;
@@ -316,21 +214,9 @@ onUnmounted(() => {
     margin-bottom: 24px;
   }
 
-  .carousel-wrapper {
-    gap: 8px;
-  }
-
-  .carousel-arrow {
-    width: 40px;
-    height: 40px;
-  }
-
-  .group-card-slot {
-    width: 340px;
-  }
-
-  .group-cards-track {
-    gap: 16px;
+  .group-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
   }
 
   .empty-state {

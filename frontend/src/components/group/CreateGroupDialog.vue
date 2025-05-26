@@ -98,14 +98,8 @@
           </div>
 
           <!-- Error Message -->
-          <v-alert
-            v-if="groupStore.error"
-            type="error"
-            class="mt-4"
-            closable
-            @click:close="groupStore.clearError()"
-          >
-            {{ groupStore.error }}
+          <v-alert v-if="error" type="error" class="mt-4" closable @click:close="clearError">
+            {{ error }}
           </v-alert>
         </v-form>
       </v-card-text>
@@ -119,8 +113,8 @@
           color="primary"
           variant="elevated"
           @click="createGroup"
-          :disabled="!formValid || groupStore.isLoading"
-          :loading="groupStore.isLoading"
+          :disabled="!formValid || isLoading"
+          :loading="isLoading"
         >
           그룹 만들기
         </v-btn>
@@ -132,6 +126,7 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { useGroupListStore } from '@/stores/groupList'
+import { apiClient } from '@/utils/apiClient'
 
 const emit = defineEmits(['update:modelValue', 'group-created'])
 const groupStore = useGroupListStore()
@@ -150,6 +145,10 @@ const dialog = computed({
 
 const form = ref(null)
 const formValid = ref(false)
+
+// Local loading and error states for this component
+const isLoading = ref(false)
+const error = ref(null)
 
 const formData = ref({
   name: '',
@@ -171,7 +170,11 @@ const nameRules = [
 ]
 
 const endDateRules = [
-  (v) => !v || !formData.value.startDate || new Date(v) >= new Date(formData.value.startDate) || '종료일은 시작일보다 늦어야 합니다',
+  (v) =>
+    !v ||
+    !formData.value.startDate ||
+    new Date(v) >= new Date(formData.value.startDate) ||
+    '종료일은 시작일보다 늦어야 합니다',
 ]
 
 const roleRules = [
@@ -194,7 +197,11 @@ const resetForm = () => {
   if (form.value) {
     form.value.resetValidation()
   }
-  groupStore.clearError()
+  clearError()
+}
+
+const clearError = () => {
+  error.value = null
 }
 
 const closeDialog = () => {
@@ -206,23 +213,56 @@ const createGroup = async () => {
   const { valid } = await form.value.validate()
   if (!valid) return
 
-  const result = await groupStore.createGroup(formData.value)
+  isLoading.value = true
+  error.value = null
 
-  if (result.success) {
-    // Create complete group object with form data + API response
-    const completeGroup = {
-      groupId: result.data.groupId,
+  try {
+    // Make API call to create group
+    const response = await apiClient.post('/group', {
+      name: formData.value.name,
+      description: formData.value.description,
+      startDate: formData.value.startDate || null,
+      endDate: formData.value.endDate || null,
+      roleLimits: formData.value.roleLimits,
+    })
+
+    // Create complete group object for the store
+    const newGroup = {
+      groupId: response.data.groupId || response.data.id,
       name: formData.value.name,
       description: formData.value.description || '',
-      status: result.data.status,
-      createdAt: result.data.createdAt,
+      status: response.data.status || 'planning',
       startDate: formData.value.startDate || '',
       endDate: formData.value.endDate || '',
-      roleLimits: { ...formData.value.roleLimits }
+      memberCount: 1, // Creator is first member
+      myRole: 'creator', // or whatever the API returns
+      progress: 0,
+      roleLimits: { ...formData.value.roleLimits },
+      createdAt: response.data.createdAt || new Date().toISOString(),
     }
 
-    emit('group-created', completeGroup)
+    // Add to store
+    groupStore.addGroup(newGroup)
+
+    // Emit to parent
+    emit('group-created', newGroup)
+
+    // Close dialog
     closeDialog()
+  } catch (err) {
+    console.error('Failed to create group:', err)
+
+    if (err.response?.status === 401) {
+      error.value = '로그인이 필요합니다.'
+    } else if (err.response?.status === 400) {
+      error.value = err.response.data?.message || '입력 정보를 확인해주세요.'
+    } else if (err.response?.status >= 500) {
+      error.value = '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.'
+    } else {
+      error.value = '그룹 생성 중 오류가 발생했습니다.'
+    }
+  } finally {
+    isLoading.value = false
   }
 }
 

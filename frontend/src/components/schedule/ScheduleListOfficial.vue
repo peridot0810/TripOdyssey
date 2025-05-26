@@ -17,7 +17,10 @@
     </v-alert>
 
     <!-- Loading State -->
-    <div v-if="scheduleStore.isLoading || groupStore.isLoading" class="loading-state text-center py-8">
+    <div
+      v-if="scheduleStore.isLoading || groupStore.isLoading"
+      class="loading-state text-center py-8"
+    >
       <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
       <p class="text-body-1 mt-3">일정을 불러오는 중...</p>
     </div>
@@ -67,24 +70,41 @@
         <div
           v-for="(schedule, index) in filteredSchedules"
           :key="schedule.contentId"
-          :draggable="true"
-          @dragstart="onDragStart($event, index)"
-          @dragover="onDragOver($event)"
-          @drop="onDrop($event, index)"
-          @dragend="onDragEnd"
-          class="draggable-schedule-card"
-          :class="{ dragging: draggedIndex === index, 'drag-over': dragOverIndex === index }"
+          class="schedule-card-container"
         >
-          <ScheduleCard :schedule="schedule" class="schedule-card-with-order">
-            <template #order>
-              <div class="order-badge">
-                <v-chip size="small" color="secondary" variant="elevated">
-                  {{ index + 1 }}
-                  <v-icon end size="small">mdi-drag-vertical</v-icon>
-                </v-chip>
-              </div>
-            </template>
-          </ScheduleCard>
+          <div
+            :draggable="true"
+            @dragstart="onDragStart($event, index)"
+            @dragover="onDragOver($event)"
+            @drop="onDrop($event, index)"
+            @dragend="onDragEnd"
+            class="draggable-schedule-card"
+            :class="{ dragging: draggedIndex === index, 'drag-over': dragOverIndex === index }"
+          >
+            <ScheduleCard :schedule="schedule" class="schedule-card-with-order">
+              <template #order>
+                <div class="order-badge">
+                  <v-chip size="small" color="secondary" variant="elevated">
+                    {{ index + 1 }}
+                    <v-icon end size="small">mdi-drag-vertical</v-icon>
+                  </v-chip>
+                </div>
+              </template>
+            </ScheduleCard>
+          </div>
+
+          <!-- Move Back to Edit Button -->
+          <v-btn
+            icon
+            size="small"
+            color="primary"
+            variant="elevated"
+            class="move-back-button"
+            @click="handleMoveBackToEdit(schedule)"
+            :title="'일정 후보로 이동'"
+          >
+            <v-icon>mdi-arrow-left</v-icon>
+          </v-btn>
         </div>
       </div>
 
@@ -166,10 +186,10 @@ const draggedIndex = ref(null)
 const dragOverIndex = ref(null)
 const isSaving = ref(false)
 
-// Use selectedDay from store instead of local state
+// Use selectedDay from store
 const selectedDay = computed({
   get: () => scheduleStore.selectedDay,
-  set: (value) => scheduleStore.setSelectedDay(value)
+  set: (value) => scheduleStore.setSelectedDay(value),
 })
 
 // Get only official schedules
@@ -180,17 +200,14 @@ const officialSchedules = computed(() => {
 // Calculate available days based on group start and end dates
 const availableDays = computed(() => {
   if (!groupStore.myGroup.startDate || !groupStore.myGroup.endDate) {
-    return [1] // Default to at least 1 day if dates are not available
+    return [1]
   }
 
   const startDate = new Date(groupStore.myGroup.startDate)
   const endDate = new Date(groupStore.myGroup.endDate)
-
-  // Calculate the difference in days
   const timeDiff = endDate.getTime() - startDate.getTime()
-  const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1 // +1 to include both start and end days
+  const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1
 
-  // Create array of days [1, 2, 3, ..., daysDiff]
   return Array.from({ length: Math.max(1, daysDiff) }, (_, i) => i + 1)
 })
 
@@ -200,6 +217,10 @@ const filteredSchedules = computed(() => {
     .filter((schedule) => schedule.day === selectedDay.value)
     .sort((a, b) => (a.order || 0) - (b.order || 0))
 })
+
+const handleMoveBackToEdit = (schedule) => {
+  scheduleStore.moveScheduleBackToEdit(schedule.contentId)
+}
 
 // Drag and drop handlers
 const onDragStart = (event, index) => {
@@ -239,20 +260,18 @@ const onDrop = (event, dropIndex) => {
 
   if (draggedOriginalIndex !== -1) {
     scheduleStore.schedules[draggedOriginalIndex].order = draggedSchedule.order
-    // Track the modification
     scheduleStore.trackOrderModification(
       draggedSchedule.contentId,
       draggedSchedule.day,
-      draggedSchedule.order
+      draggedSchedule.order,
     )
   }
   if (droppedOriginalIndex !== -1) {
     scheduleStore.schedules[droppedOriginalIndex].order = droppedOnSchedule.order
-    // Track the modification
     scheduleStore.trackOrderModification(
       droppedOnSchedule.contentId,
       droppedOnSchedule.day,
-      droppedOnSchedule.order
+      droppedOnSchedule.order,
     )
   }
 
@@ -277,46 +296,32 @@ const totalChanges = computed(() => {
   )
 })
 
-
-
 const saveChangesToServer = async () => {
-  if (!hasChangesToSave.value) {
-    return
-  }
+  if (!hasChangesToSave.value) return
 
   isSaving.value = true
 
   try {
-    // Start with empty request body
     const requestBody = {}
 
-    // Only include fields that have data (length > 0)
     if (scheduleStore.newOfficialSchedules.length > 0) {
       requestBody.newOfficialSchedules = scheduleStore.newOfficialSchedules
     }
-
     if (scheduleStore.modifiedOfficialSchedules.length > 0) {
       requestBody.modifiedOfficialSchedules = scheduleStore.modifiedOfficialSchedules
     }
-
     if (scheduleStore.removedOfficialSchedules.length > 0) {
       requestBody.removedOfficialSchedules = scheduleStore.removedOfficialSchedules
     }
 
-    console.log('Saving changes to server:', requestBody)
-
     const response = await apiClient.post(`/schedule/${groupId}/update`, requestBody)
 
     if (response.data.success) {
-      console.log('Changes saved successfully!')
       scheduleStore.clearTracking()
-      console.log('✅ All changes have been saved to the server')
     } else {
       throw new Error(response.data.message || 'Failed to save changes')
     }
-
   } catch (error) {
-    console.error('Failed to save changes:', error)
     scheduleStore.error = error.response?.data?.message || error.message || 'Failed to save changes'
   } finally {
     isSaving.value = false
@@ -334,23 +339,12 @@ const clearErrors = () => {
   groupStore.clearError()
 }
 
-// Fetch data when component mounts
 onMounted(async () => {
-  console.log('ScheduleListOfficial mounted, groupId:', groupId)
   if (groupId) {
-    // Only fetch group info if we don't already have it for this group
     if (!groupStore.hasGroup || groupStore.myGroup.groupId !== parseInt(groupId)) {
-      console.log('Fetching group info for group:', groupId)
       await groupStore.getGroupInfo(groupId)
-    } else {
-      console.log('Group info already available, skipping fetch')
     }
-
-    // Then fetch schedules
-    console.log('Calling fetchSchedules for group:', groupId)
     scheduleStore.fetchSchedules(groupId)
-  } else {
-    console.log('No groupId found in route params')
   }
 })
 </script>
@@ -406,9 +400,17 @@ onMounted(async () => {
   font-weight: bold;
 }
 
+/* NEW: Schedule card container with button layout */
+.schedule-card-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
 .schedule-card-with-order {
   position: relative;
-  margin-bottom: 16px;
+  flex: 1;
 }
 
 .order-badge {
@@ -420,9 +422,9 @@ onMounted(async () => {
 
 .draggable-schedule-card {
   position: relative;
-  margin-bottom: 16px;
   cursor: grab;
   transition: all 0.3s ease;
+  flex: 1;
 }
 
 .draggable-schedule-card:active {
@@ -441,6 +443,23 @@ onMounted(async () => {
   box-shadow: 0 6px 12px rgba(25, 118, 210, 0.3);
   border: 2px dashed #1976d2;
   border-radius: 8px;
+}
+
+/* NEW: Move back to edit button styling */
+.move-back-button {
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 50% !important;
+  min-width: auto !important;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+  flex-shrink: 0;
+}
+
+.move-back-button:hover {
+  transform: translateY(-1px) scale(1.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
 }
 
 .drag-info-hint {
@@ -478,6 +497,15 @@ onMounted(async () => {
 
   .day-header {
     gap: 8px;
+  }
+
+  .schedule-card-container {
+    gap: 8px;
+  }
+
+  .move-back-button {
+    width: 40px !important;
+    height: 40px !important;
   }
 }
 
