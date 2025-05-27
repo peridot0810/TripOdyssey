@@ -11,9 +11,16 @@
               <p class="text-body-1 text-grey">여행 정보를 공유하고 동행을 구해보세요</p>
             </div>
             <v-btn color="primary" @click="showCreateDialog = true">
-              <v-icon class="mr-2">mdi-plus</v-icon>
+              <svg-icon
+                type="mdi"
+                :path="plusPath"
+                size="20"
+                class="mr-2"
+                style="vertical-align: middle;"
+              />
               글쓰기
             </v-btn>
+
           </div>
 
           <!-- Filter & Search Section -->
@@ -33,7 +40,13 @@
 
           <!-- Posts List -->
           <div v-if="filteredPosts.length === 0" class="text-center py-8">
-            <v-icon size="64" color="grey-lighten-1">mdi-forum-outline</v-icon>
+            <svg-icon
+              type="mdi"
+              :path="forumOutlinePath"
+              size="64"
+              color="#BDBDBD" 
+            />
+
             <p class="text-h6 text-grey mt-3">게시글이 없습니다</p>
             <p class="text-body-2 text-grey">첫 번째 게시글을 작성해보세요!</p>
           </div>
@@ -82,11 +95,24 @@
 
             <!-- Post Meta -->
             <div class="d-flex align-center mb-4 text-caption text-grey">
-              <v-icon size="small" class="mr-1">mdi-account</v-icon>
+              <svg-icon
+                type="mdi"
+                :path="accountPath"
+                size="16"
+                class="mr-1"
+                style="vertical-align: middle;"
+              />
               <span class="mr-4">{{ selectedPost.author }}</span>
 
-              <v-icon size="small" class="mr-1">mdi-eye</v-icon>
+              <svg-icon
+                type="mdi"
+                :path="eyePath"
+                size="16"
+                class="mr-1"
+                style="vertical-align: middle;"
+              />
               <span class="mr-4">{{ selectedPost.views }}</span>
+
 
               <v-btn
                 variant="text"
@@ -94,9 +120,17 @@
                 :color="isLiked ? 'red' : 'grey'"
                 @click="toggleLike"
               >
-                <v-icon size="small" class="mr-1">mdi-heart</v-icon>
+                <svg-icon
+                  type="mdi"
+                  :path="heartPath"
+                  :size="18"
+                  class="mr-1"
+                  :style="{ verticalAlign: 'middle' }"
+                  :color="isLiked ? 'red' : 'grey'"
+                />
                 <span>{{ selectedPost.likes }}</span>
               </v-btn>
+
 
               <v-btn
                 v-if="user.userInfo && (selectedPost.author === user.userInfo.id)"
@@ -105,7 +139,9 @@
                 variant="text"
                 class="ml-2"
                 @click="deletePost(selectedPost.postId)"
-              ></v-btn>
+              >
+                <svg-icon type="mdi" :path="deletePath" size="18" />
+              </v-btn>
             </div>
 
             <!-- Post Content -->
@@ -163,9 +199,8 @@
                       class="ml-2"
                       @click="deleteComment(comment.commentId)"
                     >
-                      <v-icon size="small">mdi-delete</v-icon>
+                      <svg-icon type="mdi" :path="deletePath" size="16" />
                     </v-btn>
-
                     <span class="text-caption text-grey mr-2">
                       {{ formatDate(comment.createdAt) }}
                     </span>
@@ -189,9 +224,16 @@
                   size="large"
                   @click="showCreateDialog = true"
                 >
-                  <v-icon class="mr-2">mdi-plus</v-icon>
+                  <svg-icon
+                    type="mdi"
+                    :path="plusPath"
+                    size="20"
+                    class="mr-2"
+                    style="vertical-align: middle;"
+                  />
                   첫 게시글 작성하기
                 </v-btn>
+
               </div>
             </div>
           </div>
@@ -213,6 +255,15 @@ import { apiClient } from "@/stores/apiClient.js"
 import PostCard from '@/components/community/PostCard.vue'
 import CreatePost from '@/components/community/CreatePost.vue'
 import SearchFilter from '@/components/community/SearchFilter.vue'
+import SvgIcon from '@jamescoyle/vue-icon'
+import { mdiDelete, mdiHeart, mdiAccount, mdiEye, mdiPlus, mdiForumOutline } from '@mdi/js'
+
+const deletePath = mdiDelete
+const heartPath = mdiHeart
+const accountPath = mdiAccount
+const eyePath = mdiEye
+const plusPath = mdiPlus
+const forumOutlinePath = mdiForumOutline
 
 // Store
 const user = useUserStore();
