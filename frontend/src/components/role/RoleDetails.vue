@@ -103,6 +103,8 @@ const roleClass = computed(() => {
       return 'role-schedule'
     case 'LOGISTICS':
       return 'role-logistics'
+    case 'NORMAL':
+      return 'role-normal'
     default:
       return ''
   }
@@ -122,13 +124,16 @@ function getDifficultyText(difficulty) {
 }
 
 function getRoleColor(roleKey) {
-  switch (roleKey) {
-    case 'logistics':
+  const key = roleKey.toUpperCase();
+  switch (key) {
+    case 'LOGISTICS':
       return '#08549b'
-    case 'finance':
+    case 'FINANCE':
       return '#ff9900'
-    case 'scheduler':
+    case 'SCHEDULE':
       return '#d13166'
+    case 'NORMAL':
+      return '#2D2D2D'
     default:
       return '#1976d2'  // 기본 색상
   }
@@ -279,5 +284,9 @@ function getButtonGradientStyle(roleKey) {
 
 .role-logistics {
   border: 3px solid #4da6ff; /* Blue */
+}
+
+.role-normal {
+  border: 3px solid #2D2D2D; /* Dark Gray */
 }
 </style>
