@@ -462,7 +462,7 @@ CREATE TABLE IF NOT EXISTS `tripsaga`.`schedule` (
   `group_id` INT NOT NULL,
   `is_official` TINYINT(1) NULL DEFAULT '0',
   PRIMARY KEY (`content_id`),
-  UNIQUE INDEX `uq_order_day` (`order` ASC, `day` ASC) VISIBLE,
+  UNIQUE INDEX `uq_order_day_group` (`order` ASC, `day` ASC, `group_id` ASC) VISIBLE,
   INDEX `content_id` (`content_id` ASC) VISIBLE,
   INDEX `schedule_ibfk_2` (`group_id` ASC) VISIBLE,
   CONSTRAINT `schedule_ibfk_1`
@@ -472,9 +472,11 @@ CREATE TABLE IF NOT EXISTS `tripsaga`.`schedule` (
   CONSTRAINT `schedule_ibfk_2`
     FOREIGN KEY (`group_id`)
     REFERENCES `tripsaga`.`travel_group` (`group_id`)
-    ON DELETE CASCADE)
+    ON DELETE CASCADE
+)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
+
 
 
 -- -----------------------------------------------------
