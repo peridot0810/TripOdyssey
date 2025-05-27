@@ -1,104 +1,40 @@
 <template>
-  <div class="nintendo-group-info">
-    <!-- 1. Group Name -->
-    <div class="group-name-section">
-      <h2 class="group-name nintendo-text--bold">{{ groupData.name }}</h2>
-    </div>
+  <div class="nintendo-group-overview">
+    <div class="trip-progress nintendo-card">
+      <h3 class="group-title">{{ groupData.name }}</h3>
 
-    <!-- 2. Progress Bar -->
-    <div class="progress-section">
-      <div class="progress-container">
+      <div class="progress-flow">
         <div
           v-for="(step, index) in progressSteps"
           :key="index"
-          class="progress-step"
-          :class="{ completed: step.completed, current: step.current }"
+          class="stage-item"
+          :class="[getStageClass(index), `stage-color-${index}`]"
         >
-          <div class="step-circle">
-            <v-icon v-if="step.completed" size="16" color="white">mdi-check</v-icon>
-            <span v-else class="step-number">{{ index + 1 }}</span>
+          <div class="stage-indicator">
+            <span v-if="step.completed" class="completed">✓</span>
+            <span v-else-if="step.current" class="current">●</span>
+            <span v-else class="pending">○</span>
           </div>
-          <div class="step-label nintendo-text--medium">{{ step.label }}</div>
-          <div
-            v-if="index < progressSteps.length - 1"
-            class="step-connector"
-            :class="{ active: step.completed }"
-          ></div>
+          <span class="stage-name">{{ step.label }}</span>
+          <div v-if="index < progressSteps.length - 1" class="stage-arrow">→</div>
         </div>
       </div>
     </div>
 
-    <!-- 3. Group Details Card - Compact -->
-    <div class="details-card">
-      <div class="detail-row">
-        <div class="detail-icon joy-con-button joy-con-button--teal">
-          <v-icon size="14">mdi-text</v-icon>
-        </div>
-        <span class="detail-text nintendo-text--regular">
-          <strong>Description:</strong> {{ groupData.description || '설명 없음' }}
-        </span>
+    <!-- Group Info Grid -->
+    <div class="info-grid">
+      <div class="info-item nintendo-card">
+        <label>여행 기간</label>
+        <div class="info-value date-range">📅 {{ formattedTravelDates }}</div>
       </div>
 
-      <div class="detail-row">
-        <div class="detail-icon joy-con-button joy-con-button--blue">
-          <v-icon size="14">mdi-calendar-range</v-icon>
-        </div>
-        <span class="detail-text nintendo-text--regular">
-          <strong>Travel:</strong> {{ formattedTravelDates }}
-        </span>
-      </div>
-
-      <div class="detail-row">
-        <div class="detail-icon joy-con-button joy-con-button--purple">
-          <v-icon size="14">mdi-calendar-plus</v-icon>
-        </div>
-        <span class="detail-text nintendo-text--regular">
-          <strong>Created:</strong> {{ formattedCreatedDate }}
-        </span>
-      </div>
-    </div>
-
-    <!-- 4. Role Limits Card - Horizontal -->
-    <div class="role-limits-card">
-      <div class="role-limits-row">
-        <div class="role-item">
-          <div class="role-icon role-icon--finance">
-            <v-icon size="14" color="white">mdi-calculator</v-icon>
-          </div>
-          <span class="role-text nintendo-text--medium"
-            >Finance:{{ groupData.roleLimits.finance }}명</span
-          >
-        </div>
-
-        <div class="role-item">
-          <div class="role-icon role-icon--schedule">
-            <v-icon size="14" color="white">mdi-calendar-check</v-icon>
-          </div>
-          <span class="role-text nintendo-text--medium"
-            >Schedule:{{ groupData.roleLimits.schedule }}명</span
-          >
-        </div>
-
-        <div class="role-item">
-          <div class="role-icon role-icon--logistics">
-            <v-icon size="14" color="white">mdi-truck</v-icon>
-          </div>
-          <span class="role-text nintendo-text--medium"
-            >Logistics:{{ groupData.roleLimits.logistics }}명</span
-          >
-        </div>
-      </div>
-    </div>
-
-    <!-- 5. D-Day Nintendo Switch Style -->
-    <div class="d-day-section">
-      <div class="d-day-card" :class="`d-day-card--${dDayVariant}`">
-        <div class="d-day-icon">
-          <v-icon size="24" color="white">mdi-calendar-clock</v-icon>
-        </div>
-        <div class="d-day-content">
-          <div class="d-day-label nintendo-text--medium">여행까지</div>
-          <div class="d-day-value nintendo-text--bold">{{ dDayText }}</div>
+      <!-- Role Limits -->
+      <div class="info-item nintendo-card horizontal-align">
+        <label>역할 제한</label>
+        <div class="role-chips">
+          <div class="role-chip finance">재무 {{ groupData.roleLimits.finance }}명</div>
+          <div class="role-chip schedule">일정 {{ groupData.roleLimits.schedule }}명</div>
+          <div class="role-chip logistics">물류 {{ groupData.roleLimits.logistics }}명</div>
         </div>
       </div>
     </div>
@@ -112,7 +48,7 @@ import { useGroupStore } from '@/stores/group'
 const groupStore = useGroupStore()
 const groupData = computed(() => groupStore.myGroup)
 
-// Progress steps configuration based on group status
+// Progress steps configuration based on progress flags from Pinia store
 const progressSteps = computed(() => {
   const steps = [
     { key: 'scheduleCoordination', label: '조율', completed: false, current: false },
@@ -123,30 +59,50 @@ const progressSteps = computed(() => {
     { key: 'finished', label: '완료', completed: false, current: false },
   ]
 
-  // Map group status to progress steps
-  const statusMapping = {
-    schedule_coordination: 0,
-    role_assignment: 1,
-    planning: 2,
-    on_trip: 3,
-    settlement: 4,
-    finished: 5,
+  if (!groupStore.hasGroup) {
+    // Default state when no group data
+    steps[0].current = true
+    return steps
   }
 
-  const currentStepIndex = statusMapping[groupData.value.status] ?? 0
+  const progress = groupData.value.progress
 
+  // Find the last completed step
+  let lastCompletedIndex = -1
+
+  if (progress.scheduleCoordination) lastCompletedIndex = 0
+  if (progress.roleAssignment) lastCompletedIndex = 1
+  if (progress.tripPlanning) lastCompletedIndex = 2
+  if (progress.onTrip) lastCompletedIndex = 3
+  if (progress.settlement) lastCompletedIndex = 4
+  if (progress.finished) lastCompletedIndex = 5
+
+  // Set completed/current states
   steps.forEach((step, index) => {
-    if (index < currentStepIndex) {
+    if (index <= lastCompletedIndex) {
       step.completed = true
-    } else if (index === currentStepIndex) {
+    } else if (index === lastCompletedIndex + 1 && lastCompletedIndex < steps.length - 1) {
       step.current = true
     }
   })
 
+  // If all steps are completed, mark the last one as current (finished state)
+  if (lastCompletedIndex === steps.length - 1) {
+    steps[steps.length - 1].current = true
+    steps[steps.length - 1].completed = false
+  }
+
   return steps
 })
 
-// Formatted travel dates with duration - more compact
+const getStageClass = (index) => {
+  const step = progressSteps.value[index]
+  if (step.completed) return 'completed'
+  if (step.current) return 'current'
+  return 'pending'
+}
+
+// Formatted travel dates with duration
 const formattedTravelDates = computed(() => {
   if (!groupData.value.startDate || !groupData.value.endDate) {
     return '날짜 미정'
@@ -166,537 +122,425 @@ const formattedTravelDates = computed(() => {
       .replace(/\s/g, '')
   }
 
-  // Calculate duration
   const timeDiff = endDate.getTime() - startDate.getTime()
   const dayDiff = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1
 
-  return `${formatDate(startDate)}-${formatDate(endDate)} (${dayDiff}일간)`
-})
-
-// Formatted created date - more compact
-const formattedCreatedDate = computed(() => {
-  if (!groupData.value.createdAt) return '정보 없음'
-
-  const createdDate = new Date(groupData.value.createdAt)
-  return createdDate
-    .toLocaleDateString('ko-KR', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    })
-    .replace(/\./g, '.')
-    .replace(/\s/g, '')
-})
-
-// D-Day calculation
-const dDayText = computed(() => {
-  if (!groupData.value.startDate) return 'D-?'
-
-  const startDate = new Date(groupData.value.startDate)
-  const today = new Date()
-  const timeDiff = startDate.getTime() - today.getTime()
-  const dayDiff = Math.ceil(timeDiff / (1000 * 3600 * 24))
-
-  if (dayDiff > 0) {
-    return `D-${dayDiff}`
-  } else if (dayDiff === 0) {
-    return 'D-Day'
-  } else {
-    return `D+${Math.abs(dayDiff)}`
-  }
-})
-
-const dDayVariant = computed(() => {
-  if (!groupData.value.startDate) return 'unknown'
-
-  const startDate = new Date(groupData.value.startDate)
-  const today = new Date()
-  const timeDiff = startDate.getTime() - today.getTime()
-  const dayDiff = Math.ceil(timeDiff / (1000 * 3600 * 24))
-
-  if (dayDiff > 7) return 'primary'
-  if (dayDiff > 3) return 'warning'
-  if (dayDiff >= 0) return 'danger'
-  return 'success'
+  return `${formatDate(startDate)} ~ ${formatDate(endDate)} (${dayDiff}일간)`
 })
 </script>
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
 
-/* CSS Variables */
-:root {
-  --joy-con-blue: #007bff;
-  --joy-con-blue-light: #45b7d1;
-  --joy-con-blue-gradient: linear-gradient(135deg, #45b7d1 0%, #96c93d 100%);
-  --joy-con-red: #ff6b6b;
-  --joy-con-red-gradient: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
-  --joy-con-teal: #4ecdc4;
-  --joy-con-teal-gradient: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
-  --joy-con-yellow: #f9ca24;
-  --joy-con-yellow-gradient: linear-gradient(135deg, #f9ca24 0%, #f0932b 100%);
-  --joy-con-purple: #6c5ce7;
-  --joy-con-purple-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-
-  --card-bg: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  --card-bg-secondary: linear-gradient(135deg, #ffffff 0%, #f7fafc 100%);
-  --text-primary: #2d3748;
-  --text-secondary: #718096;
-  --border-light: #e2e8f0;
-  --bg-light: #edf2f7;
-
-  --radius-small: 12px;
-  --radius-medium: 20px;
-  --radius-large: 24px;
-  --radius-xl: 50%;
-}
-
-.nintendo-text--bold {
-  font-family: 'Nunito', sans-serif;
-  font-weight: 700;
-  letter-spacing: -0.025em;
-}
-
-.nintendo-text--medium {
-  font-family: 'Nunito', sans-serif;
-  font-weight: 600;
-}
-
-.nintendo-text--regular {
-  font-family: 'Nunito', sans-serif;
-  font-weight: 400;
-}
-
-.nintendo-group-info {
+.nintendo-group-overview {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding: 18px;
-  background: var(--card-bg);
-  border-radius: var(--radius-large);
-  border: 3px solid var(--border-light);
+  gap: 1.5rem;
+  padding: 1.5rem;
+  max-width: 800px;
+  margin: 0 auto;
+  font-family: 'Nunito', sans-serif;
+}
+
+.nintendo-card {
+  background: var(--card-bg, #ffffff);
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
-  box-shadow:
-    0 4px 12px rgba(0, 123, 255, 0.1),
-    0 2px 4px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Nintendo Switch rainbow border */
-.nintendo-group-info::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 6px;
-  background: linear-gradient(
-    90deg,
-    #ff6b6b 0%,
-    #4ecdc4 25%,
-    #45b7d1 50%,
-    #f9ca24 75%,
-    #6c5ce7 100%
-  );
-  border-radius: var(--radius-large) var(--radius-large) 0 0;
-}
-
-.nintendo-group-info:hover {
+.nintendo-card:hover {
   transform: translateY(-2px);
-  box-shadow:
-    0 8px 20px rgba(0, 123, 255, 0.15),
-    0 4px 8px rgba(0, 0, 0, 0.1);
-  border-color: var(--joy-con-teal);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  border-color: var(--joy-teal, #4ecdc4);
 }
 
-/* Group Name Section */
-.group-name-section {
-  text-align: center;
-  margin-top: 8px;
-}
-
-.group-name {
-  font-size: 1.4rem;
-  color: var(--joy-con-blue);
-  margin: 0;
-  text-shadow: 0 2px 4px rgba(0, 123, 255, 0.1);
-}
-
-/* Progress Section */
-.progress-section {
-  padding: 12px 0;
-}
-
-.progress-container {
+/* Group Header */
+.group-header {
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border-left: 6px solid var(--joy-blue, #45b7d1);
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  position: relative;
-  padding: 0 10px;
+  align-items: center;
 }
 
-.progress-step {
+.group-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 0 0 1rem 0;
+  color: #1e293b;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-align: center;
+}
+
+.status-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+  border: 2px solid;
+}
+
+.status-badge.status-planning {
+  background: linear-gradient(135deg, rgba(249, 202, 36, 0.2), rgba(249, 202, 36, 0.1));
+  border-color: #f9ca24;
+  color: #d4a000;
+}
+
+.status-badge.status-in_progress {
+  background: linear-gradient(135deg, rgba(78, 205, 196, 0.2), rgba(78, 205, 196, 0.1));
+  border-color: #4ecdc4;
+  color: #2d7a6f;
+}
+
+.status-badge.status-completed {
+  background: linear-gradient(135deg, rgba(46, 213, 115, 0.2), rgba(46, 213, 115, 0.1));
+  border-color: #2ed573;
+  color: #1d8348;
+}
+
+/* Trip Progress */
+.trip-progress {
+  padding: 1.5rem;
+  border-left: 6px solid var(--joy-teal, #4ecdc4);
+}
+
+.section-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin: 0 0 1.5rem 0;
+  text-align: center;
+}
+
+.progress-flow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 1rem 0;
+  overflow-x: auto;
+}
+
+.stage-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  position: relative;
+  gap: 0.5rem;
   flex: 1;
-  max-width: 70px;
+  min-width: 60px;
+  position: relative;
 }
 
-.step-circle {
+.stage-indicator {
   width: 32px;
   height: 32px;
-  border-radius: var(--radius-xl);
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
+  font-size: 0.8rem;
   font-weight: bold;
-  margin-bottom: 6px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  z-index: 2;
-  border: 2px solid transparent;
-}
-
-.progress-step.completed .step-circle {
-  background: var(--joy-con-teal-gradient);
-  color: white;
-  box-shadow: 0 3px 8px rgba(78, 205, 196, 0.4);
-  border-color: rgba(255, 255, 255, 0.3);
-}
-
-.progress-step.current .step-circle {
-  background: var(--joy-con-blue-gradient);
-  color: white;
-  box-shadow: 0 3px 8px rgba(69, 183, 209, 0.4);
-  border-color: rgba(255, 255, 255, 0.3);
-  animation: nintendo-pulse 2s infinite;
-}
-
-.progress-step:not(.completed):not(.current) .step-circle {
-  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%);
-  color: var(--text-secondary);
-  border-color: var(--border-light);
-}
-
-.step-label {
-  font-size: 9px;
-  text-align: center;
-  line-height: 1.2;
-  color: var(--text-secondary);
-}
-
-.progress-step.completed .step-label,
-.progress-step.current .step-label {
-  color: var(--text-primary);
-}
-
-.step-connector {
-  position: absolute;
-  top: 16px;
-  left: 50%;
-  width: calc(100% - 16px);
-  height: 3px;
-  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%);
-  z-index: 1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
-  border-radius: 2px;
 }
 
-.step-connector.active {
-  background: var(--joy-con-teal-gradient);
-  box-shadow: 0 1px 4px rgba(78, 205, 196, 0.3);
+.stage-item.completed .stage-indicator {
+  background: var(--stage-color, #4ecdc4);
+  color: white;
 }
 
-.progress-step:last-child .step-connector {
-  display: none;
+.stage-item.current .stage-indicator {
+  background: var(--stage-color, #45b7d1);
+  color: white;
+  animation: pulse-glow 1.5s ease-in-out infinite;
 }
 
-/* Details Card - Compact */
-.details-card {
-  background: var(--card-bg-secondary);
-  border-radius: var(--radius-medium);
-  padding: 14px;
-  border: 2px solid var(--border-light);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+.stage-item.pending .stage-indicator {
+  background: #e9ecef;
+  color: #6c757d;
+  border: 2px solid #dee2e6;
 }
 
-.detail-row {
+.stage-name {
+  font-size: 0.8rem;
+  text-align: center;
+  font-weight: 600;
+  color: #718096;
+}
+
+.stage-item.completed .stage-name,
+.stage-item.current .stage-name {
+  color: var(--stage-color, #4ecdc4);
+  font-weight: 700;
+}
+
+.stage-arrow {
+  position: absolute;
+  right: -0.75rem;
+  top: 14px;
+  color: #dee2e6;
+  font-size: 0.9rem;
+  z-index: 1;
+}
+
+.progress-info {
+  background: #edf2f7;
+  padding: 1rem;
+  border-radius: 12px;
+  border-left: 6px solid var(--joy-blue, #45b7d1);
+  margin-top: 1rem;
+}
+
+.current-stage-info {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
-.detail-text {
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-  line-height: 1.4;
+.stage-label {
+  font-weight: 700;
+  color: #333;
 }
 
-.detail-text strong {
-  color: var(--text-primary);
+.stage-count {
+  background: var(--joy-blue, #45b7d1);
+  color: white;
+  padding: 0.125rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
   font-weight: 600;
 }
 
-/* Role Limits Card - Horizontal */
-.role-limits-card {
-  background: var(--card-bg-secondary);
-  border-radius: var(--radius-medium);
-  padding: 14px;
-  border: 2px solid var(--border-light);
+.stage-description {
+  font-size: 0.9rem;
+  color: #555;
+  line-height: 1.5;
 }
 
-.role-limits-row {
+/* Stage colors */
+.stage-color-0 {
+  --stage-color: #f9ca24;
+}
+.stage-color-1 {
+  --stage-color: #4ecdc4;
+}
+.stage-color-2 {
+  --stage-color: #45b7d1;
+}
+.stage-color-3 {
+  --stage-color: #6c5ce7;
+}
+.stage-color-4 {
+  --stage-color: #ff6b6b;
+}
+.stage-color-5 {
+  --stage-color: #2ed573;
+}
+
+/* Info Grid */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.info-item {
+  padding: 1.2rem;
+  border-left: 6px solid var(--joy-teal, #4ecdc4);
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.info-item.horizontal-align {
+  flex-direction: row;
   align-items: center;
-  gap: 8px;
+  gap: 1rem;
 }
 
-.role-item {
+.info-item label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-value {
+  font-size: 1rem;
+  color: #334155;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.date-range {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  padding: 0.75rem;
+  border-radius: 12px;
+  border-left: 4px solid #f59e0b;
+  color: #92400e;
+  font-weight: 600;
+}
+
+.role-chips {
   display: flex;
-  align-items: center;
-  gap: 6px;
-  flex: 1;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
-.role-icon {
-  width: 24px;
-  height: 24px;
-  border-radius: var(--radius-xl);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+.role-chip {
+  padding: 0.5rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  border: 2px solid;
 }
 
-.role-icon--finance {
-  background: var(--joy-con-teal-gradient);
-  box-shadow: 0 2px 6px rgba(78, 205, 196, 0.3);
+.role-chip.finance {
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.2), rgba(249, 115, 22, 0.1));
+  border-color: #f97316;
+  color: #c2410c;
 }
 
-.role-icon--schedule {
-  background: var(--joy-con-blue-gradient);
-  box-shadow: 0 2px 6px rgba(69, 183, 209, 0.3);
+.role-chip.schedule {
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(236, 72, 153, 0.1));
+  border-color: #ec4899;
+  color: #be185d;
 }
 
-.role-icon--logistics {
-  background: var(--joy-con-yellow-gradient);
-  box-shadow: 0 2px 6px rgba(249, 202, 36, 0.3);
+.role-chip.logistics {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(59, 130, 246, 0.1));
+  border-color: #3b82f6;
+  color: #1d4ed8;
 }
 
-.role-text {
-  font-size: 0.75rem;
-  color: var(--text-primary);
-  white-space: nowrap;
+.role-chip:hover {
+  transform: scale(1.05);
 }
 
-/* Joy-Con Button Styles */
-.joy-con-button {
-  background: white;
-  border: 2px solid var(--border-light);
-  cursor: pointer;
-  border-radius: var(--radius-xl);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  flex-shrink: 0;
-}
-
-.joy-con-button--teal {
-  border-color: var(--joy-con-teal);
-  color: var(--joy-con-teal);
-}
-
-.joy-con-button--teal:hover {
-  transform: translateY(-1px) scale(1.05);
-  background: var(--joy-con-teal);
-  color: white;
-  box-shadow: 0 3px 8px rgba(78, 205, 196, 0.4);
-}
-
-.joy-con-button--blue {
-  border-color: var(--joy-con-blue-light);
-  color: var(--joy-con-blue-light);
-}
-
-.joy-con-button--blue:hover {
-  transform: translateY(-1px) scale(1.05);
-  background: var(--joy-con-blue-light);
-  color: white;
-  box-shadow: 0 3px 8px rgba(69, 183, 209, 0.4);
-}
-
-.joy-con-button--purple {
-  border-color: var(--joy-con-purple);
-  color: var(--joy-con-purple);
-}
-
-.joy-con-button--purple:hover {
-  transform: translateY(-1px) scale(1.05);
-  background: var(--joy-con-purple);
-  color: white;
-  box-shadow: 0 3px 8px rgba(108, 92, 231, 0.4);
-}
-
-/* D-Day Section */
-.d-day-section {
-  display: flex;
-  justify-content: center;
-}
-
-.d-day-card {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 18px;
-  border-radius: var(--radius-medium);
-  color: white;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 3px solid rgba(255, 255, 255, 0.3);
-  min-width: 150px;
-}
-
-.d-day-card--primary {
-  background: var(--joy-con-blue-gradient);
-}
-
-.d-day-card--warning {
-  background: var(--joy-con-yellow-gradient);
-}
-
-.d-day-card--danger {
-  background: var(--joy-con-red-gradient);
-}
-
-.d-day-card--success {
-  background: var(--joy-con-teal-gradient);
-}
-
-.d-day-card--unknown {
-  background: var(--joy-con-purple-gradient);
-}
-
-.d-day-card:hover {
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
-}
-
-.d-day-icon {
-  flex-shrink: 0;
-  width: 36px;
-  height: 36px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: var(--radius-xl);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(10px);
+/* D-Day Container */
+.d-day-container {
+  padding: 1.5rem;
+  text-align: center;
 }
 
 .d-day-content {
-  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  color: white;
+  font-weight: 700;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.d-day-content:hover {
+  transform: translateY(-4px) scale(1.05);
+}
+
+.d-day-primary {
+  background: linear-gradient(135deg, #3b82f6, #60a5fa);
+}
+
+.d-day-warning {
+  background: linear-gradient(135deg, #f9ca24, #fbbf24);
+}
+
+.d-day-danger {
+  background: linear-gradient(135deg, #ff6b6b, #f87171);
+}
+
+.d-day-success {
+  background: linear-gradient(135deg, #4ecdc4, #6ee7b7);
+}
+
+.d-day-unknown {
+  background: linear-gradient(135deg, #6c5ce7, #a78bfa);
+}
+
+.d-day-icon {
+  font-size: 2rem;
+}
+
+.d-day-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .d-day-label {
-  font-size: 0.75rem;
+  font-size: 0.9rem;
   opacity: 0.9;
-  margin-bottom: 2px;
 }
 
 .d-day-value {
-  font-size: 1.1rem;
+  font-size: 1.5rem;
   margin: 0;
 }
 
 /* Animations */
-@keyframes nintendo-pulse {
+@keyframes pulse-glow {
   0%,
   100% {
-    box-shadow: 0 3px 8px rgba(69, 183, 209, 0.4);
     transform: scale(1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
   50% {
-    box-shadow: 0 3px 12px rgba(69, 183, 209, 0.6);
-    transform: scale(1.05);
+    transform: scale(1.1);
+    box-shadow: 0 4px 16px rgba(69, 183, 209, 0.4);
   }
 }
 
 /* Responsive Design */
-@media (max-width: 600px) {
-  .nintendo-group-info {
-    padding: 14px;
-    gap: 12px;
+@media (max-width: 768px) {
+  .nintendo-group-overview {
+    padding: 1rem;
+    gap: 1rem;
   }
 
-  .group-name {
-    font-size: 1.2rem;
-  }
-
-  .progress-container {
-    padding: 0 5px;
-  }
-
-  .step-circle {
-    width: 28px;
-    height: 28px;
-    font-size: 10px;
-  }
-
-  .step-label {
-    font-size: 8px;
-  }
-
-  .details-card,
-  .role-limits-card {
-    padding: 12px;
-  }
-
-  .detail-text {
-    font-size: 0.75rem;
-  }
-
-  .role-limits-row {
+  .group-header {
     flex-direction: column;
-    gap: 6px;
+    gap: 1rem;
+    text-align: center;
   }
 
-  .role-item {
-    justify-content: flex-start;
+  .group-title {
+    font-size: 1.5rem;
   }
 
-  .role-text {
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .info-item.horizontal-align {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .stage-name {
     font-size: 0.7rem;
   }
 
-  .role-icon {
-    width: 20px;
-    height: 20px;
+  .d-day-content {
+    padding: 0.75rem 1.5rem;
   }
 
-  .d-day-card {
-    padding: 12px 14px;
-    min-width: 130px;
-  }
-
-  .d-day-icon {
-    width: 32px;
-    height: 32px;
-  }
-
-  .joy-con-button {
-    width: 20px;
-    height: 20px;
+  .d-day-value {
+    font-size: 1.2rem;
   }
 }
 </style>

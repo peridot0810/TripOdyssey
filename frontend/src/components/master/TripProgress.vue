@@ -35,17 +35,19 @@
     <div class="control-buttons">
       <button
         class="nintendo-btn nintendo-btn--red"
-        :disabled="currentStage === 0"
+        :disabled="currentStage === 0 || isUpdating"
         @click="rollback"
       >
-        ← 롤백
+        <span v-if="isUpdating" class="loading-spinner">⟳</span>
+        <span v-else>← 롤백</span>
       </button>
       <button
         class="nintendo-btn nintendo-btn--blue"
-        :disabled="currentStage === stages.length - 1"
+        :disabled="currentStage === stages.length - 1 || isUpdating"
         @click="proceed"
       >
-        진행 →
+        <span v-if="isUpdating" class="loading-spinner">⟳</span>
+        <span v-else>진행 →</span>
       </button>
     </div>
   </div>
@@ -53,32 +55,192 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
+import { useGroupStore } from '@/stores/group'
+import { apiClient } from '@/utils/apiClient'
 
-const currentStage = ref(1)
+const groupStore = useGroupStore()
+const route = useRoute()
+
+// Loading state for API calls
+const isUpdating = ref(false)
 
 const stages = ref([
-  { name: '일정조율', description: '그룹 멤버들과 여행 일정을 조율하는 단계입니다.' },
-  { name: '역할배정', description: '모든 멤버의 역할이 정해진 후 다음 단계로 진행할 수 있습니다.' },
-  { name: '여행계획', description: '세부 여행 계획을 수복하는 단계입니다.' },
-  { name: '여행중', description: '현재 여행을 진행 중인 단계입니다.' },
-  { name: '정산', description: '여행 비용을 정산하는 단계입니다.' },
-  { name: '완료', description: '모든 여행 과정이 완료된 단계입니다.' },
+  {
+    name: '일정조율',
+    key: 'scheduleCoordination',
+    description: '그룹 멤버들과 여행 일정을 조율하는 단계입니다.',
+  },
+  {
+    name: '역할배정',
+    key: 'roleAssignment',
+    description: '모든 멤버의 역할이 정해진 후 다음 단계로 진행할 수 있습니다.',
+  },
+  { name: '여행계획', key: 'tripPlanning', description: '세부 여행 계획을 수립하는 단계입니다.' },
+  { name: '여행중', key: 'onTrip', description: '현재 여행을 진행 중인 단계입니다.' },
+  { name: '정산', key: 'settlement', description: '여행 비용을 정산하는 단계입니다.' },
+  { name: '완료', key: 'finished', description: '모든 여행 과정이 완료된 단계입니다.' },
 ])
+
+// Calculate current stage based on progress data from Pinia store
+const currentStage = computed(() => {
+  if (!groupStore.hasGroup) return 0
+
+  const progress = groupStore.myGroup.progress
+
+  // Find the last completed stage
+  let lastCompletedStage = -1
+
+  if (progress.scheduleCoordination) lastCompletedStage = 0
+  if (progress.roleAssignment) lastCompletedStage = 1
+  if (progress.tripPlanning) lastCompletedStage = 2
+  if (progress.onTrip) lastCompletedStage = 3
+  if (progress.settlement) lastCompletedStage = 4
+  if (progress.finished) lastCompletedStage = 5
+
+  // Current stage is one after the last completed stage (unless all are complete)
+  return Math.min(lastCompletedStage + 1, stages.value.length - 1)
+})
 
 const currentStageInfo = computed(() => stages.value[currentStage.value] || stages.value[0])
 
 const getStageClass = (index) => {
-  if (index < currentStage.value) return 'completed'
-  if (index === currentStage.value) return 'current'
+  if (!groupStore.hasGroup) {
+    // Default state when no group data
+    if (index === 0) return 'current'
+    return 'pending'
+  }
+
+  const progress = groupStore.myGroup.progress
+  const stageKeys = [
+    'scheduleCoordination',
+    'roleAssignment',
+    'tripPlanning',
+    'onTrip',
+    'settlement',
+    'finished',
+  ]
+
+  // Check if this stage is completed
+  if (progress[stageKeys[index]]) {
+    return 'completed'
+  }
+
+  // Check if this is the current stage (first non-completed stage)
+  if (index === currentStage.value) {
+    return 'current'
+  }
+
   return 'pending'
 }
 
-const proceed = () => {
-  if (currentStage.value < stages.value.length - 1) currentStage.value++
+// API function to update progress
+const updateProgressAPI = async (progressData) => {
+  const groupId = route.params.groupId
+  if (!groupId) {
+    throw new Error('Group ID not found')
+  }
+
+  try {
+    console.log('Updating progress with data:', progressData)
+    const response = await apiClient.put(`/group/${groupId}/update-progress`, progressData)
+    console.log('API response:', response.data)
+    return response.data
+  } catch (error) {
+    console.error('API error:', error)
+    throw error
+  }
 }
 
-const rollback = () => {
-  if (currentStage.value > 0) currentStage.value--
+// Progress control functions with API integration
+const proceed = async () => {
+  if (!groupStore.hasGroup || isUpdating.value) return
+
+  isUpdating.value = true
+
+  try {
+    const progress = { ...groupStore.myGroup.progress }
+    const stageKeys = [
+      'scheduleCoordination',
+      'roleAssignment',
+      'tripPlanning',
+      'onTrip',
+      'settlement',
+      'finished',
+    ]
+
+    // Mark the current stage as completed
+    if (currentStage.value < stageKeys.length) {
+      progress[stageKeys[currentStage.value]] = true
+    }
+
+    console.log('Proceeding to next stage with progress:', progress)
+
+    // Call API to update progress
+    await updateProgressAPI(progress)
+
+    // Update the store only if API call succeeds
+    const updatedGroupData = {
+      ...groupStore.myGroup,
+      progress,
+    }
+    groupStore.setGroupData(updatedGroupData)
+
+    console.log('Progress updated successfully')
+  } catch (error) {
+    console.error('Failed to proceed:', error)
+
+    // Show error message to user
+    const errorMessage = error.response?.data?.message || '진행 업데이트에 실패했습니다.'
+    alert(errorMessage)
+  } finally {
+    isUpdating.value = false
+  }
+}
+
+const rollback = async () => {
+  if (!groupStore.hasGroup || isUpdating.value) return
+
+  isUpdating.value = true
+
+  try {
+    const progress = { ...groupStore.myGroup.progress }
+    const stageKeys = [
+      'scheduleCoordination',
+      'roleAssignment',
+      'tripPlanning',
+      'onTrip',
+      'settlement',
+      'finished',
+    ]
+
+    // Mark the previous stage as incomplete
+    if (currentStage.value > 0) {
+      progress[stageKeys[currentStage.value - 1]] = false
+    }
+
+    console.log('Rolling back stage with progress:', progress)
+
+    // Call API to update progress
+    await updateProgressAPI(progress)
+
+    // Update the store only if API call succeeds
+    const updatedGroupData = {
+      ...groupStore.myGroup,
+      progress,
+    }
+    groupStore.setGroupData(updatedGroupData)
+
+    console.log('Progress rolled back successfully')
+  } catch (error) {
+    console.error('Failed to rollback:', error)
+
+    // Show error message to user
+    const errorMessage = error.response?.data?.message || '롤백 업데이트에 실패했습니다.'
+    alert(errorMessage)
+  } finally {
+    isUpdating.value = false
+  }
 }
 </script>
 
@@ -136,12 +298,12 @@ const rollback = () => {
 }
 
 .stage-item.completed .stage-indicator {
-  background: var(--joy-con-teal, #4ecdc4);
+  background: var(--stage-color, var(--joy-con-teal, #4ecdc4));
   color: white;
 }
 
 .stage-item.current .stage-indicator {
-  background: var(--joy-con-blue-light, #45b7d1);
+  background: var(--stage-color, var(--joy-con-blue-light, #45b7d1));
   color: white;
   box-shadow: 0 0 0 3px rgba(69, 183, 209, 0.3);
 }
@@ -160,11 +322,11 @@ const rollback = () => {
 }
 
 .stage-item.completed .stage-name {
-  color: var(--joy-con-teal, #4ecdc4);
+  color: var(--stage-color, var(--joy-con-teal, #4ecdc4));
 }
 
 .stage-item.current .stage-name {
-  color: var(--joy-con-blue-light, #45b7d1);
+  color: var(--stage-color, var(--joy-con-blue-light, #45b7d1));
   font-weight: 700;
 }
 
@@ -197,8 +359,8 @@ const rollback = () => {
 }
 
 .stage-count {
-  background: var(--joy-con-blue-light);
-  color: rgb(0, 0, 0);
+  background: var(--joy-con-blue-light, #45b7d1);
+  color: white;
   padding: 0.125rem 0.5rem;
   border-radius: 12px;
   font-size: 0.75rem;
@@ -215,19 +377,6 @@ const rollback = () => {
   gap: 0.75rem;
   margin-top: 0.5rem;
   justify-content: center;
-}
-
-.control-btn {
-  font-family: 'Nunito', sans-serif;
-  font-size: 0.875rem;
-  font-weight: 600;
-  border-radius: 50%;
-  width: 48px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
 }
 
 .nintendo-btn {
@@ -273,64 +422,42 @@ const rollback = () => {
   transform: none;
 }
 
+.loading-spinner {
+  display: inline-block;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* Stage-specific colors */
-.stage-color-0 .stage-indicator,
-.stage-color-0 .stage-name {
+.stage-color-0 {
   --stage-color: #f9ca24;
 }
-.stage-color-1 .stage-indicator,
-.stage-color-1 .stage-name {
+.stage-color-1 {
   --stage-color: #4ecdc4;
 }
-.stage-color-2 .stage-indicator,
-.stage-color-2 .stage-name {
+.stage-color-2 {
   --stage-color: #45b7d1;
 }
-.stage-color-3 .stage-indicator,
-.stage-color-3 .stage-name {
+.stage-color-3 {
   --stage-color: #6c5ce7;
 }
-.stage-color-4 .stage-indicator,
-.stage-color-4 .stage-name {
+.stage-color-4 {
   --stage-color: #ff6b6b;
 }
-.stage-color-5 .stage-indicator,
-.stage-color-5 .stage-name {
+.stage-color-5 {
   --stage-color: #2ed573;
 }
 
-/* Apply the color depending on state */
-.stage-item.completed .stage-indicator {
-  background: var(--stage-color);
-  color: white;
-}
 .stage-item.current .stage-indicator {
-  background: var(--stage-color);
-  color: white;
-  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.15);
-}
-.stage-item.completed .stage-name,
-.stage-item.current .stage-name {
-  color: var(--stage-color);
-}
-
-@keyframes pulse-glow {
-  0% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.4);
-  }
-  70% {
-    transform: scale(1.08);
-    box-shadow: 0 0 0 10px rgba(0, 123, 255, 0);
-  }
-  100% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(0, 123, 255, 0);
-  }
-}
-
-.stage-item.current .stage-indicator {
-  animation: pulse-glow 1.5s infinite;
+  animation: pulse-glow-colored 1.5s ease-in-out infinite;
 }
 
 @keyframes pulse-glow-colored {
@@ -346,9 +473,5 @@ const rollback = () => {
     transform: scale(1);
     box-shadow: 0 0 0 0 transparent;
   }
-}
-
-.stage-item.current .stage-indicator {
-  animation: pulse-glow-colored 1.5s ease-in-out infinite;
 }
 </style>
