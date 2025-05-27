@@ -1,7 +1,7 @@
 <template>
   <v-card class="groups-card" elevation="3">
     <v-card-title class="text-h6 font-weight-bold d-flex align-center">
-      <v-icon color="primary" class="mr-2">mdi-account-group</v-icon>
+      <svg-icon type="mdi" :path="accountGroupPath" size="22" color="#1976d2" class="mr-2" style="vertical-align: middle;" />
       그룹 정보
     </v-card-title>
     <v-divider></v-divider>
@@ -9,11 +9,11 @@
     <v-card-text class="pa-0">
       <v-tabs v-model="activeTab" color="primary" fixed-tabs>
         <v-tab value="joined">
-          <v-icon class="mr-1">mdi-account-check</v-icon>
+          <svg-icon type="mdi" :path="accountCheckPath" size="18" class="mr-1" style="vertical-align: middle;" />
           참여 그룹 ({{ joinedGroups.length }})
         </v-tab>
         <v-tab value="invited">
-          <v-icon class="mr-1">mdi-email</v-icon>
+          <svg-icon type="mdi" :path="emailPath" size="18" class="mr-1" style="vertical-align: middle;" />
           초대 받은 그룹 ({{ invitedGroups.length }})
         </v-tab>
       </v-tabs>
@@ -23,13 +23,13 @@
         <v-tabs-window-item value="joined">
           <div class="pa-4">
             <div v-if="joinedGroups.length === 0" class="empty-state text-center py-8">
-              <v-icon size="64" color="grey-lighten-1">mdi-account-group-outline</v-icon>
+              <svg-icon type="mdi" :path="accountGroupOutlinePath" size="64" color="#BDBDBD" />
               <p class="text-body-1 text-grey mt-3">참여 중인 그룹이 없습니다</p>
             </div>
 
             <div v-else>
               <v-card
-                v-for="group in joinedGroups"
+                v-for="group in sortedJoinedGroups"
                 :key="group.id"
                 class="group-card mb-3"
                 variant="outlined"
@@ -48,11 +48,10 @@
                         {{ role }}
                       </v-chip>
                     </template>
-                    
                   </div>
 
                   <div class="d-flex align-center">
-                    <v-icon size="small" color="grey" class="mr-1">mdi-account-multiple</v-icon>
+                    <svg-icon type="mdi" :path="accountMultiplePath" size="16" color="#757575" class="mr-1" style="vertical-align: middle;" />
                     <span class="text-caption text-grey">{{ group.memberCount }}명</span>
                   </div>
                 </v-card-text>
@@ -65,13 +64,13 @@
         <v-tabs-window-item value="invited">
           <div class="pa-4">
             <div v-if="invitedGroups.length === 0" class="empty-state text-center py-8">
-              <v-icon size="64" color="grey-lighten-1">mdi-email-outline</v-icon>
+              <svg-icon type="mdi" :path="emailOutlinePath" size="64" color="#BDBDBD" />
               <p class="text-body-1 text-grey mt-3">새로운 초대가 없습니다</p>
             </div>
 
             <div v-else>
               <v-card
-                v-for="invitation in invitedGroups"
+                v-for="invitation in sortedInvitedGroups"
                 :key="invitation.groupId"
                 class="invitation-card mb-3"
                 variant="outlined"
@@ -88,15 +87,16 @@
 
                   <div class="d-flex justify-space-between align-center mb-3">
                     <div class="d-flex align-center">
-                      <v-icon size="small" color="grey" class="mr-1">mdi-account-multiple</v-icon>
+                      <svg-icon type="mdi" :path="accountMultiplePath" size="16" color="#757575" class="mr-1" style="vertical-align: middle;" />
                       <span class="text-caption text-grey">
                         {{invitation.memberCount}}/(최대 멤버 수)명
                       </span>
                     </div>
 
                     <v-chip :color="getStatusColor(invitation.status)" size="small" variant="flat">
-                        {{ invitation.status }}
-                      </v-chip>
+                      {{ invitation.status }}
+                    </v-chip>
+                    {{ invitation.createdAt }}
                   </div>
 
                   <div v-if="invitation.status==='PENDING'" class="d-flex gap-2">
@@ -130,8 +130,24 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import SvgIcon from '@jamescoyle/vue-icon'
+import {
+  mdiAccountGroup,
+  mdiAccountCheck,
+  mdiEmail,
+  mdiAccountGroupOutline,
+  mdiAccountMultiple,
+  mdiEmailOutline
+} from '@mdi/js'
 import { apiClient } from '@/stores/apiClient'
+
+const accountGroupPath = mdiAccountGroup
+const accountCheckPath = mdiAccountCheck
+const emailPath = mdiEmail
+const accountGroupOutlinePath = mdiAccountGroupOutline
+const accountMultiplePath = mdiAccountMultiple
+const emailOutlinePath = mdiEmailOutline
 
 const props = defineProps({
   joinedGroups: {
@@ -143,6 +159,21 @@ const props = defineProps({
     required: true
   }
 })
+
+// 참여 그룹: 여행 시작일 내림차순(최신 → 과거)
+const sortedJoinedGroups = computed(() => {
+  // 날짜가 최신(큰 값) → 과거(작은 값) 순서로 내림차순 정렬
+  return [...props.joinedGroups].sort((a, b) => {
+    return new Date(b.startDate) - new Date(a.startDate)
+  })
+})
+
+// 초대 그룹: 초대 생성일 내림차순(최근 초대 → 과거 초대)
+const sortedInvitedGroups = computed(() => {
+  return [...props.invitedGroups].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+})
+
+const emit = defineEmits(['accept-invitation'])
 
 const activeTab = ref('joined')
 
@@ -167,34 +198,31 @@ function getStatusColor(status) {
 }
 
 async function acceptInvitation(senderId, groupId) {
-  console.log("props invitedGroups : ")
-  console.log(props.invitedGroups)
   const groupIndex = props.invitedGroups.findIndex((g) => g.groupId === groupId)
-  console.log("groupIndex : ")
-  console.log(groupIndex)
   if (groupIndex !== -1) {
-
     const acceptedInvitation = props.invitedGroups[groupIndex]
-    const res = await apiClient.put("/user/invited", {
-      "senderId" : senderId,
-      "groupId" : groupId,
-      "accept" : true
+    await apiClient.put("/user/invited", {
+      senderId,
+      groupId,
+      accept: true
     })
-    acceptedInvitation.status="ACCEPTED"
-
-    // 새로 참여하게 된 그룹 생성 및 추가 
-    props.joinedGroups.unshift({
-      "groupId" : groupId,
-      "memberCount" : acceptedInvitation.memberCount+1,
-      "myRole" : ['normal'],
-      "name" : acceptedInvitation.groupInfo.name,
-      "progress" : acceptedInvitation.groupInfo.progress,
-      "startDate" : acceptedInvitation.groupInfo.startDate,
-      "endDate" : acceptedInvitation.groupInfo.endDate,
-      "status" : acceptedInvitation.groupInfo.status
+    acceptedInvitation.status = "ACCEPTED"
+    acceptedInvitation.memberCount+=1;
+    emit('accept-invitation', {
+      newGroup: {
+        groupId,
+        memberCount: acceptedInvitation.memberCount,
+        myRole: ['normal'],
+        name: acceptedInvitation.groupInfo.name,
+        progress: acceptedInvitation.groupInfo.progress,
+        startDate: acceptedInvitation.groupInfo.startDate,
+        endDate: acceptedInvitation.groupInfo.endDate,
+        status: acceptedInvitation.groupInfo.status
+      }
     })
   }
 }
+
 
 async function declineInvitation(senderId, groupId) {
   const groupIndex = props.invitedGroups.findIndex((g) => g.groupId === groupId)
@@ -202,7 +230,7 @@ async function declineInvitation(senderId, groupId) {
     // const declinedGroup = props.invitedGroups.splice(groupIndex, 1)[0]
 
     const declinedInvitation = props.invitedGroups[groupIndex]
-    const res = await apiClient.put("/user/invited", {
+    await apiClient.put("/user/invited", {
       "senderId" : senderId,
       "groupId" : groupId,
       "accept" : false
