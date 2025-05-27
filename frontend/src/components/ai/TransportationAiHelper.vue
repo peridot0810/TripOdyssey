@@ -1,7 +1,7 @@
 <template>
   <div class="transportation-ai-helper">
     <div class="ai-helper-button" @click="showDialog = true">
-      <img src="/img/logistics.PNG" alt="Transportation AI Helper" class="ai-helper-image" />
+      <img src="/img/logistics_btn.png" alt="Transportation AI Helper" class="ai-helper-image" />
     </div>
 
     <!-- Transportation AI Dialog -->

@@ -1,7 +1,7 @@
 <template>
   <div class="finance-ai-helper">
     <div class="ai-helper-button" @click="showDialog = true">
-      <img src="/img/finance.PNG" alt="Finance AI Helper" class="ai-helper-image" />
+      <img src="/img/finance_btn.png" alt="Finance AI Helper" class="ai-helper-image" />
     </div>
 
     <!-- Finance AI Dialog -->
