@@ -21,8 +21,10 @@ import com.ssafy.pjt.common.exception.FileUploadIllegalArgumentException;
 import com.ssafy.pjt.group.dto.request.TravelGroupPostRequest;
 import com.ssafy.pjt.group.dto.request.TravelGroupUpdateRequest;
 import com.ssafy.pjt.group.dto.request.UpdateProgressRequestDto;
+import com.ssafy.pjt.group.dto.request.UpdateUserExperienceRequestDto;
 import com.ssafy.pjt.group.dto.response.TravelGroupInfoResponse;
 import com.ssafy.pjt.group.dto.response.TravelGroupPostResponse;
+import com.ssafy.pjt.group.entity.GroupMemberInfo;
 import com.ssafy.pjt.group.entity.GroupProgress;
 import com.ssafy.pjt.group.entity.GroupRoleLimit;
 import com.ssafy.pjt.group.entity.RoleLimits;
@@ -39,6 +41,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class DefaultTravelGroupService implements TravelGroupService {
 	
+	private final TravelGroupMemberService memberService;
 	private final TravelGroupMapper travelGroupMapper;
 	
 	private final Map<String, Integer> roleIdCache = new ConcurrentHashMap<>();
@@ -231,6 +234,27 @@ public class DefaultTravelGroupService implements TravelGroupService {
 	public void updateProgress(Integer groupId, UpdateProgressRequestDto updateProgressRequest) {
 		updateProgressRequest.setGroupId(groupId);
 		travelGroupMapper.updateGroupProgress(updateProgressRequest);
+	}
+	
+	@Override
+	public void endTrip(Integer groupId, String userId) {
+		
+		List<GroupMemberInfo> memberList = memberService.getAllMembers(userId, groupId).getData();
+		
+		for(GroupMemberInfo member : memberList) {
+			
+			log.debug("member: {}", member);
+			Boolean[] roleList = member.getRoles();
+			
+			travelGroupMapper.updateUserExperience(UpdateUserExperienceRequestDto.builder()
+					.userId(member.getUserId())
+					.leaderExp(roleList[0] != null && roleList[0] ? 10 : null)
+					.scheduleExp(roleList[1] != null && roleList[1] ? 10 : null)
+					.financeExp(roleList[2] != null && roleList[2] ? 10 : null)
+					.logisticsExp(roleList[3] != null && roleList[3] ? 10 : null)
+					.memberExp(roleList[4] != null && roleList[4] ? 10 : null)
+					.build());
+		}
 	}
 	
 }

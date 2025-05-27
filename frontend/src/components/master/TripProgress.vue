@@ -32,7 +32,7 @@
     </div>
 
     <!-- Control Buttons -->
-    <div class="control-buttons">
+    <div class="control-buttons" v-show="!tripFinished">
       <button
         class="nintendo-btn nintendo-btn--red"
         :disabled="currentStage === 0 || isUpdating"
@@ -50,7 +50,7 @@
         <span v-else>진행 →</span>
       </button>
     </div>
-    <div class="control-buttons" v-if="currentStage === stages.length - 1">
+    <div class="control-buttons" v-if="currentStage === stages.length - 1" v-show="!tripFinished">
       <button class="nintendo-btn nintendo-btn--blue" @click="endTrip">
         Complete the Odyssey!
       </button>
@@ -245,6 +245,19 @@ const rollback = async () => {
     alert(errorMessage)
   } finally {
     isUpdating.value = false
+  }
+}
+
+
+const tripFinished = ref(false)
+const endTrip = async  () => {
+
+  try {
+    const res = await apiClient.put(`/group/${groupStore.myGroup.groupId}/end-trip`)
+    console.log(res)
+    tripFinished.value=true
+  } catch (error) {
+    console.log(error)
   }
 }
 </script>

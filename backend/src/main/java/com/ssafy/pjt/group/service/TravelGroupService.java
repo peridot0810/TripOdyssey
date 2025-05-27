@@ -18,4 +18,6 @@ public interface TravelGroupService {
 	
 	public String uploadImage(Integer groupId,MultipartFile file) throws IOException;
 	public void updateProgress(Integer groupId, UpdateProgressRequestDto updateProgressRequest);
+	
+	public void endTrip(Integer groupId, String userId);
 }
