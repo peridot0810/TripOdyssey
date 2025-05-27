@@ -246,4 +246,4 @@
 - Mock Up: /docs/MockUp.png
   - figma link: https://www.figma.com/design/fG9AtMugVSTuskDwyk84Xf/EnjoyTrip?node-id=0-1
 - 설명 자료: /docs/TripOdyssey.pdf, /docs/TripOdyssey.pptx
-- 시연 영상: [YouTube 링크 삽입 예정]
+- 시연 영상: https://youtu.be/SLysV0k-uzU
