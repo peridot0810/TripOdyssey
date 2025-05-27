@@ -312,7 +312,7 @@ onUnmounted(() => {
 }
 
 .page-schedule {
-  background-color: #d13166;
+  background-color: #eb3b67;
 }
 
 /* background: linear-gradient(135deg, #ff9900 0%, rgba(249, 115, 22, 0.05) 100%); */

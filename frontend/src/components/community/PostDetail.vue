@@ -1,3 +1,5 @@
+<!-- 이 코드 안씀!!!! CommunityView에 있음 -->
+
 <template>
   <v-dialog v-model="dialog" max-width="800px" scrollable>
     <v-card>

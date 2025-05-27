@@ -5,17 +5,14 @@
     :class="{
       selected: isSelected,
       unselected: !isSelected && hasSelection,
+      [role.key]: true, // Add this line to include the role key as a class
     }"
     @click="$emit('select', role.id)"
   >
     <!-- 카드 내부 콘텐츠 (이미지 포함) -->
     <div class="role-card-inner">
       <div class="role-image-container">
-        <img
-          :src="getRoleImagePath()"
-          :alt="role.name"
-          class="role-image"
-        />
+        <img :src="getRoleImagePath()" :alt="role.name" class="role-image" />
       </div>
     </div>
 
@@ -43,8 +40,8 @@ const props = defineProps({
 // 역할에 따른 이미지 경로 반환 함수
 const getRoleImagePath = () => {
   // role.key에 따라 해당하는 _btn 이미지 반환
-  if (props.role.key === 'scheduler') {
-    return '/img/schedule_bnt.png'  // 파일명 오타 그대로 사용 (bnt)
+  if (props.role.key === 'schedule') {
+    return '/img/schedule_bnt.png' // 파일명 오타 그대로 사용 (bnt)
   } else if (props.role.key === 'finance') {
     return '/img/finance_btn.png'
   } else if (props.role.key === 'logistics') {
@@ -64,7 +61,7 @@ defineEmits(['select'])
 /* ===== 메인 카드 스타일 ===== */
 .role-card {
   position: relative;
-  background: #D9D9D9; /* 카드 배경색 - 여기서 변경 가능 */
+  background: #d9d9d9; /* 카드 배경색 - 여기서 변경 가능 */
   border-radius: 20px; /* 카드 모서리 둥글기 - 여기서 변경 가능 */
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* 애니메이션 속도 조절 */
@@ -135,13 +132,25 @@ defineEmits(['select'])
   z-index: 1; /* 카드 뒤에 표시 */
   border: 5px solid transparent; /* 투명한 테두리 생성 */
 
-    /* 그라데이션 배경 설정 */
-    background:
-    linear-gradient(#D9D9D9, #D9D9D9) padding-box, /* 내부 영역 색상 */
-    linear-gradient(to right, #1976d2, #8E24AA, #6A1B9A, #42a5f5, #1976d2, #1976d2) border-box; /* 테두리 그라데이션 색상 - 여기서 색상 변경 가능 */
+  /* 그라데이션 배경 설정 */
+  background:
+    linear-gradient(#d9d9d9, #d9d9d9) padding-box,
+    /* 내부 영역 색상 */
+      linear-gradient(to right, #1976d2, #8e24aa, #6a1b9a, #42a5f5, #1976d2, #1976d2) border-box; /* 테두리 그라데이션 색상 - 여기서 색상 변경 가능 */
 
   background-size: 200% 100%; /* 그라데이션 크기 - 애니메이션 속도에 영향 */
   animation: gradientMove 5s linear infinite; /* 애니메이션 적용 - 5s는 속도 조절 가능 */
+}
+
+.glow-border {
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border-radius: 18px;
+  z-index: -1;
+  animation: borderGlow 2s linear infinite;
 }
 
 /* ===== 그라데이션 이동 애니메이션 ===== */
@@ -170,5 +179,43 @@ defineEmits(['select'])
     border-width: 15px; /* 모바일에서 테두리 두께 */
     border-radius: 35px; /* 모바일에서 테두리 모서리 둥글기 */
   }
+}
+
+/* Role-specific colors */
+.role-card.logistics.selected {
+  background: linear-gradient(145deg, rgba(59, 130, 246, 0.8), rgba(59, 130, 246, 0.6));
+  box-shadow: 0 20px 60px rgba(59, 130, 246, 0.4);
+}
+
+.role-card.schedule.selected {
+  background: linear-gradient(145deg, rgba(236, 72, 153, 0.8), rgba(236, 72, 153, 0.6));
+  box-shadow: 0 20px 60px rgba(236, 72, 153, 0.4);
+}
+
+.role-card.finance.selected {
+  background: linear-gradient(145deg, rgba(249, 115, 22, 0.8), rgba(249, 115, 22, 0.6));
+  box-shadow: 0 20px 60px rgba(249, 115, 22, 0.4);
+}
+
+.role-card.normal.selected {
+  background: linear-gradient(145deg, rgba(107, 114, 128, 0.8), rgba(107, 114, 128, 0.6));
+  box-shadow: 0 20px 60px rgba(107, 114, 128, 0.4);
+}
+
+/* Glow border colors for each role */
+.role-card.logistics .glow-border {
+  background: linear-gradient(45deg, #3b82f6, #60a5fa, #3b82f6, #60a5fa);
+}
+
+.role-card.schedule .glow-border {
+  background: linear-gradient(45deg, #ff3176, #f35ba2, #ec4899, #f472b6);
+}
+
+.role-card.finance .glow-border {
+  background: linear-gradient(45deg, #f97316, #fb923c, #f97316, #fb923c);
+}
+
+.role-card.normal .glow-border {
+  background: linear-gradient(45deg, #6b7280, #9ca3af, #6b7280, #9ca3af);
 }
 </style>

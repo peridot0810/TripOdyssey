@@ -177,6 +177,7 @@ onMounted(() => {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  background-color: #fffaf7;
 }
 
 .background-image {
@@ -185,7 +186,7 @@ onMounted(() => {
   left: 0;
   width: 100%;
   height: 100%;
-  background-size: cover;
+  background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
   transition: background-image 0.8s cubic-bezier(0.4, 0, 0.2, 1);

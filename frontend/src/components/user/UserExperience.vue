@@ -1,7 +1,7 @@
 <template>
   <v-card class="experience-card" elevation="3">
     <v-card-title class="text-h6 font-weight-bold d-flex align-center">
-      <v-icon color="primary" class="mr-2">mdi-chart-donut</v-icon>
+      <svg-icon type="mdi" :path="chartDonutPath" size="22" color="#1976d2" class="mr-2" style="vertical-align: middle;" />
       경험치 현황
     </v-card-title>
     <v-divider></v-divider>
@@ -75,6 +75,10 @@
 
 <script setup>
 import { computed } from 'vue'
+import SvgIcon from '@jamescoyle/vue-icon'
+import { mdiChartDonut } from '@mdi/js'
+
+const chartDonutPath = mdiChartDonut
 
 const props = defineProps({
   experienceData: {

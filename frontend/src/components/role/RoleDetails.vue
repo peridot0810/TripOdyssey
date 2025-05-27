@@ -1,5 +1,5 @@
 <template>
-  <v-card class="role-details-card" :class="{ 'slide-in': show }" elevation="24">
+  <v-card class="role-details-card" :class="[{ 'slide-in': show }, roleClass]" elevation="24">
     <div class="role-details-header">
       <v-icon :icon="selectedRole.icon" size="48" :color="getRoleColor(selectedRole.key)" class="mb-2" />
       <h2 class="role-details-title" :style="{ color: getRoleColor(selectedRole.key) }">{{ selectedRole.name }}</h2>
@@ -79,7 +79,8 @@
 </template>
 
 <script setup>
-defineProps({
+import { computed } from 'vue'
+const props = defineProps({
   selectedRole: {
     type: Object,
     required: true,
@@ -91,6 +92,21 @@ defineProps({
 })
 
 defineEmits(['confirm'])
+
+const roleClass = computed(() => {
+  switch (props.selectedRole.key) {
+    case 'MASTER':
+      return 'role-master'
+    case 'FINANCE':
+      return 'role-finance'
+    case 'SCHEDULE':
+      return 'role-schedule'
+    case 'LOGISTICS':
+      return 'role-logistics'
+    default:
+      return ''
+  }
+})
 
 function getDifficultyText(difficulty) {
   switch (difficulty) {
@@ -147,7 +163,7 @@ function getButtonGradientStyle(roleKey) {
 .role-details-card {
   position: fixed;
   top: 50%;
-  right: -400px;
+  right: -300px;
   transform: translateY(-50%);
   width: 380px;
   max-height: 80vh;
@@ -156,7 +172,7 @@ function getButtonGradientStyle(roleKey) {
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 16px;
-  transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: right 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 1000;
   box-shadow: -8px 0 32px rgba(0, 0, 0, 0.2);
   padding: 24px;
@@ -246,5 +262,22 @@ function getButtonGradientStyle(roleKey) {
   .role-details-card.slide-in {
     right: calc(3vw + 16px);
   }
+}
+
+/* 🎮 Nintendo-style role borders */
+.role-master {
+  border: 3px solid #764ba2; /* Purple */
+}
+
+.role-finance {
+  border: 3px solid #ff8c42; /* Orange */
+}
+
+.role-schedule {
+  border: 3px solid #ffb3d9; /* Pink */
+}
+
+.role-logistics {
+  border: 3px solid #4da6ff; /* Blue */
 }
 </style>
