@@ -192,6 +192,15 @@
     ```bash
     JWT_SECRET_KEY={jwt secret key} 
     ```
+3. **KAKAO Key 설정**
+  - frontend/.env 생성 후 KAKAO KEY 정보 입력
+    ```bash
+    VITE_KAKAO_JS_KEY={vite kakao js key}
+    VITE_KAKAO_REST_KEY={vite kakao rest key}
+
+    VITE_API_BASE_URL=http://localhost:8080
+    ```
+
 
 ### ✅ 백엔드 실행 (Spring Boot)
 1. **백엔드 디렉토리 진입**
