@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import com.ssafy.pjt.group.dto.request.UpdateProgressRequestDto;
+import com.ssafy.pjt.group.dto.request.UpdateUserExperienceRequestDto;
 import com.ssafy.pjt.group.entity.GroupProgress;
 import com.ssafy.pjt.group.entity.GroupRoleLimit;
 import com.ssafy.pjt.group.entity.TravelGroup;
@@ -40,4 +41,6 @@ public interface TravelGroupMapper {
 
     void updateGroupImage(Integer groupId, String imgUrl);
     void updateGroupProgress(UpdateProgressRequestDto updateProgressRequest);
+    
+    void updateUserExperience(UpdateUserExperienceRequestDto updateUserExperienceRequest);
 }
