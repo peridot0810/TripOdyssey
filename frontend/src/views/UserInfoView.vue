@@ -19,7 +19,8 @@
             <v-col cols="12">
               <UserGroups 
               :joinedGroups="joinedGroups"
-              :invitedGroups="invitedGroups"/>
+              :invitedGroups="invitedGroups"
+              @accept-invitation="onAcceptInvitation"/>
             </v-col>
           </v-row>
         </v-col>
@@ -33,10 +34,7 @@ import { ref, onMounted, computed } from 'vue'
 import UserProfile from '@/components/user/UserProfile.vue'
 import UserExperience from '@/components/user/UserExperience.vue'
 import UserGroups from '@/components/user/UserGroups.vue'
-import { useUserStore } from '@/stores/user'
 import { apiClient } from '@/stores/apiClient'
-
-const userStore = useUserStore()
 
 const userInfo = ref(null)
 const joinedGroups = ref([])
@@ -73,6 +71,12 @@ const isLoaded = computed(() =>
   joinedGroups.value !== null &&
   invitedGroups.value !== null
 )
+
+function onAcceptInvitation({ newGroup }) {
+  // joinedGroups는 부모의 data나 ref여야 함!
+  joinedGroups.value.unshift(newGroup)
+}
+
 </script>
 
 <style scoped>

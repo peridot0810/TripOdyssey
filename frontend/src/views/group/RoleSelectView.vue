@@ -243,13 +243,11 @@ onMounted(() => {
 }
 
 .roles-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 24px;
-  margin-bottom: 48px;
-  max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
+  display: flex;
+  justify-content: center;
+  gap: 46px;
+  margin: 40px 0;
+  flex-wrap: wrap;
 }
 
 .bottom-navigation {
