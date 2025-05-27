@@ -73,12 +73,12 @@ const fetchTeamAvailability = async () => {
 
     if (response.data.success) {
       // Transform the data to match our store format
-      const availabilityData = response.data.data.map(item => ({
+      const availabilityData = response.data.data.map((item) => ({
         id: item.id,
         userId: item.userId || item.user_id,
         groupId: item.groupId || item.group_id || groupId,
         startDate: item.startDate || item.start_date,
-        endDate: item.endDate || item.end_date
+        endDate: item.endDate || item.end_date,
       }))
 
       console.log('Fetched availability data:', availabilityData)
@@ -115,41 +115,41 @@ const fetchTeamAvailability = async () => {
   }
 }
 
-const fetchUserAvailability = async () => {
-  if (!groupId || !userStore.isLoggedIn) {
-    return // Skip if no group or user not logged in
-  }
+// const fetchUserAvailability = async () => {
+//   if (!groupId || !userStore.isLoggedIn) {
+//     return // Skip if no group or user not logged in
+//   }
 
-  try {
-    console.log('Fetching user availability for group:', groupId)
+//   try {
+//     console.log('Fetching user availability for group:', groupId)
 
-    // Try the correct endpoint path - adjust this based on your actual API
-    const response = await apiClient.get(`/meet/schedule/user/${groupId}`)
+//     // Try the correct endpoint path - adjust this based on your actual API
+//     const response = await apiClient.get(`/meet/schedule/${groupId}`)
 
-    if (response.data.success) {
-      // Transform the data to match our store format
-      const userAvailabilityData = response.data.data.map(item => ({
-        id: item.id,
-        startDate: item.startDate || item.start_date,
-        endDate: item.endDate || item.end_date
-      }))
+//     if (response.data.success) {
+//       // Transform the data to match our store format
+//       const userAvailabilityData = response.data.data.map((item) => ({
+//         id: item.id,
+//         startDate: item.startDate || item.start_date,
+//         endDate: item.endDate || item.end_date,
+//       }))
 
-      console.log('Fetched user availability data:', userAvailabilityData)
+//       console.log('Fetched user availability data:', userAvailabilityData)
 
-      // Save to Pinia store
-      when2MeetStore.setUserAvailability(userAvailabilityData)
+//       // Save to Pinia store
+//       when2MeetStore.setUserAvailability(userAvailabilityData)
 
-      console.log('User availability loaded successfully')
-    } else {
-      console.log('No user availability data found')
-      when2MeetStore.setUserAvailability([])
-    }
-  } catch (error) {
-    console.error('Error fetching user availability:', error)
-    // Don't show error for user availability - it's okay if it doesn't exist
-    when2MeetStore.setUserAvailability([])
-  }
-}
+//       console.log('User availability loaded successfully')
+//     } else {
+//       console.log('No user availability data found')
+//       when2MeetStore.setUserAvailability([])
+//     }
+//   } catch (error) {
+//     console.error('Error fetching user availability:', error)
+//     // Don't show error for user availability - it's okay if it doesn't exist
+//     when2MeetStore.setUserAvailability([])
+//   }
+// }
 
 const initializeData = async () => {
   isInitialLoading.value = true
@@ -166,7 +166,7 @@ const initializeData = async () => {
 
     // Fetch user availability (optional)
     if (userStore.isLoggedIn) {
-      await fetchUserAvailability()
+      //await fetchUserAvailability()
     }
   } catch (error) {
     console.error('Error during data initialization:', error)

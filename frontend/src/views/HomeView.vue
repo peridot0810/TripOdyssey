@@ -36,7 +36,7 @@
     <!-- Create Group Button -->
     <div class="create-group-section">
       <v-btn class="create-group-btn" @click="openCreateGroupDialog" rounded elevation="0">
-        CREATE NEW GROUP
+        새 여행 그룹 만들기
       </v-btn>
     </div>
 

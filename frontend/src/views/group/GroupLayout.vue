@@ -78,8 +78,8 @@ const links = [
   { label: '그룹 관리', path: 'master', icon: 'master.png' },
   { label: '일정 조율', path: 'meeting', icon: 'meeting.png' },
   { label: '장소 찾기', path: 'map', icon: 'map.png' },
-  { label: '일정 계획', path: 'schedule', icon: 'schedule.png' },
-  { label: '교통/숙소', path: 'logistics', icon: 'logistics.png' },
+  // { label: '일정 계획', path: 'schedule', icon: 'schedule.png' },
+  // { label: '교통/숙소', path: 'logistics', icon: 'logistics.png' },
   { label: '재무', path: 'finance', icon: 'finance.png' },
   { label: '역할', path: 'role', icon: 'role.png' },
 ]
