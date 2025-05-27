@@ -4,6 +4,7 @@
     :class="{
       selected: isSelected,
       unselected: !isSelected && hasSelection,
+      [role.key]: true, // Add this line to include the role key as a class
     }"
     @click="$emit('select', role.id)"
   >
@@ -155,7 +156,6 @@ defineEmits(['select'])
   left: -2px;
   right: -2px;
   bottom: -2px;
-  background: linear-gradient(45deg, #1976d2, #42a5f5, #1976d2, #42a5f5);
   border-radius: 18px;
   z-index: -1;
   animation: borderGlow 2s linear infinite;
@@ -187,5 +187,43 @@ defineEmits(['select'])
   .role-subtitle {
     font-size: 0.8rem;
   }
+}
+
+/* Role-specific colors */
+.role-card.logistics.selected {
+  background: linear-gradient(145deg, rgba(59, 130, 246, 0.8), rgba(59, 130, 246, 0.6));
+  box-shadow: 0 20px 60px rgba(59, 130, 246, 0.4);
+}
+
+.role-card.schedule.selected {
+  background: linear-gradient(145deg, rgba(236, 72, 153, 0.8), rgba(236, 72, 153, 0.6));
+  box-shadow: 0 20px 60px rgba(236, 72, 153, 0.4);
+}
+
+.role-card.finance.selected {
+  background: linear-gradient(145deg, rgba(249, 115, 22, 0.8), rgba(249, 115, 22, 0.6));
+  box-shadow: 0 20px 60px rgba(249, 115, 22, 0.4);
+}
+
+.role-card.normal.selected {
+  background: linear-gradient(145deg, rgba(107, 114, 128, 0.8), rgba(107, 114, 128, 0.6));
+  box-shadow: 0 20px 60px rgba(107, 114, 128, 0.4);
+}
+
+/* Glow border colors for each role */
+.role-card.logistics .glow-border {
+  background: linear-gradient(45deg, #3b82f6, #60a5fa, #3b82f6, #60a5fa);
+}
+
+.role-card.schedule .glow-border {
+  background: linear-gradient(45deg, #ff3176, #f35ba2, #ec4899, #f472b6);
+}
+
+.role-card.finance .glow-border {
+  background: linear-gradient(45deg, #f97316, #fb923c, #f97316, #fb923c);
+}
+
+.role-card.normal .glow-border {
+  background: linear-gradient(45deg, #6b7280, #9ca3af, #6b7280, #9ca3af);
 }
 </style>
