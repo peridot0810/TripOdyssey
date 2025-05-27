@@ -26,7 +26,7 @@
       <!-- Navigation Links -->
       <div class="navigator">
         <div
-          v-for="item in links"
+          v-for="item in filterdLinks"
           :key="item.label"
           class="nav-item"
           :class="{ 'nav-item-active': isActiveRoute(item.path) }"
@@ -71,7 +71,7 @@ const router = useRouter()
 const groupStore = useGroupStore()
 const userStore = useUserStore()
 const memberListStore = useMemberListStore()
-const members = computed(() => [...memberListStore.members].filter(a => a.userId===userStore.userInfo.id)) 
+const member = computed(() => memberListStore.members.find(a => a.userId===userStore.userInfo.id)) 
 
 const isLoading = ref(false)
 const error = ref(null)
@@ -88,6 +88,33 @@ const links = [
   { label: '재무', path: 'finance', icon: 'finance.png' },
   { label: '역할', path: 'role', icon: 'role.png' },
 ]
+
+// 네비게이션 메뉴 필터링
+const filterdLinks = computed(() => {
+  if(!member.value || !member.value.roles) return []
+
+  const alwaysIncludeLabels = ['그룹 홈', '일정 조율', '장소 찾기', '역할'];
+  const roleToLabelMap = {
+    0: '그룹 관리',
+    1: '일정 계획',
+    2: '재무',
+    3: '교통/숙소',
+  };
+
+  return [...links].filter(link => {
+    if (alwaysIncludeLabels.includes(link.label)) {
+      return true;
+    }
+
+    for (let i = 0; i < member.value.roles.length; i++) {
+      if (member.value.roles[i] === true && roleToLabelMap[i] === link.label) {
+        return true;
+      }
+    }
+
+    return false;
+  });
+})
 
 // 아이콘 경로 생성 함수
 const getIconPath = (iconName) => {
