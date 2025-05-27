@@ -203,4 +203,5 @@
 - API 명세(Swagger): (백엔드 실행 상태에서) http://localhost:8080/swagger-ui/index.html
 - Mock Up: /docs/MockUp.png
   - figma link: https://www.figma.com/design/fG9AtMugVSTuskDwyk84Xf/EnjoyTrip?node-id=0-1
+- 설명 자료: /docs/TripOdyssey.pdf, /docs/TripOdyssey.pptx
 - 시연 영상: [YouTube 링크 삽입]
