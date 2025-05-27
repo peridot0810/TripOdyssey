@@ -15,7 +15,7 @@
           class="flex-grow-1"
           :class="{ 'selected-category': selectedCategoryIndex === 'all' }"
         >
-          <v-icon class="mr-2">mdi-map-marker-multiple</v-icon>
+          <svg-icon type="mdi" :path="mapMarkerMultiplePath" size="20" class="mr-2" style="vertical-align: middle;" />
           전체
         </v-btn>
         <v-btn
@@ -23,7 +23,7 @@
           class="flex-grow-1"
           :class="{ 'selected-category': selectedCategoryIndex === '1' }"
         >
-          <v-icon class="mr-2">mdi-information</v-icon>
+          <svg-icon type="mdi" :path="informationPath" size="20" class="mr-2" style="vertical-align: middle;" />
           여행정보
         </v-btn>
         <v-btn
@@ -31,7 +31,7 @@
           class="flex-grow-1"
           :class="{ 'selected-category': selectedCategoryIndex === '2' }"
         >
-          <v-icon class="mr-2">mdi-account-group</v-icon>
+          <svg-icon type="mdi" :path="accountGroupPath" size="20" class="mr-2" style="vertical-align: middle;" />
           같이가요
         </v-btn>
       </v-btn-toggle>
@@ -49,17 +49,17 @@
         @keyup.enter="performSearch"
       >
         <template v-slot:prepend-inner>
-          <v-icon color="grey">mdi-magnify</v-icon>
+          <svg-icon type="mdi" :path="magnifyPath" size="20" color="grey" style="vertical-align: middle;" />
         </template>
         <template v-slot:append-inner>
           <v-btn v-if="searchKeyword" icon size="small" variant="text" @click="clearSearch">
-            <v-icon size="small">mdi-close</v-icon>
+            <svg-icon type="mdi" :path="closePath" size="16" style="vertical-align: middle;" />
           </v-btn>
         </template>
       </v-text-field>
 
       <v-btn color="primary" variant="flat" class="search-btn" @click="performSearch">
-        <v-icon>mdi-magnify</v-icon>
+        <svg-icon type="mdi" :path="magnifyPath" size="20" class="mr-1" style="vertical-align: middle;" />
         검색
       </v-btn>
 
@@ -75,7 +75,7 @@
         @update:model-value="updateSort"
       >
         <template v-slot:prepend-inner>
-          <v-icon color="grey" size="small">mdi-sort</v-icon>
+          <svg-icon type="mdi" :path="sortPath" size="16" color="grey" style="vertical-align: middle;" />
         </template>
       </v-select>
     </div>
@@ -84,6 +84,22 @@
 
 <script setup>
 import { ref, watch } from 'vue'
+import SvgIcon from '@jamescoyle/vue-icon'
+import {
+  mdiMapMarkerMultiple,
+  mdiInformation,
+  mdiAccountGroup,
+  mdiMagnify,
+  mdiClose,
+  mdiSort,
+} from '@mdi/js'
+
+const mapMarkerMultiplePath = mdiMapMarkerMultiple
+const informationPath = mdiInformation
+const accountGroupPath = mdiAccountGroup
+const magnifyPath = mdiMagnify
+const closePath = mdiClose
+const sortPath = mdiSort
 
 const props = defineProps({
   modelCategory: {
