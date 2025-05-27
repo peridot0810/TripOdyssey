@@ -21,13 +21,13 @@
 
 ## 🧭 프로젝트 개요
 
-> “여행 준비, 이제는 귀찮지 않다!”
+> “여행 준비, 이제는 게임처럼!”
 
 **Trip Odyssey**는 그룹 내 **역할 분담**을 중심으로,  
 각 멤버의 역할에 꼭 맞는 기능을 제공하여  
 여행 준비의 복잡함을 **쉽고 체계적으로 해결해주는 All-in-One 웹 플랫폼**입니다.  
 
-기획자, 일정 관리자, 재무 담당 등 역할별 기능을 통해  
+교통/숙소 담당, 일정 담당, 재무 담당 등 역할별로 제공되는 기능을 통해  
 여행 준비 과정이 **협업 중심의 게임처럼 재미있는 경험**이 되도록 설계되었습니다.  
 
 또한, **AI 기능을 통해 일정 최적화, 지출 리포트 생성, 교통정보 등록 자동화** 등  
@@ -131,15 +131,8 @@
 | 6-1  | 재무 페이지 진입  | 그룹 내 "재무" 메뉴를 클릭해 재무 관리 대시보드에 진입                               |
 | 6-2  | 지출 내역 기록    | 각 그룹 일정 우측 + 버튼으로 금액, 카테고리별로 지출 내역을 실시간 입력할 수 있음          |
 | 6-3  | 영수증 정보 추가  | 각 지출 항목에 대해 장소, 시간, 금액 등 상세 정보를 입력할 수 있음                 |
-| 6-4  | AI 지출 분석      | "분석 보기" 클릭 시 카테고리별 지출 비율, 일별 추이 등 시각적 분석 그래프 제공        |
+| 6-4  | AI 지출 분석      | 좌측 하단 캐릭터 버튼을 클릭 시 카테고리별 지출 비율, 일별 추이 등 시각적 분석 그래프 제공        |
 | 6-5  | 개인별 입금 현황  | 멤버별 입금 상태를 체크리스트로 확인하고 실시간 추적할 수 있음                     |
-
-
-## 7. 최종 정산 및 마무리
-
-|  | 기능명            | 기능 요약 설명                                                               |
-|--|-------------------|----------------------------------------------------------------------------|
-| 7-1  | 여행 상태 변경    | 상태 드롭다운에서 "재무 회계" 등으로 최종 여행 상태를 변경할 수 있음               |
 
 
 ## 추가 보조 기능
@@ -193,19 +186,21 @@
     ```
     http://localhost:5173/login
     ```
-4. **회원가입/로그인 후 사용 가능**
+4. **회원가입/로그인 후 서비스 이용 가능**
 ---
 ## 💁‍♂️ 프로젝트 팀원
-| ![](https://github.com/yewon-Noh.png?size=120) | ![](https://github.com/SeongHo-C.png?size=120) | ![](https://github.com/SeongHo-C.png?size=120) |
+| <img src="https://github.com/wlgns012.png?size=120" width="100"/> | <img src="https://github.com/peridot0810.png?size=120" width="100"/> | <img src="https://github.com/honger062.png?size=120" width="100"/> |
 |:---:|:---:|:---:|
-|[박지훈](https://github.com/yewon-Noh)|[김준혁](https://github.com/SeongHo-C)| [봉현진](https://github.com/SeongHo-C)|
+| [박지훈](https://github.com/wlgns012) | [김준혁](https://github.com/peridot0810) | [봉현진](https://github.com/honger062) |
 
 ---
 
 ## 📌 기타 사항
 
 서비스 로고, 시연 영상, ERD, API 명세서 등은 아래 링크에서 확인하실 수 있습니다.
-	- 로고 이미지: /frontend/src/assets/logo.png
-	- ERD: /docs/erd.png
-  - API 명세(Swagger): 
-	- 시연 영상: [YouTube 링크 삽입]
+- 로고 이미지: /frontend/src/assets/logo.png
+- ERD: /docs/erd.png
+- API 명세(Swagger): (백엔드 실행 상태에서) http://localhost:8080/swagger-ui/index.html
+- Mock Up: /docs/MockUp.png
+  - figma link: https://www.figma.com/design/fG9AtMugVSTuskDwyk84Xf/EnjoyTrip?node-id=0-1
+- 시연 영상: [YouTube 링크 삽입]
