@@ -37,7 +37,7 @@
           src="@/assets/logo.png"
           alt="Trip Odyssey Logo"
           class="logo-img"
-          style="height: 130px; width: auto; display: block;"
+          style="height: 70px; width: auto; display: block;"
         />
       </v-toolbar-title>
 
