@@ -45,14 +45,23 @@
 
     <!-- Confirmation Dialog -->
     <v-dialog v-model="confirmDialog" max-width="500">
-      <v-card class="text-center pa-4">
-        <v-card-title class="text-h5 mb-2"> 역할 확정 </v-card-title>
-        <v-card-text>
-          <v-icon :icon="selectedRole?.icon" size="64" color="primary" class="mb-4" />
-          <p class="text-body-1">
+      <v-card class="text-center pa-4 custom-confirm-card">
+        <v-card-title class="text-h5 mb-1 pa-0" >역할 확정</v-card-title>
+        <v-card-text class="pa-0" style="margin-bottom:16px;">
+          <v-icon
+            v-if="selectedRole?.icon"
+            :icon="selectedRole.icon"
+            size="48"
+            color="primary"
+            class="mb-2"
+            style="margin-bottom:12px;"
+          />
+          <p class="text-body-1" style="margin-bottom:4px;">
             <strong>{{ selectedRole?.name }}</strong> 역할을 선택하시겠습니까?
           </p>
-          <p class="text-caption text-grey">선택한 후에도 설정에서 역할을 변경할 수 있습니다.</p>
+          <p class="text-caption text-grey" style="margin-bottom:0;">
+            선택한 후에도 설정에서 역할을 변경할 수 있습니다.
+          </p>
         </v-card-text>
         <v-card-actions class="justify-center">
           <v-btn variant="text" @click="confirmDialog = false" :disabled="isSubmitting">
@@ -71,6 +80,7 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
   </div>
 </template>
 
@@ -266,6 +276,24 @@ onMounted(() => {
 .back-btn:hover {
   background: rgba(255, 255, 255, 0.2);
   transform: translateY(-2px);
+}
+
+
+.custom-confirm-card .v-card-title {
+  margin-bottom: 8px !important;
+  padding-bottom: 0 !important;
+  padding-top: 0 !important;
+}
+.custom-confirm-card .v-card-text {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin-bottom: 12px !important;
+}
+.custom-confirm-card .v-icon {
+  margin-bottom: 8px !important;
+}
+.custom-confirm-card p {
+  margin-bottom: 4px !important;
 }
 
 /* Mobile responsiveness */

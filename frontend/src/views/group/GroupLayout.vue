@@ -61,6 +61,7 @@
 import { ref, onMounted, watch, onUnmounted, computed } from 'vue'
 import { useRoute, useRouter, RouterView } from 'vue-router'
 import { useGroupStore } from '@/stores/group'
+import { useMemberListStore } from '@/stores/memberList'
 import { apiClient } from '@/utils/apiClient'
 import HelperSpace from '@/components/ai/HelperSpace.vue'
 

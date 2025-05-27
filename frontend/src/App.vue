@@ -13,7 +13,7 @@
       }"
       elevation="0"
     >
-      <v-toolbar-title
+      <!-- <v-toolbar-title
         class="font-weight-bold custom-title"
         style="
           font-family: 'Inter', sans-serif;
@@ -27,7 +27,21 @@
         "
       >
         Trip Odyssey
+      </v-toolbar-title> -->
+
+      <v-toolbar-title
+        class="font-weight-bold custom-title"
+        style="padding: 8px 0; display: flex; align-items: center;"
+      >
+        <img
+          src="@/assets/logo.png"
+          alt="Trip Odyssey Logo"
+          class="logo-img"
+          style="height: 130px; width: auto; display: block;"
+        />
       </v-toolbar-title>
+
+
 
       <v-btn to="/" class="custom-nav-btn" :class="{ 'active-btn': $route.path === '/' }" exact>
         HOME
