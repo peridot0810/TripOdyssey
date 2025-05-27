@@ -127,6 +127,13 @@
 		    <groupId>org.springframework.ai</groupId>
 		    <artifactId>spring-ai-pdf-document-reader</artifactId>
 		</dependency>
+
+		<!-- dotEnv -->
+		<dependency>
+			<groupId>io.github.cdimascio</groupId>
+			<artifactId>dotenv-java</artifactId>
+			<version>3.0.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>

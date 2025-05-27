@@ -149,7 +149,6 @@
 
 ## 🚀 실행 방법
 
-
 ### ✅ 프로젝트 클론
 1. **git clone**
     ```bash
@@ -158,6 +157,40 @@
 2. **프로젝트 진입**
     ```bash
     cd ssafy_trip_final_kimjoonhyeok_parkjihun_bonghyenjin/
+    ```
+
+### ✅ DB(MySQL) 설정
+1. **스키마 생성**
+- 이름 : tripsaga
+
+2. **DB 계정 정보 설정**
+- backend/src/main/resources/application.properties 수정
+    ```bash
+    # ------------------------
+    # ✅ DB 접속 설정
+    # ------------------------
+    spring.datasource.url=jdbc:mysql://localhost:3306/tripsaga?serverTimezone=Asia/Seoul&useSSL=false&allowMultiQueries=true
+    spring.datasource.username={사용자 계정 입력}
+    spring.datasource.password={사용자 계정 비밀번호 입력}
+    spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+    ```
+
+3. **테이블 생성**
+- backend/src/main/resources/sql/schema.sql 실행
+
+4. **데이터 삽입**
+- backend/src/main/resources/sql/attraction_data.sql, dummy_data.sql 실행
+
+### ✅ 환경 변수 설정
+1. **Chat GPT API 설정**
+  - backend/.env 생성 후 OPEN API KEY 정보 입력
+    ```bash
+    OPENAI_API_KEY={open api key}
+    ``` 
+2. **JWT Secrete Key 설정**
+  - backend/.env에 JWT 비밀 키 정보 추가 입력
+    ```bash
+    JWT_SECRET_KEY={jwt secret key} 
     ```
 
 ### ✅ 백엔드 실행 (Spring Boot)
@@ -204,4 +237,4 @@
 - Mock Up: /docs/MockUp.png
   - figma link: https://www.figma.com/design/fG9AtMugVSTuskDwyk84Xf/EnjoyTrip?node-id=0-1
 - 설명 자료: /docs/TripOdyssey.pdf, /docs/TripOdyssey.pptx
-- 시연 영상: [YouTube 링크 삽입]
+- 시연 영상: [YouTube 링크 삽입 예정]
