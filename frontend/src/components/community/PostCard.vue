@@ -19,16 +19,23 @@
 
     <v-card-actions class="px-4 pb-3">
       <div class="d-flex align-center text-caption text-grey">
-        <v-icon size="small" class="mr-1">mdi-account</v-icon>
+        <svg-icon type="mdi" :path="accountPath" size="16" class="mr-1" style="vertical-align: middle;" />
         <span class="mr-4">{{ post.author }}</span>
 
-        <v-icon size="small" class="mr-1">mdi-eye</v-icon>
+        <svg-icon type="mdi" :path="eyePath" size="16" class="mr-1" style="vertical-align: middle;" />
         <span class="mr-4">{{ post.views }}</span>
 
-        <v-icon size="small" class="mr-1" color="red">mdi-heart</v-icon>
+        <svg-icon
+          type="mdi"
+          :path="heartPath"
+          size="16"
+          class="mr-1"
+          style="vertical-align: middle;"
+          :color="post.userLiked ? 'red' : '#757575'"
+        />
         <span class="mr-4">{{ post.likes }}</span>
 
-        <v-icon size="small" class="mr-1">mdi-comment</v-icon>
+        <svg-icon type="mdi" :path="commentPath" size="16" class="mr-1" style="vertical-align: middle;" />
         <span>{{ post.commentList?.length || 0 }}</span>
       </div>
     </v-card-actions>
@@ -37,6 +44,13 @@
 
 <script setup>
 import { categories } from '@/data/communityData.js'
+import SvgIcon from '@jamescoyle/vue-icon'
+import { mdiAccount, mdiEye, mdiHeart, mdiComment } from '@mdi/js'
+
+const accountPath = mdiAccount
+const eyePath = mdiEye
+const heartPath = mdiHeart
+const commentPath = mdiComment
 
 defineEmits(['click'])
 

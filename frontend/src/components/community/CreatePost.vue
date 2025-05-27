@@ -4,7 +4,7 @@
       <v-card-title class="d-flex justify-space-between align-center pa-4">
         <span class="text-h6">새 게시글 작성</span>
         <v-btn icon variant="text" @click="$emit('close')">
-          <v-icon>mdi-close</v-icon>
+          <svg-icon type="mdi" :path="closePath" size="20" />
         </v-btn>
       </v-card-title>
 
@@ -64,10 +64,13 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
+import SvgIcon from '@jamescoyle/vue-icon'
+import { mdiClose } from '@mdi/js'
 import {useUserStore} from '@/stores/user'
 import { categories } from '@/data/communityData.js'
 import { apiClient } from '@/stores/apiClient.js'
 
+const closePath = mdiClose
 const userStore = useUserStore();
 
 const props = defineProps({
