@@ -7,7 +7,7 @@
       @mouseenter="showTooltip = true"
       @mouseleave="showTooltip = false"
     >
-      <img src="/img/schedule.PNG" alt="AI Helper" class="ai-helper-image" />
+      <img src="/img/schedule_bnt.png" alt="AI Helper" class="ai-helper-image" />
     </div>
 
     <!-- Custom Dialog-style Tooltip with Fixed Positioning -->

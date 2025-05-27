@@ -1,8 +1,8 @@
 <template>
   <v-card class="role-details-card" :class="{ 'slide-in': show }" elevation="24">
     <div class="role-details-header">
-      <v-icon :icon="selectedRole.icon" size="48" color="primary" class="mb-2" />
-      <h2 class="role-details-title">{{ selectedRole.name }}</h2>
+      <v-icon :icon="selectedRole.icon" size="48" :color="getRoleColor(selectedRole.key)" class="mb-2" />
+      <h2 class="role-details-title" :style="{ color: getRoleColor(selectedRole.key) }">{{ selectedRole.name }}</h2>
       <p class="role-details-subtitle">{{ selectedRole.subtitle }}</p>
     </div>
 
@@ -26,7 +26,7 @@
         <v-chip
           v-for="skill in selectedRole.skills"
           :key="skill"
-          color="primary"
+          :color="getRoleColor(selectedRole.key)"
           variant="tonal"
           size="small"
           class="ma-1"
@@ -65,11 +65,11 @@
     <v-card-actions class="pa-4">
       <v-btn
         block
-        color="primary"
         variant="elevated"
         size="large"
         @click="$emit('confirm')"
         class="confirm-btn"
+        :style="getButtonGradientStyle(selectedRole.key)"
       >
         <v-icon icon="mdi-account-check" class="mr-2" />
         이 역할 선택하기
@@ -104,6 +104,43 @@ function getDifficultyText(difficulty) {
       return '보통'
   }
 }
+
+function getRoleColor(roleKey) {
+  switch (roleKey) {
+    case 'logistics':
+      return '#08549b'
+    case 'finance':
+      return '#ff9900'
+    case 'scheduler':
+      return '#d13166'
+    default:
+      return '#1976d2'  // 기본 색상
+  }
+}
+
+function getLighterColor(hexColor) {
+  // 색상을 RGB 형식으로 변환
+  const r = parseInt(hexColor.substring(1, 3), 16);
+  const g = parseInt(hexColor.substring(3, 5), 16);
+  const b = parseInt(hexColor.substring(5, 7), 16);
+
+  // 20% 밝게 (최대 255를 넘지 않도록)
+  const lighterR = Math.min(255, Math.floor(r + (255 - r) * 0.2));
+  const lighterG = Math.min(255, Math.floor(g + (255 - g) * 0.2));
+  const lighterB = Math.min(255, Math.floor(b + (255 - b) * 0.2));
+
+  // 다시 HEX 형식으로 변환
+  return `#${lighterR.toString(16).padStart(2, '0')}${lighterG.toString(16).padStart(2, '0')}${lighterB.toString(16).padStart(2, '0')}`;
+}
+
+function getButtonGradientStyle(roleKey) {
+  const baseColor = getRoleColor(roleKey);
+  const lighterColor = getLighterColor(baseColor);
+  return {
+    background: `linear-gradient(45deg, ${baseColor}, ${lighterColor})`,
+    color: 'white'
+  };
+}
 </script>
 
 <style scoped>
@@ -126,7 +163,7 @@ function getDifficultyText(difficulty) {
 }
 
 .role-details-card.slide-in {
-  right: 24px;
+  right: calc(3vw + 24px);
 }
 
 .role-details-header {
@@ -137,7 +174,6 @@ function getDifficultyText(difficulty) {
 .role-details-title {
   font-size: 1.5rem;
   font-weight: bold;
-  color: #1976d2;
   margin-bottom: 4px;
 }
 
@@ -176,16 +212,13 @@ function getDifficultyText(difficulty) {
 }
 
 .confirm-btn {
-  background: linear-gradient(45deg, #1976d2, #42a5f5);
-  color: white;
   font-weight: bold;
   letter-spacing: 0.5px;
 }
 
 .confirm-btn:hover {
-  background: linear-gradient(45deg, #1565c0, #2196f3);
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(25, 118, 210, 0.4);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
 }
 
 /* Custom scrollbar */
@@ -211,7 +244,7 @@ function getDifficultyText(difficulty) {
   }
 
   .role-details-card.slide-in {
-    right: 16px;
+    right: calc(3vw + 16px);
   }
 }
 </style>
