@@ -8,32 +8,45 @@
           <h3 class="group-title">{{ group.name }}</h3>
         </div>
 
-        <!-- 날짜 섹션 -->
-        <div class="date-section">
-          <div class="date-display">{{ group.startDate }} ~ {{ group.endDate }}</div>
-        </div>
+        <!-- 날짜 섹션 - 호버 시에만 표시 -->
+        <div class="date-section hover-only">
+          <div class="date-container">
+            <v-chip
+              class="date-chip"
+              size="small"
+              variant="flat"
+              color="primary"
+              prepend-icon="mdi-calendar"
+            >
+              {{ formattedStartDate }}
+            </v-chip>
 
-        <!-- 역할 제한 섹션 -->
-        <div class="role-limits">
-          <div class="limit-grid">
-            <div class="limit-item">
-              <span class="limit-label">재무:</span>
-              <span class="limit-value">{{ group.roleLimits.finance }}</span>
-            </div>
-            <div class="limit-item">
-              <span class="limit-label">일정:</span>
-              <span class="limit-value">{{ group.roleLimits.schedule }}</span>
-            </div>
-            <div class="limit-item">
-              <span class="limit-label">물류:</span>
-              <span class="limit-value">{{ group.roleLimits.logistics }}</span>
-            </div>
+            <v-icon class="date-separator" size="small" color="primary"> mdi-arrow-right </v-icon>
+
+            <v-chip
+              class="date-chip"
+              size="small"
+              variant="flat"
+              color="primary"
+              append-icon="mdi-calendar-check"
+            >
+              {{ formattedEndDate }}
+            </v-chip>
           </div>
         </div>
 
         <!-- 상태 표시 섹션 -->
         <div class="status-section">
-          <span class="status-text">{{ statusText }}</span>
+          <v-chip
+            class="status-chip"
+            :color="statusColor"
+            :variant="statusVariant"
+            size="large"
+            :prepend-icon="statusIcon"
+            elevation="2"
+          >
+            <span class="status-text">{{ statusText }}</span>
+          </v-chip>
         </div>
       </div>
 
@@ -64,6 +77,7 @@ const props = defineProps({
 })
 
 const router = useRouter()
+
 // 그룹 이미지 URL - 실제 이미지로 교체 가능
 const groupImageUrl = computed(() => {
   if (!props.group?.imageUrl) {
@@ -86,8 +100,28 @@ const statusText = computed(() => {
     planning: '계획 중',
     in_progress: '진행 중',
     completed: '완료',
+    canceled: '취소됨',
   }
   return statusMap[props.group.status] || props.group.status
+})
+
+// 날짜 포맷팅 함수 - YYYY-MM-DD를 YY년MM월DD일로 변환
+const formatDate = (dateString) => {
+  if (!dateString) return ''
+
+  // YYYY-MM-DD 형식 파싱
+  const [year, month, day] = dateString.split('-')
+  const shortYear = year.slice(-2) // 마지막 2자리만
+
+  return `${shortYear}년${parseInt(month)}월${parseInt(day)}일`
+}
+
+const formattedStartDate = computed(() => formatDate(props.group.startDate))
+const formattedEndDate = computed(() => formatDate(props.group.endDate))
+
+// 상태 클래스 계산
+const statusClass = computed(() => {
+  return `status-${props.group.status}`
 })
 
 // 그룹 페이지로 이동하는 함수
@@ -101,55 +135,119 @@ const goToGroupPage = () => {
 .group-card {
   width: 100%;
   height: 265px;
-  border-radius: 16px;
+  border-radius: 20px;
   overflow: hidden;
-  transition: all 0.3s ease; /* 애니메이션 속도 조정 */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
-  border: 1px solid #e0e0e0;
-  position: relative; /* 호버 효과를 위한 기준점 */
+  border: 3px solid #e2e8f0;
+  position: relative;
+  font-family:
+    'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', '맑은 고딕', sans-serif;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(255, 255, 255, 0.3) inset;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+}
+
+/* 상단 컬러 스트라이프 추가 */
+.group-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #f97316 0%, #ec4899 33%, #3b82f6 66%, #4ecdc4 100%);
+  border-radius: 20px 20px 0 0;
+  z-index: 3;
 }
 
 /* === 호버 효과 === */
-/* 카드 호버 시 약간 위로 이동하는 효과 */
 .group-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
+  border-color: #4ecdc4;
 }
 
-/* 호버 시 이미지 확장 효과 - 너비나 속도 조정 가능 */
 .group-card:hover .group-image {
   width: 100%;
   position: absolute;
   right: 0;
   top: 0;
   z-index: 1;
-  transition: all 0.5s ease;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* 호버 시 정보 오버레이 효과 */
 .group-card:hover .group-info {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.1); /* 배경 투명도 조정 가능 */
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.75));
+  backdrop-filter: blur(4px);
   color: white;
   z-index: 2;
   display: flex;
   flex-direction: column;
-  padding: 14px;
+  padding: 20px;
   gap: 0;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 20px;
 }
 
-/* 호버 시 모든 텍스트 색상 변경 */
-.group-card:hover .group-title,
-.group-card:hover .date-display,
-.group-card:hover .limit-label,
-.group-card:hover .limit-value,
-.group-card:hover .status-text {
+/* 호버 시 텍스트 가시성 향상 */
+.group-card:hover .group-title {
   color: white;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  font-weight: 700;
+  transform: translateY(-2px);
+}
+
+/* Vuetify 컴포넌트 호버 효과 */
+.group-card:hover .date-container {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border: 2px solid rgba(255, 255, 255, 0.4) !important;
+  backdrop-filter: blur(8px) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3) !important;
+  border-radius: 16px !important;
+  padding: 8px !important;
+}
+
+.group-card:hover .roles-container {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border: 2px solid rgba(255, 255, 255, 0.4) !important;
+  backdrop-filter: blur(8px) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3) !important;
+}
+
+.group-card:hover .role-label,
+.group-card:hover .role-value {
+  color: white !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5) !important;
+}
+
+.group-card:hover .date-chip {
+  background: rgba(255, 255, 255, 0.25) !important;
+  color: white !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5) !important;
+  font-weight: 700 !important;
+}
+
+.group-card:hover .status-chip {
+  background: rgba(255, 255, 255, 0.25) !important;
+  color: white !important;
+  border: 2px solid rgba(255, 255, 255, 0.4) !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5) !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* 호버 시 아이콘 색상 변경 */
+.group-card:hover .v-icon {
+  color: white !important;
+  filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.5));
 }
 
 /* === 레이아웃 구조 === */
@@ -158,7 +256,6 @@ const goToGroupPage = () => {
   height: 100%;
 }
 
-/* 정보 영역 스타일 - 피그마 기준으로 수정 */
 .group-info {
   width: 50%;
   padding: 14px;
@@ -169,7 +266,6 @@ const goToGroupPage = () => {
   color: #2c2c2c;
 }
 
-/* 이미지 영역 스타일 - 피그마 기준으로 수정 */
 .group-image {
   width: 50%;
   height: 100%;
@@ -183,93 +279,133 @@ const goToGroupPage = () => {
   height: 100%;
 }
 
-/* === 컨텐츠 스타일 === */
-/* 제목 영역 - 피그마 기준으로 수정 */
+/* === 개선된 컨텐츠 스타일 === */
+
+/* 제목 스타일 */
 .group-header {
   display: flex;
   align-items: flex-start;
   width: 100%;
-  margin-bottom: 38px;
+  margin-bottom: 20px;
 }
 
-/* 제목 텍스트 스타일 - 피그마 기준으로 수정 */
 .group-title {
-  font-family: 'Inter', sans-serif;
   font-size: 24px;
-  font-weight: 400;
+  font-weight: 700;
   margin: 0;
-  line-height: 1.2;
-  transition: color 0.3s ease;
+  line-height: 1.3;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: #2c2c2c;
+  color: #1e293b;
+  letter-spacing: -0.8px;
+  font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+  background: linear-gradient(135deg, #229cff, #1d68d8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-/* 날짜 섹션 - 피그마 기준으로 수정 */
+/* 호버 시에만 표시되는 요소들 */
+.hover-only {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.group-card:hover .hover-only {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* === Vuetify 컴포넌트 커스텀 스타일 === */
+
+/* 날짜 섹션 개선 */
 .date-section {
-  margin-bottom: 39px;
+  margin-bottom: 20px;
   width: 100%;
 }
 
-/* 날짜 텍스트 스타일 - 피그마 기준으로 수정 */
-.date-display {
-  font-family: 'Inter', sans-serif;
-  font-size: 15px;
-  font-weight: 400;
-  transition: color 0.3s ease;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  color: #2c2c2c;
-}
-
-/* 역할 제한 섹션 - 피그마 기준으로 수정 */
-.role-limits {
-  margin-bottom: 48px;
+.date-section {
+  margin-bottom: 20px;
   width: 100%;
 }
 
-/* 역할 제한 그리드 레이아웃 - 피그마 기준으로 수정 */
-.limit-grid {
+.date-container {
   display: flex;
-  gap: 18px;
-  width: 100%;
-}
-
-/* 각 역할 항목 스타일 - 피그마 기준으로 수정 */
-.limit-item {
-  display: flex;
-  flex-direction: row;
   align-items: center;
-  gap: 5px;
-  white-space: nowrap;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px;
+  background: rgba(59, 130, 246, 0.08);
+  border: 2px solid rgba(59, 130, 246, 0.15);
+  border-radius: 16px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.15);
 }
 
-/* 역할 라벨과 값 스타일 - 피그마 기준으로 수정 */
-.limit-label,
-.limit-value {
-  font-family: 'Inter', sans-serif;
-  font-size: 15px;
-  font-weight: 400;
-  transition: color 0.3s ease;
-  color: #2c2c2c;
+.date-chip {
+  font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif !important;
+  font-weight: 700 !important;
+  font-size: 13px !important;
+  letter-spacing: -0.3px !important;
+  border-radius: 12px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2) !important;
+  min-width: 120px !important;
+  padding: 0 8px !important;
 }
 
-/* 상태 섹션 - 피그마 기준으로 수정 */
+.date-separator {
+  margin: 0 4px !important;
+  opacity: 0.8 !important;
+  transition: all 0.3s ease !important;
+  transform: scale(1.2);
+}
+
+/* 상태 섹션 개선 */
 .status-section {
   margin-top: 0;
   width: 100%;
+  display: flex;
+  justify-content: flex-start;
 }
 
-/* 상태 텍스트 스타일 - 피그마 기준으로 수정 */
+.status-chip {
+  font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif !important;
+  font-weight: 700 !important;
+  font-size: 14px !important;
+  letter-spacing: -0.3px !important;
+  border-radius: 20px !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15) !important;
+  padding: 8px 16px !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* 상태 칩에 반짝이는 효과 추가 */
+.status-chip::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.status-chip:hover::before {
+  left: 100%;
+}
+
 .status-text {
-  font-family: 'Inter', sans-serif;
-  font-size: 15px;
-  font-weight: 400;
-  transition: color 0.3s ease;
-  display: block;
-  color: #2c2c2c;
+  font-weight: 700 !important;
+  font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif !important;
 }
 
 /* === 반응형 디자인 === */
@@ -279,18 +415,15 @@ const goToGroupPage = () => {
     min-height: 265px;
   }
 
-  /* 모바일에서는 이미지가 상단, 정보가 하단에 배치 */
   .card-content {
     flex-direction: column-reverse;
   }
 
-  /* 모바일 이미지 크기 조정 */
   .group-image {
     width: 100%;
     height: 150px;
   }
 
-  /* 모바일 정보 영역 패딩 조정 */
   .group-info {
     padding: 14px;
     width: 100%;
@@ -306,6 +439,10 @@ const goToGroupPage = () => {
 
   .role-limits {
     margin-bottom: 20px;
+  }
+
+  .limit-grid {
+    gap: 6px;
   }
 }
 </style>
