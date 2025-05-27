@@ -41,7 +41,13 @@
           <div class="location-details pa-4">
             <h3 class="text-h6 font-weight-bold mb-2">{{ selectedLocation.title }}</h3>
             <div class="d-flex align-center mb-2">
-              <SvgIcon type="mdi" :path="mapMarkerIcon" size="16" color="grey-darken-1" class="mr-2" />
+              <SvgIcon
+                type="mdi"
+                :path="mapMarkerIcon"
+                size="16"
+                color="grey-darken-1"
+                class="mr-2"
+              />
               <span class="text-body-2 text-grey-darken-1">
                 {{ formatAddress(selectedLocation) }}
               </span>
@@ -77,7 +83,13 @@
             <!-- Check-in Date and Time -->
             <div class="datetime-section mb-4">
               <h4 class="text-subtitle-1 font-weight-medium mb-3 d-flex align-center">
-                <SvgIcon type="mdi" :path="calendarClockIcon" size="20" color="primary" class="mr-2" />
+                <SvgIcon
+                  type="mdi"
+                  :path="calendarClockIcon"
+                  size="20"
+                  color="primary"
+                  class="mr-2"
+                />
                 체크인 날짜/시간
               </h4>
               <v-row>
@@ -96,12 +108,18 @@
                   <v-text-field
                     v-model="formData.checkInTime"
                     label="체크인 시간"
-                    type="time"
+                    placeholder="14:30"
                     variant="outlined"
                     density="comfortable"
-                    :rules="[rules.required]"
+                    :rules="[rules.required, rules.validTime]"
+                    @blur="formatTime('checkInTime')"
+                    @input="handleTimeInput('checkInTime', $event)"
                     required
-                  />
+                  >
+                    <template v-slot:append-inner>
+                      <SvgIcon type="mdi" :path="clockIcon" size="20" color="grey" />
+                    </template>
+                  </v-text-field>
                 </v-col>
               </v-row>
             </div>
@@ -109,7 +127,13 @@
             <!-- Check-out Date and Time -->
             <div class="datetime-section mb-4">
               <h4 class="text-subtitle-1 font-weight-medium mb-3 d-flex align-center">
-                <SvgIcon type="mdi" :path="calendarClockIcon" size="20" color="primary" class="mr-2" />
+                <SvgIcon
+                  type="mdi"
+                  :path="calendarClockIcon"
+                  size="20"
+                  color="primary"
+                  class="mr-2"
+                />
                 체크아웃 날짜/시간
               </h4>
               <v-row>
@@ -128,24 +152,24 @@
                   <v-text-field
                     v-model="formData.checkOutTime"
                     label="체크아웃 시간"
-                    type="time"
+                    placeholder="16:00"
                     variant="outlined"
                     density="comfortable"
-                    :rules="[rules.required, rules.checkOutAfterCheckIn]"
+                    :rules="[rules.required, rules.validTime, rules.checkOutAfterCheckIn]"
+                    @blur="formatTime('checkOutTime')"
+                    @input="handleTimeInput('checkOutTime', $event)"
                     required
-                  />
+                  >
+                    <template v-slot:append-inner>
+                      <SvgIcon type="mdi" :path="clockIcon" size="20" color="grey" />
+                    </template>
+                  </v-text-field>
                 </v-col>
               </v-row>
             </div>
 
             <!-- Error Alert -->
-            <v-alert
-              v-if="error"
-              type="error"
-              class="mb-4"
-              closable
-              @click:close="clearError"
-            >
+            <v-alert v-if="error" type="error" class="mb-4" closable @click:close="clearError">
               {{ error }}
             </v-alert>
           </v-form>
@@ -156,13 +180,7 @@
 
       <v-card-actions class="pa-6">
         <v-spacer></v-spacer>
-        <v-btn
-          variant="outlined"
-          @click="closeModal"
-          :disabled="isLoading"
-        >
-          취소
-        </v-btn>
+        <v-btn variant="outlined" @click="closeModal" :disabled="isLoading"> 취소 </v-btn>
         <v-btn
           color="primary"
           variant="elevated"
@@ -192,7 +210,8 @@ import {
   mdiImageOff,
   mdiText,
   mdiCalendarClock,
-  mdiPlus
+  mdiPlus,
+  mdiClock,
 } from '@mdi/js'
 
 const homePlusIcon = mdiHomePlus
@@ -203,20 +222,21 @@ const imageOffIcon = mdiImageOff
 const textIcon = mdiText
 const calendarClockIcon = mdiCalendarClock
 const plusIcon = mdiPlus
+const clockIcon = mdiClock
 
-// Props (removed modelValue)
+// Props
 const props = defineProps({
   selectedLocation: {
     type: Object,
-    required: true
-  }
+    required: true,
+  },
 })
 
 // Store and Route
 const route = useRoute()
 const accommodationStore = useAccommodationStore()
 
-// Internal dialog state (no emit needed)
+// Internal dialog state
 const dialog = ref(false)
 
 // Form data
@@ -226,36 +246,116 @@ const formData = ref({
   checkInDate: '',
   checkInTime: '',
   checkOutDate: '',
-  checkOutTime: ''
+  checkOutTime: '',
 })
 
 const isLoading = ref(false)
 const error = ref(null)
 
+// Time validation and formatting functions
+const isValidTimeFormat = (time) => {
+  const timeRegex = /^([01]?[0-9]|2[0-3]):([0-5][0-9])$/
+  return timeRegex.test(time)
+}
+
+const isValid30MinInterval = (time) => {
+  if (!isValidTimeFormat(time)) return false
+  const [hours, minutes] = time.split(':').map(Number)
+  return minutes === 0 || minutes === 30
+}
+
+const formatTime = (field) => {
+  let time = formData.value[field]
+  if (!time) return
+
+  // Remove any non-digit characters except colon
+  time = time.replace(/[^\d:]/g, '')
+
+  // Handle different input formats
+  if (time.length === 3 && !time.includes(':')) {
+    // Format like "130" to "1:30"
+    time = time.slice(0, 1) + ':' + time.slice(1)
+  } else if (time.length === 4 && !time.includes(':')) {
+    // Format like "1430" to "14:30"
+    time = time.slice(0, 2) + ':' + time.slice(2)
+  }
+
+  // Ensure proper format
+  if (time.includes(':')) {
+    let [hours, minutes] = time.split(':')
+    hours = hours.padStart(2, '0')
+    minutes = minutes.padStart(2, '0')
+
+    // Validate ranges
+    if (parseInt(hours) > 23) hours = '23'
+    if (parseInt(minutes) > 59) minutes = '59'
+
+    // Round to nearest 30-minute interval
+    const minuteNum = parseInt(minutes)
+    if (minuteNum < 15) {
+      minutes = '00'
+    } else if (minuteNum < 45) {
+      minutes = '30'
+    } else {
+      minutes = '00'
+      hours = String(Math.min(parseInt(hours) + 1, 23)).padStart(2, '0')
+    }
+
+    formData.value[field] = `${hours}:${minutes}`
+  }
+}
+
+const handleTimeInput = (field, event) => {
+  // Allow real-time typing but don't format until blur
+  let value = event.target.value
+
+  // Limit input length
+  if (value.length > 5) {
+    value = value.slice(0, 5)
+    formData.value[field] = value
+  }
+}
+
 // Validation rules
 const rules = {
   required: (value) => !!value || '필수 입력 항목입니다.',
+  validTime: (value) => {
+    if (!value) return true
+    if (!isValidTimeFormat(value)) return '올바른 시간 형식이 아닙니다. (예: 14:30)'
+    if (!isValid30MinInterval(value)) return '30분 단위로만 입력 가능합니다. (예: 14:00, 14:30)'
+    return true
+  },
   checkOutAfterCheckIn: () => {
-    if (!formData.value.checkInDate || !formData.value.checkInTime ||
-        !formData.value.checkOutDate || !formData.value.checkOutTime) {
+    if (
+      !formData.value.checkInDate ||
+      !formData.value.checkInTime ||
+      !formData.value.checkOutDate ||
+      !formData.value.checkOutTime
+    ) {
       return true
     }
 
-    const checkInDateTime = new Date(`${formData.value.checkInDate}T${formData.value.checkInTime}:00`)
-    const checkOutDateTime = new Date(`${formData.value.checkOutDate}T${formData.value.checkOutTime}:00`)
+    const checkInDateTime = new Date(
+      `${formData.value.checkInDate}T${formData.value.checkInTime}:00`,
+    )
+    const checkOutDateTime = new Date(
+      `${formData.value.checkOutDate}T${formData.value.checkOutTime}:00`,
+    )
 
     return checkOutDateTime > checkInDateTime || '체크아웃 시간은 체크인 시간보다 늦어야 합니다.'
-  }
+  },
 }
 
 // Form validation
 const isFormValid = computed(() => {
-  return formData.value.name &&
-         formData.value.checkInDate &&
-         formData.value.checkInTime &&
-         formData.value.checkOutDate &&
-         formData.value.checkOutTime &&
-         rules.checkOutAfterCheckIn() === true
+  return (
+    formData.value.name &&
+    formData.value.checkInDate &&
+    formData.value.checkInTime &&
+    formData.value.checkOutDate &&
+    formData.value.checkOutTime &&
+    rules.checkOutAfterCheckIn() === true
+  )
 })
 
 // Helper function to format address
@@ -302,7 +402,7 @@ const handleSubmit = async () => {
       name: formData.value.name,
       attractionNo: props.selectedLocation.no || props.selectedLocation.attractionNo,
       checkInTime: combineDateAndTime(formData.value.checkInDate, formData.value.checkInTime),
-      checkOutTime: combineDateAndTime(formData.value.checkOutDate, formData.value.checkOutTime)
+      checkOutTime: combineDateAndTime(formData.value.checkOutDate, formData.value.checkOutTime),
     }
 
     // Call API to create accommodation
@@ -328,8 +428,8 @@ const handleSubmit = async () => {
           addr1: props.selectedLocation.addr1 || '',
           addr2: props.selectedLocation.addr2 || '',
           homepage: props.selectedLocation.homepage || null,
-          overview: props.selectedLocation.overview || null
-        }
+          overview: props.selectedLocation.overview || null,
+        },
       }
 
       // Use store method to add accommodation
@@ -384,7 +484,7 @@ const resetForm = () => {
     checkInDate: '',
     checkInTime: '',
     checkOutDate: '',
-    checkOutTime: ''
+    checkOutTime: '',
   }
   error.value = null
   if (formRef.value) {
@@ -399,16 +499,19 @@ const clearError = () => {
 // Expose methods to parent if needed
 defineExpose({
   openDialog,
-  closeModal
+  closeModal,
 })
 
 // Watch for selectedLocation changes to update form when dialog is open
-watch(() => props.selectedLocation, (newLocation) => {
-  if (dialog.value && newLocation) {
-    // Pre-fill accommodation name with location title
-    formData.value.name = newLocation.title || ''
-  }
-})
+watch(
+  () => props.selectedLocation,
+  (newLocation) => {
+    if (dialog.value && newLocation) {
+      // Pre-fill accommodation name with location title
+      formData.value.name = newLocation.title || ''
+    }
+  },
+)
 </script>
 
 <style scoped>
@@ -466,6 +569,12 @@ watch(() => props.selectedLocation, (newLocation) => {
 .v-btn:not(.v-btn--disabled):hover {
   transform: translateY(-1px);
   transition: transform 0.2s;
+}
+
+/* Time picker menu styling */
+.v-menu .v-time-picker {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
 }
 
 /* Responsive adjustments */

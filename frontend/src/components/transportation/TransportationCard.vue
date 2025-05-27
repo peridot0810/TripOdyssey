@@ -4,13 +4,20 @@
       <!-- Top Row: Transportation Type and Delete Button -->
       <div class="d-flex justify-space-between align-start mb-3">
         <div class="transportation-type">
-<v-chip
-  size="large"
-  class="text-white font-weight-bold"
-  style="background-color: #003c78; display: flex; align-items: center; justify-content: center; font-size: 14px; padding: 8px 16px;"
->
-  {{ getTransportationType(transportation.typeId) }}
-</v-chip>
+          <v-chip
+            size="large"
+            class="text-white font-weight-bold"
+            style="
+              background-color: #003c78;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 14px;
+              padding: 8px 16px;
+            "
+          >
+            {{ getTransportationType(transportation.typeId) }}
+          </v-chip>
         </div>
         <v-btn
           v-if="isLogisticsPage"
@@ -33,11 +40,19 @@
 
       <!-- Departure and Arrival Times with Arrow -->
       <div class="time-section d-flex justify-space-between align-center mb-2">
-        <span class="time-text">{{ transportation.departure }}</span>
-          <div class="arrow-container">
-            <img src="/img/barcode.jpg" alt="barcode" style="height: 80px;" />
-          </div>
-        <span class="time-text">{{ transportation.arrival }}</span>
+        <span class="time-text">{{ transportation.departure.split(' ')[1].slice(0, 5) }}</span>
+        <div class="arrow-container">
+          <img src="/img/barcode.jpg" alt="barcode" style="height: 80px" />
+        </div>
+        <span class="time-text">{{ transportation.arrival.split(' ')[1].slice(0, 5) }}</span>
+      </div>
+
+      <!-- Dates row -->
+      <div
+        class="date-section d-flex justify-space-between text-caption text-grey-darken-1 mb-2 px-1"
+      >
+        <span class="date-text">{{ transportation.departure.split(' ')[0] }}</span>
+        <span class="date-text">{{ transportation.arrival.split(' ')[0] }}</span>
       </div>
 
       <!-- Departure and Arrival Locations -->
@@ -92,19 +107,12 @@
               {{ transportation.from }} → {{ transportation.to }}
             </div>
           </div>
-          <p class="text-caption text-error mt-2 mb-0">
-            ⚠️ 이 작업은 되돌릴 수 없습니다.
-          </p>
+          <p class="text-caption text-error mt-2 mb-0">⚠️ 이 작업은 되돌릴 수 없습니다.</p>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn variant="text" @click="showDeleteDialog = false">취소</v-btn>
-          <v-btn
-            color="error"
-            variant="elevated"
-            @click="confirmDelete"
-            :loading="isDeleting"
-          >
+          <v-btn color="error" variant="elevated" @click="confirmDelete" :loading="isDeleting">
             삭제
           </v-btn>
         </v-card-actions>
@@ -134,7 +142,6 @@ const deleteIcon = mdiDelete
 const pencilIcon = mdiPencil
 const alertIcon = mdiAlertCircle
 
-
 // Props
 const props = defineProps({
   transportation: {
@@ -143,6 +150,7 @@ const props = defineProps({
   },
 })
 
+console.log(props)
 // Store and Route
 const route = useRoute()
 const transportationStore = useTransportationStore()
@@ -190,8 +198,8 @@ const confirmDelete = async () => {
     // Call API to delete transportation
     const response = await apiClient.delete(`/transportation/${groupId}`, {
       params: {
-        transportationId: props.transportation.transportationId
-      }
+        transportationId: props.transportation.transportationId,
+      },
     })
 
     if (response.data.success) {
@@ -376,5 +384,4 @@ const handleTransportationUpdated = (updatedTransportation) => {
   font-size: 1rem; /* or 16px */
   font-weight: 600;
 }
-
 </style>

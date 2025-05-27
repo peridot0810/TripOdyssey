@@ -50,6 +50,11 @@
         <span v-else>진행 →</span>
       </button>
     </div>
+    <div class="control-buttons" v-if="currentStage === stages.length - 1">
+      <button class="nintendo-btn nintendo-btn--blue" @click="endTrip">
+        Complete the Odyssey!
+      </button>
+    </div>
   </div>
 </template>
 

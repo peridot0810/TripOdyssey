@@ -5,7 +5,7 @@
       app
       flat
       :style="{
-        backgroundColor: '#EBEBEB',
+        backgroundColor: '#ffffff',
         height: '64px',
         boxShadow: 'none',
         display: 'flex',
@@ -60,10 +60,10 @@ import { RouterView } from 'vue-router'
 import { onMounted } from 'vue'
 import { useUserStore } from '@/stores/user'
 
-const userStore = useUserStore();
+const userStore = useUserStore()
 
 onMounted(() => {
-  userStore.loadUserInfoFromStorage();
+  userStore.loadUserInfoFromStorage()
 })
 
 import { useRoute } from 'vue-router'
@@ -153,9 +153,10 @@ const $route = useRoute()
   padding: 8px 16px !important;
 }
 
-/* Main content styling to prevent scrolling issues */
+/* Main content styling - let content determine scroll naturally */
 .main-content {
-  height: 100vh;
-  overflow-y: auto;
+  /* Remove forced height and overflow settings */
+  /* Let the content naturally determine if scrolling is needed */
+  min-height: calc(100vh - 64px); /* Minimum height to fill screen minus app bar */
 }
 </style>

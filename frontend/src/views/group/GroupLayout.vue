@@ -213,10 +213,11 @@ onUnmounted(() => {
   height: calc(100vh);
   position: fixed;
   left: 0;
-  top: 60px;
+  top: 70px;
   z-index: 100;
   transition: background-color 0.5s ease;
   overflow: hidden;
+  border-top-right-radius: 80px;
 }
 
 /* 라디얼 오버레이 */

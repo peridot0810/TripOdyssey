@@ -274,12 +274,9 @@ const scheduleActiveTab = ref('schedule')
   .schedule-panel,
   .transport-accommodation-panel,
   .finance-panel {
-    height: auto;
-    overflow-y: visible;
-    border-right: none;
-    border-bottom: 1px solid #e0e0e0;
-    margin-bottom: 16px;
-    min-height: 400px;
+    height: 100%;
+    /* border-right removed */
+    overflow-y: auto;
   }
 
   .finance-panel {

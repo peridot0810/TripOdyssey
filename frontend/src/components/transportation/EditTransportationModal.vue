@@ -31,10 +31,23 @@
               ></v-select>
             </v-col>
 
-            <!-- Departure and Arrival Times -->
+            <!-- Departure Date and Time -->
             <v-col cols="6">
               <v-text-field
-                v-model="formData.departure"
+                v-model="formData.departureDate"
+                label="출발 날짜"
+                type="date"
+                variant="outlined"
+                density="comfortable"
+                prepend-inner-icon="mdi-calendar"
+                :rules="[rules.required]"
+                required
+              ></v-text-field>
+            </v-col>
+
+            <v-col cols="6">
+              <v-text-field
+                v-model="formData.departureTime"
                 label="출발 시간"
                 placeholder="09:30"
                 variant="outlined"
@@ -45,9 +58,23 @@
               ></v-text-field>
             </v-col>
 
+            <!-- Arrival Date and Time -->
             <v-col cols="6">
               <v-text-field
-                v-model="formData.arrival"
+                v-model="formData.arrivalDate"
+                label="도착 날짜"
+                type="date"
+                variant="outlined"
+                density="comfortable"
+                prepend-inner-icon="mdi-calendar"
+                :rules="[rules.required]"
+                required
+              ></v-text-field>
+            </v-col>
+
+            <v-col cols="6">
+              <v-text-field
+                v-model="formData.arrivalTime"
                 label="도착 시간"
                 placeholder="11:45"
                 variant="outlined"
@@ -125,13 +152,7 @@
           </v-card>
 
           <!-- Error Alert -->
-          <v-alert
-            v-if="error"
-            type="error"
-            class="mb-4"
-            closable
-            @click:close="clearError"
-          >
+          <v-alert v-if="error" type="error" class="mb-4" closable @click:close="clearError">
             {{ error }}
           </v-alert>
         </v-form>
@@ -141,13 +162,7 @@
 
       <v-card-actions class="pa-6">
         <v-spacer></v-spacer>
-        <v-btn
-          variant="outlined"
-          @click="closeModal"
-          :disabled="isLoading"
-        >
-          취소
-        </v-btn>
+        <v-btn variant="outlined" @click="closeModal" :disabled="isLoading"> 취소 </v-btn>
         <v-btn
           color="primary"
           variant="elevated"
@@ -164,7 +179,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import { useTransportationStore } from '@/stores/transportation'
 import { apiClient } from '@/utils/apiClient'
@@ -173,12 +188,12 @@ import { apiClient } from '@/utils/apiClient'
 const props = defineProps({
   modelValue: {
     type: Boolean,
-    default: false
+    default: false,
   },
   transportation: {
     type: Object,
-    required: true
-  }
+    required: true,
+  },
 })
 
 const emit = defineEmits(['update:modelValue', 'transportation-updated'])
@@ -187,15 +202,17 @@ const emit = defineEmits(['update:modelValue', 'transportation-updated'])
 const route = useRoute()
 const transportationStore = useTransportationStore()
 
-// Form data
+// Form data - Initialize with default structure
 const formRef = ref(null)
 const formData = ref({
   typeId: '',
-  departure: '',
-  arrival: '',
+  departureDate: '',
+  departureTime: '',
+  arrivalDate: '',
+  arrivalTime: '',
   from: '',
   to: '',
-  description: ''
+  description: '',
 })
 
 const originalData = ref({})
@@ -205,7 +222,7 @@ const error = ref(null)
 // Dialog model
 const dialog = computed({
   get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value)
+  set: (value) => emit('update:modelValue', value),
 })
 
 // Transportation types
@@ -217,23 +234,51 @@ const transportationTypes = [
   { value: '5', label: '택시' },
   { value: '6', label: '렌터카' },
   { value: '7', label: '도보' },
-  { value: '8', label: '기타' }
+  { value: '8', label: '기타' },
 ]
 
 // Field name mapping for Korean labels
 const fieldNameMap = {
   typeId: '교통편 종류',
-  departure: '출발 시간',
-  arrival: '도착 시간',
+  departureDate: '출발 날짜',
+  departureTime: '출발 시간',
+  arrivalDate: '도착 날짜',
+  arrivalTime: '도착 시간',
   from: '출발지',
   to: '도착지',
-  description: '상세 정보'
+  description: '상세 정보',
 }
 
 // Helper function to get type label
 const getTypeLabel = (typeId) => {
-  const type = transportationTypes.find(t => t.value === typeId)
+  const type = transportationTypes.find((t) => t.value === String(typeId))
   return type ? type.label : typeId
+}
+
+// Helper function to parse datetime string
+const parseDateTimeString = (dateTimeString) => {
+  if (!dateTimeString) return { date: '', time: '' }
+
+  try {
+    const dateObj = new Date(dateTimeString)
+    // Ensure we're working with a valid date
+    if (isNaN(dateObj.getTime())) {
+      return { date: '', time: '' }
+    }
+
+    const date = dateObj.toISOString().split('T')[0] // YYYY-MM-DD
+    const time = dateObj.toTimeString().substring(0, 5) // HH:MM
+    return { date, time }
+  } catch (error) {
+    console.warn('DateTime parsing error:', error)
+    return { date: '', time: '' }
+  }
+}
+
+// Helper function to combine date and time
+const combineDateAndTime = (date, time) => {
+  if (!date || !time) return ''
+  return `${date}T${time}:00`
 }
 
 // Validation rules
@@ -243,22 +288,26 @@ const rules = {
     if (!value) return true
     const timePattern = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/
     return timePattern.test(value) || '시간 형식이 올바르지 않습니다. (예: 09:30)'
-  }
+  },
 }
 
 // Computed properties
 const isFormValid = computed(() => {
-  return formData.value.typeId &&
-         formData.value.departure &&
-         formData.value.arrival &&
-         formData.value.from &&
-         formData.value.to &&
-         rules.timeFormat(formData.value.departure) === true &&
-         rules.timeFormat(formData.value.arrival) === true
+  return (
+    formData.value.typeId &&
+    formData.value.departureDate &&
+    formData.value.departureTime &&
+    formData.value.arrivalDate &&
+    formData.value.arrivalTime &&
+    formData.value.from &&
+    formData.value.to &&
+    rules.timeFormat(formData.value.departureTime) === true &&
+    rules.timeFormat(formData.value.arrivalTime) === true
+  )
 })
 
 const hasChanges = computed(() => {
-  return Object.keys(formData.value).some(key => {
+  return Object.keys(formData.value).some((key) => {
     return formData.value[key] !== originalData.value[key]
   })
 })
@@ -266,7 +315,7 @@ const hasChanges = computed(() => {
 const changesList = computed(() => {
   const changes = []
 
-  Object.keys(formData.value).forEach(key => {
+  Object.keys(formData.value).forEach((key) => {
     if (formData.value[key] !== originalData.value[key]) {
       let originalValue = originalData.value[key] || '(없음)'
       let newValue = formData.value[key] || '(없음)'
@@ -281,7 +330,7 @@ const changesList = computed(() => {
         field: key,
         fieldName: fieldNameMap[key],
         originalValue,
-        newValue
+        newValue,
       })
     }
   })
@@ -291,23 +340,48 @@ const changesList = computed(() => {
 
 // Methods
 const loadFormData = () => {
-  if (props.transportation) {
-    formData.value = {
-      typeId: props.transportation.typeId,
-      departure: props.transportation.departure,
-      arrival: props.transportation.arrival,
-      from: props.transportation.from,
-      to: props.transportation.to,
-      description: props.transportation.description || ''
-    }
-
-    // Store original data for comparison
-    originalData.value = { ...formData.value }
+  if (!props.transportation) {
+    console.warn('No transportation data provided')
+    return
   }
+
+  console.log('Loading form data:', props.transportation)
+
+  // Parse departure datetime
+  const departureDateTime = parseDateTimeString(props.transportation.departure)
+  const arrivalDateTime = parseDateTimeString(props.transportation.arrival)
+
+  // Ensure typeId is a string for v-select compatibility
+  const newFormData = {
+    typeId: String(props.transportation.typeId || ''),
+    departureDate: departureDateTime.date,
+    departureTime: departureDateTime.time,
+    arrivalDate: arrivalDateTime.date,
+    arrivalTime: arrivalDateTime.time,
+    from: props.transportation.from || '',
+    to: props.transportation.to || '',
+    description: props.transportation.description || '',
+  }
+
+  // Update form data reactively
+  Object.keys(newFormData).forEach((key) => {
+    formData.value[key] = newFormData[key]
+  })
+
+  // Store original data for comparison (deep copy)
+  originalData.value = { ...newFormData }
+
+  console.log('Form data loaded:', formData.value)
+  console.log('Original data stored:', originalData.value)
 }
 
 const handleSubmit = async () => {
   // Validate form
+  if (!formRef.value) {
+    console.error('Form ref not available')
+    return
+  }
+
   const { valid } = await formRef.value.validate()
   if (!valid) return
 
@@ -324,35 +398,50 @@ const handleSubmit = async () => {
     // Format data for API request
     const requestData = {
       typeId: parseInt(formData.value.typeId),
-      departure: formatTimeToDateTime(formData.value.departure),
-      arrival: formatTimeToDateTime(formData.value.arrival),
+      departure: combineDateAndTime(formData.value.departureDate, formData.value.departureTime),
+      arrival: combineDateAndTime(formData.value.arrivalDate, formData.value.arrivalTime),
       from: formData.value.from,
       to: formData.value.to,
-      description: formData.value.description || ''
+      description: formData.value.description || '',
     }
+
+    console.log('Sending update request:', requestData)
 
     // Call API to update transportation
     const response = await apiClient.put(`/transportation/${groupId}`, requestData, {
       params: {
-        transportationId: props.transportation.transportationId
-      }
+        transportationId: props.transportation.transportationId,
+      },
     })
 
     if (response.data.success) {
+      // Create updated transportation data for store
+      const updatedTransportationData = {
+        ...props.transportation,
+        typeId: formData.value.typeId,
+        departure: requestData.departure,
+        arrival: requestData.arrival,
+        from: formData.value.from,
+        to: formData.value.to,
+        description: formData.value.description,
+      }
+
       // Update in store with the new data
       const result = transportationStore.updateTransportation(
         props.transportation.transportationId,
-        formData.value
+        updatedTransportationData,
       )
 
       if (result.success) {
         // Emit success event
         emit('transportation-updated', result.data)
         console.log('교통편 수정 성공:', response.data.message)
+        closeModal()
       } else {
         // This shouldn't happen if API succeeded, but handle gracefully
         console.warn('Store에서 수정 실패:', result.error)
-        emit('transportation-updated', formData.value)
+        emit('transportation-updated', updatedTransportationData)
+        closeModal()
       }
     } else {
       throw new Error(response.data.message || '교통편 수정에 실패했습니다.')
@@ -386,25 +475,6 @@ const handleSubmit = async () => {
   }
 }
 
-// Helper function to format time to datetime string
-const formatTimeToDateTime = (timeString) => {
-  if (!timeString) return ''
-
-  try {
-    // Convert "09:30" to "2025-06-01T09:30:00" format
-    // For now, using a default date - you might want to get actual travel date
-    const today = new Date()
-    const year = today.getFullYear()
-    const month = String(today.getMonth() + 1).padStart(2, '0')
-    const day = String(today.getDate()).padStart(2, '0')
-
-    return `${year}-${month}-${day}T${timeString}:00`
-  } catch (error) {
-    console.warn('시간 형식 변환 오류:', error)
-    return timeString
-  }
-}
-
 const closeModal = () => {
   dialog.value = false
   error.value = null
@@ -418,9 +488,20 @@ const clearError = () => {
 }
 
 // Watch for prop changes and dialog open/close
-watch(() => props.transportation, loadFormData, { immediate: true })
-watch(dialog, (newValue) => {
-  if (newValue) {
+watch(
+  () => props.transportation,
+  (newTransportation) => {
+    if (newTransportation) {
+      loadFormData()
+    }
+  },
+  { deep: true, immediate: true },
+)
+
+watch(dialog, async (newValue) => {
+  if (newValue && props.transportation) {
+    // Wait for next tick to ensure dialog is fully rendered
+    await nextTick()
     loadFormData()
   }
 })
@@ -438,7 +519,9 @@ watch(dialog, (newValue) => {
 }
 
 /* Form styling */
-.v-text-field, .v-select, .v-textarea {
+.v-text-field,
+.v-select,
+.v-textarea {
   margin-bottom: 8px;
 }
 

@@ -21,11 +21,7 @@
 
     <!-- Initial Loading State -->
     <div v-if="isInitialLoading" class="loading-state text-center py-8">
-      <v-progress-circular
-        indeterminate
-        color="primary"
-        size="64"
-      ></v-progress-circular>
+      <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
       <p class="text-body-1 text-grey-darken-1 mt-3">교통편 목록을 불러오는 중...</p>
     </div>
 
@@ -142,7 +138,7 @@ const fetchTransportationList = async () => {
 
     if (response.data.success) {
       // Format the data to match our store structure
-      const formattedData = response.data.data.map(item => ({
+      const formattedData = response.data.data.map((item) => ({
         transportationId: item.transportationId.toString(),
         typeId: item.typeId.toString(),
         groupId: item.groupId,
@@ -150,7 +146,7 @@ const fetchTransportationList = async () => {
         arrival: formatDateTime(item.arrival),
         from: item.from,
         to: item.to,
-        description: item.description || ''
+        description: item.description || '',
       }))
 
       // Set data to store
@@ -190,20 +186,7 @@ const fetchTransportationList = async () => {
 
 // Helper function to format datetime from server response
 const formatDateTime = (dateTimeString) => {
-  if (!dateTimeString) return ''
-
-  try {
-    // Assuming server returns "2025-06-01 09:30:00" format
-    // Extract time part (HH:MM)
-    const timePart = dateTimeString.split(' ')[1]
-    if (timePart) {
-      return timePart.substring(0, 5) // "09:30"
-    }
-    return dateTimeString
-  } catch (error) {
-    console.warn('날짜 형식 변환 오류:', error)
-    return dateTimeString
-  }
+  return dateTimeString || ''
 }
 
 // Event handlers
@@ -260,9 +243,15 @@ onMounted(() => {
 }
 
 @keyframes pulse {
-  0% { opacity: 1; }
-  50% { opacity: 0.7; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 /* Responsive adjustments */

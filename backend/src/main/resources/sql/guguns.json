@@ -1,0 +1,1406 @@
+[
+	{
+		"no" : 235,
+		"sido_code" : 1,
+		"gugun_code" : 1,
+		"gugun_name" : "강남구"
+	},
+	{
+		"no" : 236,
+		"sido_code" : 1,
+		"gugun_code" : 2,
+		"gugun_name" : "강동구"
+	},
+	{
+		"no" : 237,
+		"sido_code" : 1,
+		"gugun_code" : 3,
+		"gugun_name" : "강북구"
+	},
+	{
+		"no" : 238,
+		"sido_code" : 1,
+		"gugun_code" : 4,
+		"gugun_name" : "강서구"
+	},
+	{
+		"no" : 239,
+		"sido_code" : 1,
+		"gugun_code" : 5,
+		"gugun_name" : "관악구"
+	},
+	{
+		"no" : 240,
+		"sido_code" : 1,
+		"gugun_code" : 6,
+		"gugun_name" : "광진구"
+	},
+	{
+		"no" : 241,
+		"sido_code" : 1,
+		"gugun_code" : 7,
+		"gugun_name" : "구로구"
+	},
+	{
+		"no" : 242,
+		"sido_code" : 1,
+		"gugun_code" : 8,
+		"gugun_name" : "금천구"
+	},
+	{
+		"no" : 243,
+		"sido_code" : 1,
+		"gugun_code" : 9,
+		"gugun_name" : "노원구"
+	},
+	{
+		"no" : 244,
+		"sido_code" : 1,
+		"gugun_code" : 10,
+		"gugun_name" : "도봉구"
+	},
+	{
+		"no" : 245,
+		"sido_code" : 1,
+		"gugun_code" : 11,
+		"gugun_name" : "동대문구"
+	},
+	{
+		"no" : 246,
+		"sido_code" : 1,
+		"gugun_code" : 12,
+		"gugun_name" : "동작구"
+	},
+	{
+		"no" : 247,
+		"sido_code" : 1,
+		"gugun_code" : 13,
+		"gugun_name" : "마포구"
+	},
+	{
+		"no" : 248,
+		"sido_code" : 1,
+		"gugun_code" : 14,
+		"gugun_name" : "서대문구"
+	},
+	{
+		"no" : 249,
+		"sido_code" : 1,
+		"gugun_code" : 15,
+		"gugun_name" : "서초구"
+	},
+	{
+		"no" : 250,
+		"sido_code" : 1,
+		"gugun_code" : 16,
+		"gugun_name" : "성동구"
+	},
+	{
+		"no" : 251,
+		"sido_code" : 1,
+		"gugun_code" : 17,
+		"gugun_name" : "성북구"
+	},
+	{
+		"no" : 252,
+		"sido_code" : 1,
+		"gugun_code" : 18,
+		"gugun_name" : "송파구"
+	},
+	{
+		"no" : 253,
+		"sido_code" : 1,
+		"gugun_code" : 19,
+		"gugun_name" : "양천구"
+	},
+	{
+		"no" : 254,
+		"sido_code" : 1,
+		"gugun_code" : 20,
+		"gugun_name" : "영등포구"
+	},
+	{
+		"no" : 255,
+		"sido_code" : 1,
+		"gugun_code" : 21,
+		"gugun_name" : "용산구"
+	},
+	{
+		"no" : 256,
+		"sido_code" : 1,
+		"gugun_code" : 22,
+		"gugun_name" : "은평구"
+	},
+	{
+		"no" : 257,
+		"sido_code" : 1,
+		"gugun_code" : 23,
+		"gugun_name" : "종로구"
+	},
+	{
+		"no" : 258,
+		"sido_code" : 1,
+		"gugun_code" : 24,
+		"gugun_name" : "중구"
+	},
+	{
+		"no" : 259,
+		"sido_code" : 1,
+		"gugun_code" : 25,
+		"gugun_name" : "중랑구"
+	},
+	{
+		"no" : 260,
+		"sido_code" : 2,
+		"gugun_code" : 1,
+		"gugun_name" : "강화군"
+	},
+	{
+		"no" : 261,
+		"sido_code" : 2,
+		"gugun_code" : 2,
+		"gugun_name" : "계양구"
+	},
+	{
+		"no" : 262,
+		"sido_code" : 2,
+		"gugun_code" : 3,
+		"gugun_name" : "미추홀구"
+	},
+	{
+		"no" : 263,
+		"sido_code" : 2,
+		"gugun_code" : 4,
+		"gugun_name" : "남동구"
+	},
+	{
+		"no" : 264,
+		"sido_code" : 2,
+		"gugun_code" : 5,
+		"gugun_name" : "동구"
+	},
+	{
+		"no" : 265,
+		"sido_code" : 2,
+		"gugun_code" : 6,
+		"gugun_name" : "부평구"
+	},
+	{
+		"no" : 266,
+		"sido_code" : 2,
+		"gugun_code" : 7,
+		"gugun_name" : "서구"
+	},
+	{
+		"no" : 267,
+		"sido_code" : 2,
+		"gugun_code" : 8,
+		"gugun_name" : "연수구"
+	},
+	{
+		"no" : 268,
+		"sido_code" : 2,
+		"gugun_code" : 9,
+		"gugun_name" : "옹진군"
+	},
+	{
+		"no" : 269,
+		"sido_code" : 2,
+		"gugun_code" : 10,
+		"gugun_name" : "중구"
+	},
+	{
+		"no" : 270,
+		"sido_code" : 3,
+		"gugun_code" : 1,
+		"gugun_name" : "대덕구"
+	},
+	{
+		"no" : 271,
+		"sido_code" : 3,
+		"gugun_code" : 2,
+		"gugun_name" : "동구"
+	},
+	{
+		"no" : 272,
+		"sido_code" : 3,
+		"gugun_code" : 3,
+		"gugun_name" : "서구"
+	},
+	{
+		"no" : 273,
+		"sido_code" : 3,
+		"gugun_code" : 4,
+		"gugun_name" : "유성구"
+	},
+	{
+		"no" : 274,
+		"sido_code" : 3,
+		"gugun_code" : 5,
+		"gugun_name" : "중구"
+	},
+	{
+		"no" : 275,
+		"sido_code" : 4,
+		"gugun_code" : 1,
+		"gugun_name" : "남구"
+	},
+	{
+		"no" : 276,
+		"sido_code" : 4,
+		"gugun_code" : 2,
+		"gugun_name" : "달서구"
+	},
+	{
+		"no" : 277,
+		"sido_code" : 4,
+		"gugun_code" : 3,
+		"gugun_name" : "달성군"
+	},
+	{
+		"no" : 278,
+		"sido_code" : 4,
+		"gugun_code" : 4,
+		"gugun_name" : "동구"
+	},
+	{
+		"no" : 279,
+		"sido_code" : 4,
+		"gugun_code" : 5,
+		"gugun_name" : "북구"
+	},
+	{
+		"no" : 280,
+		"sido_code" : 4,
+		"gugun_code" : 6,
+		"gugun_name" : "서구"
+	},
+	{
+		"no" : 281,
+		"sido_code" : 4,
+		"gugun_code" : 7,
+		"gugun_name" : "수성구"
+	},
+	{
+		"no" : 282,
+		"sido_code" : 4,
+		"gugun_code" : 8,
+		"gugun_name" : "중구"
+	},
+	{
+		"no" : 283,
+		"sido_code" : 4,
+		"gugun_code" : 9,
+		"gugun_name" : "군위군"
+	},
+	{
+		"no" : 284,
+		"sido_code" : 5,
+		"gugun_code" : 1,
+		"gugun_name" : "광산구"
+	},
+	{
+		"no" : 285,
+		"sido_code" : 5,
+		"gugun_code" : 2,
+		"gugun_name" : "남구"
+	},
+	{
+		"no" : 286,
+		"sido_code" : 5,
+		"gugun_code" : 3,
+		"gugun_name" : "동구"
+	},
+	{
+		"no" : 287,
+		"sido_code" : 5,
+		"gugun_code" : 4,
+		"gugun_name" : "북구"
+	},
+	{
+		"no" : 288,
+		"sido_code" : 5,
+		"gugun_code" : 5,
+		"gugun_name" : "서구"
+	},
+	{
+		"no" : 289,
+		"sido_code" : 6,
+		"gugun_code" : 1,
+		"gugun_name" : "강서구"
+	},
+	{
+		"no" : 290,
+		"sido_code" : 6,
+		"gugun_code" : 2,
+		"gugun_name" : "금정구"
+	},
+	{
+		"no" : 291,
+		"sido_code" : 6,
+		"gugun_code" : 3,
+		"gugun_name" : "기장군"
+	},
+	{
+		"no" : 292,
+		"sido_code" : 6,
+		"gugun_code" : 4,
+		"gugun_name" : "남구"
+	},
+	{
+		"no" : 293,
+		"sido_code" : 6,
+		"gugun_code" : 5,
+		"gugun_name" : "동구"
+	},
+	{
+		"no" : 294,
+		"sido_code" : 6,
+		"gugun_code" : 6,
+		"gugun_name" : "동래구"
+	},
+	{
+		"no" : 295,
+		"sido_code" : 6,
+		"gugun_code" : 7,
+		"gugun_name" : "부산진구"
+	},
+	{
+		"no" : 296,
+		"sido_code" : 6,
+		"gugun_code" : 8,
+		"gugun_name" : "북구"
+	},
+	{
+		"no" : 297,
+		"sido_code" : 6,
+		"gugun_code" : 9,
+		"gugun_name" : "사상구"
+	},
+	{
+		"no" : 298,
+		"sido_code" : 6,
+		"gugun_code" : 10,
+		"gugun_name" : "사하구"
+	},
+	{
+		"no" : 299,
+		"sido_code" : 6,
+		"gugun_code" : 11,
+		"gugun_name" : "서구"
+	},
+	{
+		"no" : 300,
+		"sido_code" : 6,
+		"gugun_code" : 12,
+		"gugun_name" : "수영구"
+	},
+	{
+		"no" : 301,
+		"sido_code" : 6,
+		"gugun_code" : 13,
+		"gugun_name" : "연제구"
+	},
+	{
+		"no" : 302,
+		"sido_code" : 6,
+		"gugun_code" : 14,
+		"gugun_name" : "영도구"
+	},
+	{
+		"no" : 303,
+		"sido_code" : 6,
+		"gugun_code" : 15,
+		"gugun_name" : "중구"
+	},
+	{
+		"no" : 304,
+		"sido_code" : 6,
+		"gugun_code" : 16,
+		"gugun_name" : "해운대구"
+	},
+	{
+		"no" : 305,
+		"sido_code" : 7,
+		"gugun_code" : 1,
+		"gugun_name" : "중구"
+	},
+	{
+		"no" : 306,
+		"sido_code" : 7,
+		"gugun_code" : 2,
+		"gugun_name" : "남구"
+	},
+	{
+		"no" : 307,
+		"sido_code" : 7,
+		"gugun_code" : 3,
+		"gugun_name" : "동구"
+	},
+	{
+		"no" : 308,
+		"sido_code" : 7,
+		"gugun_code" : 4,
+		"gugun_name" : "북구"
+	},
+	{
+		"no" : 309,
+		"sido_code" : 7,
+		"gugun_code" : 5,
+		"gugun_name" : "울주군"
+	},
+	{
+		"no" : 310,
+		"sido_code" : 8,
+		"gugun_code" : 1,
+		"gugun_name" : "세종특별자치시"
+	},
+	{
+		"no" : 311,
+		"sido_code" : 31,
+		"gugun_code" : 1,
+		"gugun_name" : "가평군"
+	},
+	{
+		"no" : 312,
+		"sido_code" : 31,
+		"gugun_code" : 2,
+		"gugun_name" : "고양시"
+	},
+	{
+		"no" : 313,
+		"sido_code" : 31,
+		"gugun_code" : 3,
+		"gugun_name" : "과천시"
+	},
+	{
+		"no" : 314,
+		"sido_code" : 31,
+		"gugun_code" : 4,
+		"gugun_name" : "광명시"
+	},
+	{
+		"no" : 315,
+		"sido_code" : 31,
+		"gugun_code" : 5,
+		"gugun_name" : "광주시"
+	},
+	{
+		"no" : 316,
+		"sido_code" : 31,
+		"gugun_code" : 6,
+		"gugun_name" : "구리시"
+	},
+	{
+		"no" : 317,
+		"sido_code" : 31,
+		"gugun_code" : 7,
+		"gugun_name" : "군포시"
+	},
+	{
+		"no" : 318,
+		"sido_code" : 31,
+		"gugun_code" : 8,
+		"gugun_name" : "김포시"
+	},
+	{
+		"no" : 319,
+		"sido_code" : 31,
+		"gugun_code" : 9,
+		"gugun_name" : "남양주시"
+	},
+	{
+		"no" : 320,
+		"sido_code" : 31,
+		"gugun_code" : 10,
+		"gugun_name" : "동두천시"
+	},
+	{
+		"no" : 321,
+		"sido_code" : 31,
+		"gugun_code" : 11,
+		"gugun_name" : "부천시"
+	},
+	{
+		"no" : 322,
+		"sido_code" : 31,
+		"gugun_code" : 12,
+		"gugun_name" : "성남시"
+	},
+	{
+		"no" : 323,
+		"sido_code" : 31,
+		"gugun_code" : 13,
+		"gugun_name" : "수원시"
+	},
+	{
+		"no" : 324,
+		"sido_code" : 31,
+		"gugun_code" : 14,
+		"gugun_name" : "시흥시"
+	},
+	{
+		"no" : 325,
+		"sido_code" : 31,
+		"gugun_code" : 15,
+		"gugun_name" : "안산시"
+	},
+	{
+		"no" : 326,
+		"sido_code" : 31,
+		"gugun_code" : 16,
+		"gugun_name" : "안성시"
+	},
+	{
+		"no" : 327,
+		"sido_code" : 31,
+		"gugun_code" : 17,
+		"gugun_name" : "안양시"
+	},
+	{
+		"no" : 328,
+		"sido_code" : 31,
+		"gugun_code" : 18,
+		"gugun_name" : "양주시"
+	},
+	{
+		"no" : 329,
+		"sido_code" : 31,
+		"gugun_code" : 19,
+		"gugun_name" : "양평군"
+	},
+	{
+		"no" : 330,
+		"sido_code" : 31,
+		"gugun_code" : 20,
+		"gugun_name" : "여주시"
+	},
+	{
+		"no" : 331,
+		"sido_code" : 31,
+		"gugun_code" : 21,
+		"gugun_name" : "연천군"
+	},
+	{
+		"no" : 332,
+		"sido_code" : 31,
+		"gugun_code" : 22,
+		"gugun_name" : "오산시"
+	},
+	{
+		"no" : 333,
+		"sido_code" : 31,
+		"gugun_code" : 23,
+		"gugun_name" : "용인시"
+	},
+	{
+		"no" : 334,
+		"sido_code" : 31,
+		"gugun_code" : 24,
+		"gugun_name" : "의왕시"
+	},
+	{
+		"no" : 335,
+		"sido_code" : 31,
+		"gugun_code" : 25,
+		"gugun_name" : "의정부시"
+	},
+	{
+		"no" : 336,
+		"sido_code" : 31,
+		"gugun_code" : 26,
+		"gugun_name" : "이천시"
+	},
+	{
+		"no" : 337,
+		"sido_code" : 31,
+		"gugun_code" : 27,
+		"gugun_name" : "파주시"
+	},
+	{
+		"no" : 338,
+		"sido_code" : 31,
+		"gugun_code" : 28,
+		"gugun_name" : "평택시"
+	},
+	{
+		"no" : 339,
+		"sido_code" : 31,
+		"gugun_code" : 29,
+		"gugun_name" : "포천시"
+	},
+	{
+		"no" : 340,
+		"sido_code" : 31,
+		"gugun_code" : 30,
+		"gugun_name" : "하남시"
+	},
+	{
+		"no" : 341,
+		"sido_code" : 31,
+		"gugun_code" : 31,
+		"gugun_name" : "화성시"
+	},
+	{
+		"no" : 342,
+		"sido_code" : 32,
+		"gugun_code" : 1,
+		"gugun_name" : "강릉시"
+	},
+	{
+		"no" : 343,
+		"sido_code" : 32,
+		"gugun_code" : 2,
+		"gugun_name" : "고성군"
+	},
+	{
+		"no" : 344,
+		"sido_code" : 32,
+		"gugun_code" : 3,
+		"gugun_name" : "동해시"
+	},
+	{
+		"no" : 345,
+		"sido_code" : 32,
+		"gugun_code" : 4,
+		"gugun_name" : "삼척시"
+	},
+	{
+		"no" : 346,
+		"sido_code" : 32,
+		"gugun_code" : 5,
+		"gugun_name" : "속초시"
+	},
+	{
+		"no" : 347,
+		"sido_code" : 32,
+		"gugun_code" : 6,
+		"gugun_name" : "양구군"
+	},
+	{
+		"no" : 348,
+		"sido_code" : 32,
+		"gugun_code" : 7,
+		"gugun_name" : "양양군"
+	},
+	{
+		"no" : 349,
+		"sido_code" : 32,
+		"gugun_code" : 8,
+		"gugun_name" : "영월군"
+	},
+	{
+		"no" : 350,
+		"sido_code" : 32,
+		"gugun_code" : 9,
+		"gugun_name" : "원주시"
+	},
+	{
+		"no" : 351,
+		"sido_code" : 32,
+		"gugun_code" : 10,
+		"gugun_name" : "인제군"
+	},
+	{
+		"no" : 352,
+		"sido_code" : 32,
+		"gugun_code" : 11,
+		"gugun_name" : "정선군"
+	},
+	{
+		"no" : 353,
+		"sido_code" : 32,
+		"gugun_code" : 12,
+		"gugun_name" : "철원군"
+	},
+	{
+		"no" : 354,
+		"sido_code" : 32,
+		"gugun_code" : 13,
+		"gugun_name" : "춘천시"
+	},
+	{
+		"no" : 355,
+		"sido_code" : 32,
+		"gugun_code" : 14,
+		"gugun_name" : "태백시"
+	},
+	{
+		"no" : 356,
+		"sido_code" : 32,
+		"gugun_code" : 15,
+		"gugun_name" : "평창군"
+	},
+	{
+		"no" : 357,
+		"sido_code" : 32,
+		"gugun_code" : 16,
+		"gugun_name" : "홍천군"
+	},
+	{
+		"no" : 358,
+		"sido_code" : 32,
+		"gugun_code" : 17,
+		"gugun_name" : "화천군"
+	},
+	{
+		"no" : 359,
+		"sido_code" : 32,
+		"gugun_code" : 18,
+		"gugun_name" : "횡성군"
+	},
+	{
+		"no" : 360,
+		"sido_code" : 33,
+		"gugun_code" : 1,
+		"gugun_name" : "괴산군"
+	},
+	{
+		"no" : 361,
+		"sido_code" : 33,
+		"gugun_code" : 2,
+		"gugun_name" : "단양군"
+	},
+	{
+		"no" : 362,
+		"sido_code" : 33,
+		"gugun_code" : 3,
+		"gugun_name" : "보은군"
+	},
+	{
+		"no" : 363,
+		"sido_code" : 33,
+		"gugun_code" : 4,
+		"gugun_name" : "영동군"
+	},
+	{
+		"no" : 364,
+		"sido_code" : 33,
+		"gugun_code" : 5,
+		"gugun_name" : "옥천군"
+	},
+	{
+		"no" : 365,
+		"sido_code" : 33,
+		"gugun_code" : 6,
+		"gugun_name" : "음성군"
+	},
+	{
+		"no" : 366,
+		"sido_code" : 33,
+		"gugun_code" : 7,
+		"gugun_name" : "제천시"
+	},
+	{
+		"no" : 367,
+		"sido_code" : 33,
+		"gugun_code" : 8,
+		"gugun_name" : "진천군"
+	},
+	{
+		"no" : 368,
+		"sido_code" : 33,
+		"gugun_code" : 9,
+		"gugun_name" : "청원군"
+	},
+	{
+		"no" : 369,
+		"sido_code" : 33,
+		"gugun_code" : 10,
+		"gugun_name" : "청주시"
+	},
+	{
+		"no" : 370,
+		"sido_code" : 33,
+		"gugun_code" : 11,
+		"gugun_name" : "충주시"
+	},
+	{
+		"no" : 371,
+		"sido_code" : 33,
+		"gugun_code" : 12,
+		"gugun_name" : "증평군"
+	},
+	{
+		"no" : 372,
+		"sido_code" : 34,
+		"gugun_code" : 1,
+		"gugun_name" : "공주시"
+	},
+	{
+		"no" : 373,
+		"sido_code" : 34,
+		"gugun_code" : 2,
+		"gugun_name" : "금산군"
+	},
+	{
+		"no" : 374,
+		"sido_code" : 34,
+		"gugun_code" : 3,
+		"gugun_name" : "논산시"
+	},
+	{
+		"no" : 375,
+		"sido_code" : 34,
+		"gugun_code" : 4,
+		"gugun_name" : "당진시"
+	},
+	{
+		"no" : 376,
+		"sido_code" : 34,
+		"gugun_code" : 5,
+		"gugun_name" : "보령시"
+	},
+	{
+		"no" : 377,
+		"sido_code" : 34,
+		"gugun_code" : 6,
+		"gugun_name" : "부여군"
+	},
+	{
+		"no" : 378,
+		"sido_code" : 34,
+		"gugun_code" : 7,
+		"gugun_name" : "서산시"
+	},
+	{
+		"no" : 379,
+		"sido_code" : 34,
+		"gugun_code" : 8,
+		"gugun_name" : "서천군"
+	},
+	{
+		"no" : 380,
+		"sido_code" : 34,
+		"gugun_code" : 9,
+		"gugun_name" : "아산시"
+	},
+	{
+		"no" : 381,
+		"sido_code" : 34,
+		"gugun_code" : 11,
+		"gugun_name" : "예산군"
+	},
+	{
+		"no" : 382,
+		"sido_code" : 34,
+		"gugun_code" : 12,
+		"gugun_name" : "천안시"
+	},
+	{
+		"no" : 383,
+		"sido_code" : 34,
+		"gugun_code" : 13,
+		"gugun_name" : "청양군"
+	},
+	{
+		"no" : 384,
+		"sido_code" : 34,
+		"gugun_code" : 14,
+		"gugun_name" : "태안군"
+	},
+	{
+		"no" : 385,
+		"sido_code" : 34,
+		"gugun_code" : 15,
+		"gugun_name" : "홍성군"
+	},
+	{
+		"no" : 386,
+		"sido_code" : 34,
+		"gugun_code" : 16,
+		"gugun_name" : "계룡시"
+	},
+	{
+		"no" : 387,
+		"sido_code" : 35,
+		"gugun_code" : 1,
+		"gugun_name" : "경산시"
+	},
+	{
+		"no" : 388,
+		"sido_code" : 35,
+		"gugun_code" : 2,
+		"gugun_name" : "경주시"
+	},
+	{
+		"no" : 389,
+		"sido_code" : 35,
+		"gugun_code" : 3,
+		"gugun_name" : "고령군"
+	},
+	{
+		"no" : 390,
+		"sido_code" : 35,
+		"gugun_code" : 4,
+		"gugun_name" : "구미시"
+	},
+	{
+		"no" : 391,
+		"sido_code" : 35,
+		"gugun_code" : 6,
+		"gugun_name" : "김천시"
+	},
+	{
+		"no" : 392,
+		"sido_code" : 35,
+		"gugun_code" : 7,
+		"gugun_name" : "문경시"
+	},
+	{
+		"no" : 393,
+		"sido_code" : 35,
+		"gugun_code" : 8,
+		"gugun_name" : "봉화군"
+	},
+	{
+		"no" : 394,
+		"sido_code" : 35,
+		"gugun_code" : 9,
+		"gugun_name" : "상주시"
+	},
+	{
+		"no" : 395,
+		"sido_code" : 35,
+		"gugun_code" : 10,
+		"gugun_name" : "성주군"
+	},
+	{
+		"no" : 396,
+		"sido_code" : 35,
+		"gugun_code" : 11,
+		"gugun_name" : "안동시"
+	},
+	{
+		"no" : 397,
+		"sido_code" : 35,
+		"gugun_code" : 12,
+		"gugun_name" : "영덕군"
+	},
+	{
+		"no" : 398,
+		"sido_code" : 35,
+		"gugun_code" : 13,
+		"gugun_name" : "영양군"
+	},
+	{
+		"no" : 399,
+		"sido_code" : 35,
+		"gugun_code" : 14,
+		"gugun_name" : "영주시"
+	},
+	{
+		"no" : 400,
+		"sido_code" : 35,
+		"gugun_code" : 15,
+		"gugun_name" : "영천시"
+	},
+	{
+		"no" : 401,
+		"sido_code" : 35,
+		"gugun_code" : 16,
+		"gugun_name" : "예천군"
+	},
+	{
+		"no" : 402,
+		"sido_code" : 35,
+		"gugun_code" : 17,
+		"gugun_name" : "울릉군"
+	},
+	{
+		"no" : 403,
+		"sido_code" : 35,
+		"gugun_code" : 18,
+		"gugun_name" : "울진군"
+	},
+	{
+		"no" : 404,
+		"sido_code" : 35,
+		"gugun_code" : 19,
+		"gugun_name" : "의성군"
+	},
+	{
+		"no" : 405,
+		"sido_code" : 35,
+		"gugun_code" : 20,
+		"gugun_name" : "청도군"
+	},
+	{
+		"no" : 406,
+		"sido_code" : 35,
+		"gugun_code" : 21,
+		"gugun_name" : "청송군"
+	},
+	{
+		"no" : 407,
+		"sido_code" : 35,
+		"gugun_code" : 22,
+		"gugun_name" : "칠곡군"
+	},
+	{
+		"no" : 408,
+		"sido_code" : 35,
+		"gugun_code" : 23,
+		"gugun_name" : "포항시"
+	},
+	{
+		"no" : 409,
+		"sido_code" : 36,
+		"gugun_code" : 1,
+		"gugun_name" : "거제시"
+	},
+	{
+		"no" : 410,
+		"sido_code" : 36,
+		"gugun_code" : 2,
+		"gugun_name" : "거창군"
+	},
+	{
+		"no" : 411,
+		"sido_code" : 36,
+		"gugun_code" : 3,
+		"gugun_name" : "고성군"
+	},
+	{
+		"no" : 412,
+		"sido_code" : 36,
+		"gugun_code" : 4,
+		"gugun_name" : "김해시"
+	},
+	{
+		"no" : 413,
+		"sido_code" : 36,
+		"gugun_code" : 5,
+		"gugun_name" : "남해군"
+	},
+	{
+		"no" : 414,
+		"sido_code" : 36,
+		"gugun_code" : 6,
+		"gugun_name" : "마산시"
+	},
+	{
+		"no" : 415,
+		"sido_code" : 36,
+		"gugun_code" : 7,
+		"gugun_name" : "밀양시"
+	},
+	{
+		"no" : 416,
+		"sido_code" : 36,
+		"gugun_code" : 8,
+		"gugun_name" : "사천시"
+	},
+	{
+		"no" : 417,
+		"sido_code" : 36,
+		"gugun_code" : 9,
+		"gugun_name" : "산청군"
+	},
+	{
+		"no" : 418,
+		"sido_code" : 36,
+		"gugun_code" : 10,
+		"gugun_name" : "양산시"
+	},
+	{
+		"no" : 419,
+		"sido_code" : 36,
+		"gugun_code" : 12,
+		"gugun_name" : "의령군"
+	},
+	{
+		"no" : 420,
+		"sido_code" : 36,
+		"gugun_code" : 13,
+		"gugun_name" : "진주시"
+	},
+	{
+		"no" : 421,
+		"sido_code" : 36,
+		"gugun_code" : 14,
+		"gugun_name" : "진해시"
+	},
+	{
+		"no" : 422,
+		"sido_code" : 36,
+		"gugun_code" : 15,
+		"gugun_name" : "창녕군"
+	},
+	{
+		"no" : 423,
+		"sido_code" : 36,
+		"gugun_code" : 16,
+		"gugun_name" : "창원시"
+	},
+	{
+		"no" : 424,
+		"sido_code" : 36,
+		"gugun_code" : 17,
+		"gugun_name" : "통영시"
+	},
+	{
+		"no" : 425,
+		"sido_code" : 36,
+		"gugun_code" : 18,
+		"gugun_name" : "하동군"
+	},
+	{
+		"no" : 426,
+		"sido_code" : 36,
+		"gugun_code" : 19,
+		"gugun_name" : "함안군"
+	},
+	{
+		"no" : 427,
+		"sido_code" : 36,
+		"gugun_code" : 20,
+		"gugun_name" : "함양군"
+	},
+	{
+		"no" : 428,
+		"sido_code" : 36,
+		"gugun_code" : 21,
+		"gugun_name" : "합천군"
+	},
+	{
+		"no" : 429,
+		"sido_code" : 37,
+		"gugun_code" : 1,
+		"gugun_name" : "고창군"
+	},
+	{
+		"no" : 430,
+		"sido_code" : 37,
+		"gugun_code" : 2,
+		"gugun_name" : "군산시"
+	},
+	{
+		"no" : 431,
+		"sido_code" : 37,
+		"gugun_code" : 3,
+		"gugun_name" : "김제시"
+	},
+	{
+		"no" : 432,
+		"sido_code" : 37,
+		"gugun_code" : 4,
+		"gugun_name" : "남원시"
+	},
+	{
+		"no" : 433,
+		"sido_code" : 37,
+		"gugun_code" : 5,
+		"gugun_name" : "무주군"
+	},
+	{
+		"no" : 434,
+		"sido_code" : 37,
+		"gugun_code" : 6,
+		"gugun_name" : "부안군"
+	},
+	{
+		"no" : 435,
+		"sido_code" : 37,
+		"gugun_code" : 7,
+		"gugun_name" : "순창군"
+	},
+	{
+		"no" : 436,
+		"sido_code" : 37,
+		"gugun_code" : 8,
+		"gugun_name" : "완주군"
+	},
+	{
+		"no" : 437,
+		"sido_code" : 37,
+		"gugun_code" : 9,
+		"gugun_name" : "익산시"
+	},
+	{
+		"no" : 438,
+		"sido_code" : 37,
+		"gugun_code" : 10,
+		"gugun_name" : "임실군"
+	},
+	{
+		"no" : 439,
+		"sido_code" : 37,
+		"gugun_code" : 11,
+		"gugun_name" : "장수군"
+	},
+	{
+		"no" : 440,
+		"sido_code" : 37,
+		"gugun_code" : 12,
+		"gugun_name" : "전주시"
+	},
+	{
+		"no" : 441,
+		"sido_code" : 37,
+		"gugun_code" : 13,
+		"gugun_name" : "정읍시"
+	},
+	{
+		"no" : 442,
+		"sido_code" : 37,
+		"gugun_code" : 14,
+		"gugun_name" : "진안군"
+	},
+	{
+		"no" : 443,
+		"sido_code" : 38,
+		"gugun_code" : 1,
+		"gugun_name" : "강진군"
+	},
+	{
+		"no" : 444,
+		"sido_code" : 38,
+		"gugun_code" : 2,
+		"gugun_name" : "고흥군"
+	},
+	{
+		"no" : 445,
+		"sido_code" : 38,
+		"gugun_code" : 3,
+		"gugun_name" : "곡성군"
+	},
+	{
+		"no" : 446,
+		"sido_code" : 38,
+		"gugun_code" : 4,
+		"gugun_name" : "광양시"
+	},
+	{
+		"no" : 447,
+		"sido_code" : 38,
+		"gugun_code" : 5,
+		"gugun_name" : "구례군"
+	},
+	{
+		"no" : 448,
+		"sido_code" : 38,
+		"gugun_code" : 6,
+		"gugun_name" : "나주시"
+	},
+	{
+		"no" : 449,
+		"sido_code" : 38,
+		"gugun_code" : 7,
+		"gugun_name" : "담양군"
+	},
+	{
+		"no" : 450,
+		"sido_code" : 38,
+		"gugun_code" : 8,
+		"gugun_name" : "목포시"
+	},
+	{
+		"no" : 451,
+		"sido_code" : 38,
+		"gugun_code" : 9,
+		"gugun_name" : "무안군"
+	},
+	{
+		"no" : 452,
+		"sido_code" : 38,
+		"gugun_code" : 10,
+		"gugun_name" : "보성군"
+	},
+	{
+		"no" : 453,
+		"sido_code" : 38,
+		"gugun_code" : 11,
+		"gugun_name" : "순천시"
+	},
+	{
+		"no" : 454,
+		"sido_code" : 38,
+		"gugun_code" : 12,
+		"gugun_name" : "신안군"
+	},
+	{
+		"no" : 455,
+		"sido_code" : 38,
+		"gugun_code" : 13,
+		"gugun_name" : "여수시"
+	},
+	{
+		"no" : 456,
+		"sido_code" : 38,
+		"gugun_code" : 16,
+		"gugun_name" : "영광군"
+	},
+	{
+		"no" : 457,
+		"sido_code" : 38,
+		"gugun_code" : 17,
+		"gugun_name" : "영암군"
+	},
+	{
+		"no" : 458,
+		"sido_code" : 38,
+		"gugun_code" : 18,
+		"gugun_name" : "완도군"
+	},
+	{
+		"no" : 459,
+		"sido_code" : 38,
+		"gugun_code" : 19,
+		"gugun_name" : "장성군"
+	},
+	{
+		"no" : 460,
+		"sido_code" : 38,
+		"gugun_code" : 20,
+		"gugun_name" : "장흥군"
+	},
+	{
+		"no" : 461,
+		"sido_code" : 38,
+		"gugun_code" : 21,
+		"gugun_name" : "진도군"
+	},
+	{
+		"no" : 462,
+		"sido_code" : 38,
+		"gugun_code" : 22,
+		"gugun_name" : "함평군"
+	},
+	{
+		"no" : 463,
+		"sido_code" : 38,
+		"gugun_code" : 23,
+		"gugun_name" : "해남군"
+	},
+	{
+		"no" : 464,
+		"sido_code" : 38,
+		"gugun_code" : 24,
+		"gugun_name" : "화순군"
+	},
+	{
+		"no" : 465,
+		"sido_code" : 39,
+		"gugun_code" : 1,
+		"gugun_name" : "남제주군"
+	},
+	{
+		"no" : 466,
+		"sido_code" : 39,
+		"gugun_code" : 2,
+		"gugun_name" : "북제주군"
+	},
+	{
+		"no" : 467,
+		"sido_code" : 39,
+		"gugun_code" : 3,
+		"gugun_name" : "서귀포시"
+	},
+	{
+		"no" : 468,
+		"sido_code" : 39,
+		"gugun_code" : 4,
+		"gugun_name" : "제주시"
+	}
+]
