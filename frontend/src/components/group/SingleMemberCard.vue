@@ -22,10 +22,13 @@
 import { computed } from 'vue'
 import { useMemberListStore } from '@/stores/memberList'
 
+const imgUrlPrefix="http://localhost:8080"
 const profileImageSrc = computed(() => {
-  const role = roleKey.value?.toLowerCase()
-  const validRoles = ['master', 'finance', 'schedule', 'logistics']
-  return validRoles.includes(role) ? `/img/${role}.PNG` : '/img/normal.PNG'
+  // const role = roleKey.value?.toLowerCase()
+  // const validRoles = ['master', 'finance', 'schedule', 'logistics']
+  // return validRoles.includes(role) ? `/img/${role}.PNG` : '/img/normal.PNG'
+
+  return props.member.profileImage ? (imgUrlPrefix + props.member.profileImage) : '/src/assets/no_profile_img.jpg'
 })
 
 const props = defineProps({

@@ -29,7 +29,8 @@
   <select id="selectAllGroupUserInfo" resultType="com.ssafy.pjt.group.entity.GroupMemberInfo">
     SELECT
 	  gui.user_id AS userId,
-	  u.nickname AS nickName
+	  u.nickname AS nickName,
+	  u.profile_image AS profileImage
 	FROM group_user_info gui
 		JOIN user u ON gui.user_id = u.id
 	WHERE gui.group_id = #{groupId}

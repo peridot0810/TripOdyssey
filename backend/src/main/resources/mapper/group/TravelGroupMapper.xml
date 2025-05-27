@@ -92,5 +92,28 @@
   			finished=#{finished}
   		WHERE group_id=#{groupId}
   	</update>
+  	
+  	
+  	<update id="updateUserExperience">
+  		UPDATE user_experience
+  		<set>
+  			<if test="leaderExp != null">
+  				leader_exp= leader_exp + #{leaderExp},
+  			</if>
+  			<if test="scheduleExp != null">
+  				schedule_exp= schedule_exp + #{scheduleExp},
+  			</if>
+  			<if test="financeExp != null">
+  				finance_exp= finance_exp + #{financeExp},
+  			</if>
+  			<if test="logisticsExp != null">
+  				logistics_exp= logistics_exp + #{logisticsExp},
+  			</if>
+  			<if test="memberExp != null">
+  				member_exp= member_exp + #{memberExp},
+  			</if>
+  		</set>
+  		WHERE user_id=#{userId}
+  	</update>
 
 </mapper>

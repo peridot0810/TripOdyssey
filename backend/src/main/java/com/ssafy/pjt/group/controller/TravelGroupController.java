@@ -141,4 +141,23 @@ public class TravelGroupController {
 		return ResponseEntity.ok(new CommonResponse<>(true, "그룹 진척도 업데이트에 성공했습니다.", null));
 	}
 	
+	
+	@PutMapping("/{groupId}/end-trip")
+	@Operation(summary = "그룹 여행 종료", description = "그룹 여행을 종료하고, 그룹원의 경험치를 올려줍니다.")
+	@ApiResponse(responseCode = "200", description = "그룹 여행 종료 완료")
+	public ResponseEntity<?> endTrip(
+			@AuthenticationPrincipal UserDetails userDetails,
+			@PathVariable Integer groupId){
+		
+		String userId = userDetails.getUsername();
+		if(!userValidationService.isUserInGroup(userId, groupId)) {
+			throw new UserNotInGroupException("그룹원만 요청할 수 있는 기능입니다.");
+		}
+		if(!userValidationService.isUserRoleValid(userId, groupId, MemberRole.MASTER.getId())) {
+			throw new UserNotInGroupException("그룹 여행 종료는 방장만 가능합니다.");
+		}
+		
+		travelGroupService.endTrip(groupId, userId);
+		return ResponseEntity.ok(new CommonResponse<>(true, "그룹 여행 종료에 성공했습니다.", null));
+	}
 }
