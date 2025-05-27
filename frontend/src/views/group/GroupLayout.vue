@@ -61,12 +61,17 @@
 import { ref, onMounted, watch, onUnmounted, computed } from 'vue'
 import { useRoute, useRouter, RouterView } from 'vue-router'
 import { useGroupStore } from '@/stores/group'
+import { useUserStore } from '@/stores/user'
+import { useMemberListStore } from '@/stores/memberList'
 import { apiClient } from '@/utils/apiClient'
 import HelperSpace from '@/components/ai/HelperSpace.vue'
 
 const route = useRoute()
 const router = useRouter()
 const groupStore = useGroupStore()
+const userStore = useUserStore()
+const memberListStore = useMemberListStore()
+const members = computed(() => [...memberListStore.members].filter(a => a.userId===userStore.userInfo.id)) 
 
 const isLoading = ref(false)
 const error = ref(null)
