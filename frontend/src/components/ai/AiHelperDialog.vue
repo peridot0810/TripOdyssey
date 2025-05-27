@@ -1,9 +1,8 @@
 <template>
-  <v-dialog v-model="isOpen" max-width="600" persistent>
+  <v-dialog v-model="isOpen" max-width="600" persistent class="container">
     <v-card class="ai-dialog-card">
       <!-- Header -->
       <v-card-title class="ai-dialog-header">
-        <v-icon color="success" class="mr-2">mdi-robot</v-icon>
         AI 일정 도우미
         <v-spacer></v-spacer>
         <v-btn icon variant="text" @click="closeDialog">
@@ -13,91 +12,31 @@
 
       <v-divider></v-divider>
 
-      <!-- Chat Messages Area -->
-      <v-card-text class="chat-area">
-        <div class="messages-container">
-          <!-- AI Greeting Message -->
-          <div class="message ai-message">
-            <v-avatar size="32" color="success" class="message-avatar">
-              <v-icon color="white" size="18">mdi-robot</v-icon>
-            </v-avatar>
-            <div class="message-bubble ai-bubble">
-              안녕하세요! 일정 계획에 도움이 필요하시면<br />
-              무엇이든 말씀해 주세요.
-            </div>
-          </div>
-
-          <!-- Example Hints (only show initially) -->
-          <div v-if="messages.length === 0" class="examples-container">
-            <v-alert type="info" variant="tonal" density="compact" class="examples-alert">
-              <div class="examples-text">
-                <strong>예시:</strong><br />
-                • "3일차에 맛집 추천해줘"<br />
-                • "부산 관광지 일정 짜줘"<br />
-                • "교통편 정보 알려줘"
-              </div>
-            </v-alert>
-          </div>
-
-          <!-- User and AI Messages -->
-          <div
-            v-for="(message, index) in messages"
-            :key="index"
-            class="message"
-            :class="message.type + '-message'"
-          >
-            <v-avatar
-              v-if="message.type === 'user'"
-              size="32"
-              color="primary"
-              class="message-avatar user-avatar"
-            >
-              <v-icon color="white" size="18">mdi-account</v-icon>
-            </v-avatar>
-
-            <div class="message-bubble" :class="message.type + '-bubble'">
-              {{ message.text }}
-            </div>
-
-            <v-avatar
-              v-if="message.type === 'ai'"
-              size="32"
-              color="success"
-              class="message-avatar ai-avatar"
-            >
-              <v-icon color="white" size="18">mdi-robot</v-icon>
-            </v-avatar>
-          </div>
-
-          <!-- Loading indicator when AI is processing -->
-          <div v-if="isProcessing" class="message ai-message">
-            <v-avatar size="32" color="success" class="message-avatar">
-              <v-icon color="white" size="18">mdi-robot</v-icon>
-            </v-avatar>
-            <div class="message-bubble ai-bubble">
-              <v-progress-circular
-                indeterminate
-                size="16"
-                width="2"
-                color="success"
-              ></v-progress-circular>
-              처리 중입니다...
-            </div>
-          </div>
+      <!-- Content -->
+      <v-card-text class="dialog-content">
+        <!-- AI Greeting -->
+        <div class="greeting-section">
+          <p class="text-body-1 mb-4">일정 관련 질문을 입력하시면 도움을 드립니다.</p>
         </div>
-      </v-card-text>
 
-      <!-- Input Section -->
-      <v-divider></v-divider>
-      <v-card-actions class="input-section">
+        <!-- Examples -->
+        <v-alert type="info" variant="tonal" density="comfortable" class="mb-4">
+          <div class="examples-text">
+            <strong>예시:</strong><br />
+            • "3일차에 맛집 추천해줘"<br />
+            • "부산 관광지 일정 짜줘"<br />
+            • "교통편 정보 알려줘"<br />
+            • "일정 최적화해줘"
+          </div>
+        </v-alert>
+
+        <!-- Input -->
         <v-text-field
           v-model="userInput"
-          :placeholder="inputPlaceholder"
+          label="일정 관련 질문을 입력하세요 (Enter로 전송)"
           variant="outlined"
           density="comfortable"
-          hide-details
-          class="message-input"
-          :disabled="isInputDisabled"
+          :disabled="isProcessing"
           @keyup.enter="submitMessage"
         >
           <template #append-inner>
@@ -105,16 +44,22 @@
               icon
               variant="text"
               color="primary"
-              :disabled="!userInput.trim() || isInputDisabled"
+              :disabled="!userInput.trim() || isProcessing"
               @click="submitMessage"
             >
               <v-icon>mdi-send</v-icon>
             </v-btn>
           </template>
         </v-text-field>
-      </v-card-actions>
 
-      <!-- Close Dialog Button -->
+        <!-- Loading -->
+        <div v-if="isProcessing" class="loading-section text-center py-4">
+          <v-progress-circular indeterminate color="success" size="48"></v-progress-circular>
+          <p class="text-body-1 mt-3">일정 최적화 중입니다...</p>
+        </div>
+      </v-card-text>
+
+      <!-- Actions -->
       <v-card-actions class="close-section">
         <v-spacer></v-spacer>
         <v-btn variant="outlined" color="grey" @click="closeDialog" :disabled="isProcessing">
@@ -127,7 +72,6 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { useRoute } from 'vue-router'
 import { useScheduleStore } from '@/stores/schedule'
 import { apiClient } from '@/utils/apiClient'
 
@@ -139,31 +83,16 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:modelValue'])
-
-const route = useRoute()
 const scheduleStore = useScheduleStore()
 
 const userInput = ref('')
-const messages = ref([])
 const isProcessing = ref(false)
-const hasSubmitted = ref(false)
+const showResponse = ref(false)
+const responseText = ref('')
 
 const isOpen = computed({
   get: () => props.modelValue,
   set: (value) => emit('update:modelValue', value),
-})
-
-const isInputDisabled = computed(() => {
-  return hasSubmitted.value || isProcessing.value
-})
-
-const inputPlaceholder = computed(() => {
-  if (hasSubmitted.value) {
-    return '작업이 완료될 때까지 기다려주세요...'
-  }
-  return messages.value.length === 0
-    ? '어떤 도움이 필요하신가요?'
-    : '추가 요청사항이 있으시면 말씀해 주세요...'
 })
 
 const applyOptimizedSchedules = (optimizedSchedules) => {
@@ -216,27 +145,12 @@ const applyOptimizedSchedules = (optimizedSchedules) => {
 }
 
 const submitMessage = async () => {
-  if (!userInput.value.trim() || isInputDisabled.value) return
+  if (!userInput.value.trim() || isProcessing.value) return
 
   const messageText = userInput.value.trim()
-  const groupId = route.params.groupId
 
-  // Add user message
-  messages.value.push({
-    type: 'user',
-    text: messageText,
-  })
-
-  // Clear input and disable it
-  userInput.value = ''
-  hasSubmitted.value = true
   isProcessing.value = true
-
-  // Add initial AI response
-  messages.value.push({
-    type: 'ai',
-    text: `네! "${messageText}"을 처리해드릴게요. 잠시만 기다려주세요! ⏳`,
-  })
+  console.log(messageText)
 
   try {
     // Prepare request body
@@ -264,14 +178,8 @@ const submitMessage = async () => {
 
     console.log('AI Response received:', response.data)
 
-    // Add success response message
     if (response.data.status === 'SUCCESS') {
       const aiSummary = response.data.data.summary || '일정 최적화가 완료되었습니다!'
-
-      messages.value.push({
-        type: 'ai',
-        text: aiSummary,
-      })
 
       // Apply optimized schedules to the store
       if (
@@ -280,23 +188,28 @@ const submitMessage = async () => {
       ) {
         applyOptimizedSchedules(response.data.data.optimizedSchedules)
 
-        // Add additional message about applied changes
-        messages.value.push({
-          type: 'ai',
-          text: `✅ ${response.data.data.optimizedSchedules.length}개의 일정이 확정 일정으로 적용되었습니다!`,
-        })
+        responseText.value = `${aiSummary}\n\n✅ ${response.data.data.optimizedSchedules.length}개의 일정이 확정 일정으로 적용되었습니다!`
+      } else {
+        responseText.value = aiSummary
       }
+
+      // Close this dialog and show response
+      isOpen.value = false
+      setTimeout(() => {
+        showResponse.value = true
+      }, 300)
     } else {
       throw new Error('AI 처리 실패')
     }
   } catch (error) {
     console.error('AI Helper API error:', error)
+    responseText.value = '죄송합니다. 처리 중 오류가 발생했습니다. 다시 시도해 주세요.'
 
-    // Add error message
-    messages.value.push({
-      type: 'ai',
-      text: '죄송합니다. 처리 중 오류가 발생했습니다. 다시 시도해 주세요.',
-    })
+    // Still show response even on error
+    isOpen.value = false
+    setTimeout(() => {
+      showResponse.value = true
+    }, 300)
   } finally {
     isProcessing.value = false
   }
@@ -307,11 +220,10 @@ const closeDialog = () => {
 
   isOpen.value = false
 
-  // Reset state when dialog closes
+  // Reset state
   setTimeout(() => {
-    messages.value = []
     userInput.value = ''
-    hasSubmitted.value = false
+    responseText.value = ''
     isProcessing.value = false
   }, 300)
 }
@@ -322,129 +234,62 @@ const closeDialog = () => {
   max-height: 80vh;
   display: flex;
   flex-direction: column;
+  border-radius: 12px;
 }
 
 .ai-dialog-header {
-  background-color: #f8f9fa;
+  background-color: #f3e5f5;
   font-weight: bold;
   padding: 16px 20px;
-}
-
-.chat-area {
-  flex: 1;
-  max-height: 400px;
-  overflow-y: auto;
-  padding: 20px;
-}
-
-.messages-container {
   display: flex;
-  flex-direction: column;
-  gap: 16px;
+  align-items: center;
 }
 
-.message {
+.header-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.dialog-content {
+  padding: 24px;
+  text-align: center;
+}
+
+.greeting-section {
+  margin-bottom: 24px;
+}
+
+.avatar-container {
   display: flex;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.ai-message {
-  justify-content: flex-start;
-}
-
-.user-message {
-  justify-content: flex-end;
-  flex-direction: row-reverse;
-}
-
-.message-avatar {
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-
-.user-avatar {
-  margin-left: 12px;
+  justify-content: center;
 }
 
 .ai-avatar {
-  margin-right: 12px;
-}
-
-.message-bubble {
-  max-width: 70%;
-  padding: 12px 16px;
-  border-radius: 16px;
-  line-height: 1.4;
-  word-wrap: break-word;
-}
-
-.ai-bubble {
-  background-color: #e8f5e8;
-  color: #2e7d32;
-  border-bottom-left-radius: 4px;
-}
-
-.user-bubble {
-  background-color: #e3f2fd;
-  color: #1565c0;
-  border-bottom-right-radius: 4px;
-}
-
-.examples-container {
-  margin: 8px 0;
-}
-
-.examples-alert {
-  border-radius: 12px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #5a152c;
 }
 
 .examples-text {
   font-size: 14px;
   line-height: 1.5;
+  text-align: left;
 }
 
-.input-section {
-  padding: 16px 20px;
-  background-color: #fafafa;
+.loading-section {
+  margin: 20px 0;
 }
 
 .close-section {
-  padding: 12px 20px;
+  padding: 16px 20px;
   background-color: #f8f9fa;
 }
 
-.message-input {
-  flex: 1;
-}
-
-/* Custom scrollbar for chat area */
-.chat-area::-webkit-scrollbar {
-  width: 6px;
-}
-
-.chat-area::-webkit-scrollbar-thumb {
-  background-color: #bdbdbd;
-  border-radius: 3px;
-}
-
-.chat-area::-webkit-scrollbar-track {
-  background-color: #f5f5f5;
-}
-
-/* Animation for new messages */
-.message {
-  animation: slideIn 0.3s ease-out;
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.container {
+  border-radius: 50px; /* or whatever value you prefer */
 }
 </style>

@@ -35,13 +35,19 @@
       <div v-else>
         <!-- Summary Section -->
         <div class="summary-section mb-4">
-          <v-card color="primary" variant="flat" class="pa-4 text-white">
+          <v-card color="orange" variant="flat" class="pa-4 text-white">
             <div class="d-flex justify-space-between align-center">
               <div>
                 <div class="text-h5 font-weight-bold">{{ formatAmount(totalAmount) }}원</div>
                 <div class="text-body-2 opacity-90">총 {{ financeData.length }}건의 지출</div>
               </div>
-              <SvgIcon type="mdi" :path="cashMultipleIcon" size="32" color="white" class="opacity-70" />
+              <SvgIcon
+                type="mdi"
+                :path="cashMultipleIcon"
+                size="32"
+                color="white"
+                class="opacity-70"
+              />
             </div>
           </v-card>
         </div>
@@ -122,12 +128,7 @@ import { useScheduleStore } from '@/stores/schedule'
 import FinanceCard from './FinanceCard.vue'
 import { apiClient } from '@/utils/apiClient'
 import SvgIcon from '@jamescoyle/vue-icon'
-import {
-  mdiWalletOutline,
-  mdiCashMultiple,
-  mdiFilterVariant,
-  mdiSort
-} from '@mdi/js'
+import { mdiWalletOutline, mdiCashMultiple, mdiFilterVariant, mdiSort } from '@mdi/js'
 
 const walletOutlineIcon = mdiWalletOutline
 const cashMultipleIcon = mdiCashMultiple
@@ -175,7 +176,7 @@ const koreanCategoryMap = {
   3: '식비',
   4: '레저',
   5: '공용품',
-  6: '기타'
+  6: '기타',
 }
 
 // Category options for filter
@@ -220,8 +221,9 @@ const filteredFinanceData = computed(() => {
         comparison = a.amount - b.amount
         break
       case 'category':
-        comparison = (koreanCategoryMap[a.categoryId] || '기타')
-          .localeCompare(koreanCategoryMap[b.categoryId] || '기타')
+        comparison = (koreanCategoryMap[a.categoryId] || '기타').localeCompare(
+          koreanCategoryMap[b.categoryId] || '기타',
+        )
         break
       default:
         comparison = a.expenseId - b.expenseId
@@ -320,7 +322,10 @@ const getContentImage = (contentId) => {
 const getContentName = (contentId) => {
   if (!contentId) return null
   const schedule = scheduleMap.value.get(contentId)
-  console.log(`Getting name for contentId ${contentId}:`, schedule?.attractionInfo?.title || schedule?.name)
+  console.log(
+    `Getting name for contentId ${contentId}:`,
+    schedule?.attractionInfo?.title || schedule?.name,
+  )
   return schedule?.attractionInfo?.title || schedule?.name || null
 }
 

@@ -31,7 +31,7 @@
       class="request-groups"
     >
       <div v-for="(requests, roleId) in groupedRequests" :key="roleId" class="role-group">
-        <h4 class="role-group-title">
+        <h4 class="role-group-title" :class="`role-title--${roleId}`">
           {{ getRoleIcon(roleId) }} {{ getRoleName(roleId) }} 역할 신청 ({{ requests.length }})
         </h4>
         <div class="role-group-requests">
@@ -42,7 +42,6 @@
             :class="getRequestItemClass(request.status)"
           >
             <div class="request-info">
-              <span class="user-icon">👤</span>
               <span class="user-name">{{ request.userId }}</span>
               <span class="request-date">{{ formatDate(request.requestedAt) }}</span>
               <span class="request-status" :class="getStatusClass(request.status)">
@@ -97,10 +96,11 @@ const processingRequests = ref(new Set()) // Track which requests are being proc
 
 // Role mapping
 const roleMapping = {
-  1: { name: '마스터', icon: '🔑' },
-  2: { name: '회계', icon: '💰' },
-  3: { name: '일정', icon: '📅' },
-  4: { name: '숙박', icon: '🏨' },
+  1: { name: '마스터', icon: '' },
+  2: { name: '회계', icon: '' },
+  3: { name: '일정', icon: '' },
+  4: { name: '숙박', icon: '' },
+  5: { name: '일반', icon: '' },
 }
 
 // Computed
@@ -161,7 +161,7 @@ const getRoleName = (roleId) => {
 }
 
 const getRoleIcon = (roleId) => {
-  return roleMapping[roleId]?.icon || '👥'
+  return roleMapping[roleId]?.icon || ''
 }
 
 const formatDate = (dateString) => {
@@ -412,11 +412,11 @@ onMounted(() => {
 .role-group-title {
   margin: 0 0 0.5rem 0;
   padding: 0.5rem 0.75rem;
-  background: #fff3cd;
-  border-left: 3px solid #ffc107;
+  background: #a5ffe1;
+  border-left: 3px solid #77dfff;
   font-size: 0.95rem;
   font-weight: 600;
-  color: #856404;
+  color: #00455a;
 }
 
 .role-group-requests {
@@ -589,5 +589,35 @@ onMounted(() => {
   .request-actions {
     align-self: flex-end;
   }
+}
+
+/* Role-specific header colors (Nintendo-style Joy-Con inspired) */
+
+.role-title--1 {
+  /* MASTER */
+  background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+  border-left-color: #6c5ce7;
+  color: white;
+}
+
+.role-title--2 {
+  /* FINANCE */
+  background: linear-gradient(135deg, #f9ca24, #f0932b);
+  border-left-color: #4ecdc4;
+  color: white;
+}
+
+.role-title--3 {
+  /* SCHEDULE */
+  background: linear-gradient(135deg, #e95385, #ff2075);
+  border-left-color: #45b7d1;
+  color: white;
+}
+
+.role-title--4 {
+  /* LOGISTICS */
+  background: linear-gradient(135deg, #45b7d1, #007bff);
+  border-left-color: #f9ca24;
+  color: #333;
 }
 </style>

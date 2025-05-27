@@ -41,7 +41,6 @@
 
         <!-- Description -->
         <div class="info-item">
-          <label>설명</label>
           <div class="info-value">
             {{ groupStore.myGroup.description || '설명 없음' }}
           </div>
@@ -51,13 +50,13 @@
         <div class="info-item">
           <label>여행 기간</label>
           <div class="info-value date-range">
-            📅 {{ formatDate(groupStore.myGroup.startDate) }} ~
+            {{ formatDate(groupStore.myGroup.startDate) }} ~
             {{ formatDate(groupStore.myGroup.endDate) }}
           </div>
         </div>
 
         <!-- Role Limits -->
-        <div class="info-item">
+        <div class="info-item horizontal-align">
           <label>역할 제한</label>
           <div class="role-chips">
             <div
@@ -80,7 +79,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useGroupStore } from '@/stores/group'
 import { apiClient } from '@/utils/apiClient'
@@ -91,13 +90,19 @@ const route = useRoute()
 // State
 const fileInput = ref(null)
 const isUploading = ref(false)
-const groupImage = ref(null) // Will store the full image URL
-
-// API Base URL for constructing full image URLs
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
+const groupImage = ref(groupStore.getGroupImageUrl) // Initialize from store
 
 // Computed
 const groupId = computed(() => route.params.groupId)
+
+// Watch for changes in store image URL
+watch(
+  () => groupStore.getGroupImageUrl,
+  (newImageUrl) => {
+    groupImage.value = newImageUrl
+  },
+  { immediate: true },
+)
 
 // Methods
 const formatDate = (dateString) => {
@@ -159,15 +164,16 @@ const uploadImage = async (file) => {
 
     console.log('Image upload response:', response.data)
 
-    // If upload successful, update the image display
+    // If upload successful, update the store
     if (response.data.success) {
-      // Construct full URL from relative path
-      const relativePath = response.data.data
-      const fullImageUrl = `${API_BASE_URL}${relativePath}`
+      // Update the store with the new image URL
+      const updatedGroupData = {
+        ...groupStore.myGroup,
+        imageUrl: response.data.data,
+      }
+      groupStore.setGroupData(updatedGroupData)
 
-      groupImage.value = fullImageUrl
-      console.log('Image uploaded successfully. Full URL:', fullImageUrl)
-      alert('이미지 업로드가 완료되었습니다!')
+      console.log('Image uploaded successfully:', response.data.data)
     } else {
       throw new Error(response.data.message || '업로드에 실패했습니다.')
     }
@@ -218,8 +224,8 @@ const uploadImage = async (file) => {
 
 .image-container {
   position: relative;
-  width: 160px;
-  height: 160px;
+  width: 370px; /* was 160px */
+  height: 250px; /* was 160px */
   border-radius: 8px;
   overflow: hidden;
   border: 2px solid #e0e0e0;
@@ -289,7 +295,7 @@ const uploadImage = async (file) => {
 .upload-btn {
   width: 100%;
   padding: 0.75rem;
-  background: #007bff;
+  background: #3ef3d5;
   color: white;
   border: none;
   border-radius: 6px;
@@ -297,6 +303,9 @@ const uploadImage = async (file) => {
   font-weight: 500;
   cursor: pointer;
   transition: background-color 0.2s ease;
+  display: inline-block;
+  width: 50%;
+  margin: auto;
 }
 
 .upload-btn:hover:not(:disabled) {
@@ -369,7 +378,10 @@ const uploadImage = async (file) => {
   }
 
   .image-section {
-    flex: none;
+    flex: 0 0 220px; /* was 160px */
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
     align-items: center;
   }
 
@@ -381,5 +393,85 @@ const uploadImage = async (file) => {
   .upload-btn {
     max-width: 160px;
   }
+}
+
+.info-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.info-item {
+  background: var(--card-bg, #ffffff);
+  border-left: 6px solid var(--joy-teal, #4ecdc4);
+  border-radius: 16px;
+  padding: 1rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s ease;
+}
+
+.info-item:hover {
+  transform: translateY(-2px);
+}
+
+.group-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary, #2d3748);
+  font-family: 'Nunito', sans-serif;
+}
+
+.info-item label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted, #718096);
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+  letter-spacing: 0.5px;
+}
+
+.info-value {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-primary, #2d3748);
+  font-family: 'Nunito', sans-serif;
+  line-height: 1.5;
+}
+
+.date-range {
+  color: var(--text-secondary, #495057);
+}
+
+.role-chips {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.role-chip {
+  background: var(--joy-purple, #6c5ce7);
+  color: white;
+  padding: 0.35rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+  font-family: 'Nunito', sans-serif;
+  transition: transform 0.2s ease;
+}
+
+.role-chip:hover {
+  transform: scale(1.05);
+}
+
+.info-item.horizontal-align {
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+}
+
+.info-item.horizontal-align label {
+  min-width: 80px;
+  margin-bottom: 0; /* remove vertical gap */
 }
 </style>

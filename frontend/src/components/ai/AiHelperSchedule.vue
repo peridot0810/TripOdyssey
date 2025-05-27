@@ -1,30 +1,22 @@
 <template>
   <div class="ai-helper-schedule">
-    <v-btn
+    <div
       ref="aiButton"
-      icon
-      size="large"
-      color="success"
-      variant="elevated"
       class="ai-helper-button"
       @click="handleAiHelperClick"
       @mouseenter="showTooltip = true"
       @mouseleave="showTooltip = false"
     >
-      <v-icon size="large">mdi-robot</v-icon>
-    </v-btn>
+      <img src="/img/schedule.PNG" alt="AI Helper" class="ai-helper-image" />
+    </div>
 
     <!-- Custom Dialog-style Tooltip with Fixed Positioning -->
     <Teleport to="body">
-      <div
-        v-if="showTooltip && !showDialog"
-        class="ai-dialog-tooltip"
-        :style="tooltipStyle"
-      >
+      <div v-if="showTooltip && !showDialog" class="ai-dialog-tooltip" :style="tooltipStyle">
         <div class="dialog-bubble">
-          일정 짜기가<br>
-          막막하면<br>
-          저에게<br>
+          일정 짜기가<br />
+          막막하면<br />
+          저에게<br />
           물어보세요!
         </div>
         <div class="dialog-pointer"></div>
@@ -32,7 +24,7 @@
     </Teleport>
 
     <!-- AI Helper Dialog -->
-    <AiHelperDialog v-model="showDialog" />
+    <AiHelperDialog v-model="showDialog" class="dialog" />
   </div>
 </template>
 
@@ -47,12 +39,12 @@ const aiButton = ref(null)
 const tooltipStyle = computed(() => {
   if (!aiButton.value) return {}
 
-  const rect = aiButton.value.$el.getBoundingClientRect()
+  const rect = aiButton.value.getBoundingClientRect()
   return {
     position: 'fixed',
     left: `${rect.right + 10}px`,
     top: `${rect.top - 80}px`,
-    zIndex: 9999
+    zIndex: 9999,
   }
 })
 
@@ -72,21 +64,36 @@ const handleAiHelperClick = () => {
 }
 
 .ai-helper-button {
-  width: 56px !important;
-  height: 56px !important;
-  border-radius: 50% !important;
-  min-width: auto !important;
-  transition: transform 0.2s, box-shadow 0.2s;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 3px solid #5a152c; /* Pink border */
+  overflow: hidden;
+  cursor: pointer;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
 }
 
 .ai-helper-button:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25) !important;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
 }
 
 .ai-helper-button:active {
   transform: translateY(0) scale(0.98);
+}
+
+.ai-helper-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
 }
 
 /* Dialog-style Tooltip with Fixed Positioning */

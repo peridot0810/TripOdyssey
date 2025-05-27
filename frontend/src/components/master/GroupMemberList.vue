@@ -21,14 +21,14 @@
         :class="{ active: currentView === 'members' && !showRoleGrouping }"
         @click="setView('members', false)"
       >
-        📋 전체 목록
+        전체 목록
       </button>
       <button
         class="view-toggle-btn"
         :class="{ active: currentView === 'requests' }"
         @click="setView('requests')"
       >
-        📝 역할 신청
+        역할 신청
       </button>
     </div>
 
@@ -441,5 +441,43 @@ onMounted(() => {
     margin: 0;
     border-radius: 0;
   }
+}
+
+.view-controls {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background: var(--bg-subtle, #f8f9fa);
+  border-radius: var(--radius-large, 20px);
+  margin-bottom: 1rem;
+  justify-content: center;
+  font-family: 'Nunito', sans-serif;
+}
+
+.view-toggle-btn {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  border: 2px solid transparent;
+  border-radius: var(--radius-medium, 20px);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  background: white;
+  transition: all 0.2s ease;
+  color: #4a5568;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.view-toggle-btn:hover {
+  background: #f1f3f5;
+  transform: translateY(-1px);
+}
+
+.view-toggle-btn.active {
+  background: linear-gradient(135deg, #4ecdc4 0%, #45b7d1 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(78, 205, 196, 0.4);
+  border-color: #4ecdc4;
+  transform: translateY(-2px);
 }
 </style>

@@ -3,7 +3,6 @@
     <v-card class="finance-dialog-card">
       <!-- Header -->
       <v-card-title class="finance-dialog-header">
-        <v-icon color="warning" class="mr-2">mdi-calculator</v-icon>
         재무 AI 도우미
         <v-spacer></v-spacer>
         <v-btn icon variant="text" @click="closeDialog">
@@ -17,10 +16,6 @@
       <v-card-text class="dialog-content">
         <!-- AI Greeting -->
         <div class="greeting-section">
-          <v-avatar size="48" color="warning" class="mb-3">
-            <v-icon color="white" size="24">mdi-calculator</v-icon>
-          </v-avatar>
-          <h3 class="text-h6 mb-2">재무 AI 도우미</h3>
           <p class="text-body-1 mb-4">재무 관련 질문을 입력하시면 분석해드립니다.</p>
         </div>
 
@@ -37,7 +32,7 @@
         <!-- Input -->
         <v-text-field
           v-model="userInput"
-          label="재무 관련 질문을 입력하세요"
+          label="재무 관련 질문을 입력하세요 (Enter로 전송)"
           variant="outlined"
           density="comfortable"
           :disabled="isProcessing"
@@ -66,12 +61,7 @@
       <!-- Actions -->
       <v-card-actions class="close-section">
         <v-spacer></v-spacer>
-        <v-btn
-          variant="outlined"
-          color="grey"
-          @click="closeDialog"
-          :disabled="isProcessing"
-        >
+        <v-btn variant="outlined" color="grey" @click="closeDialog" :disabled="isProcessing">
           닫기
         </v-btn>
       </v-card-actions>
@@ -79,10 +69,7 @@
   </v-dialog>
 
   <!-- Response Display Component -->
-  <FinanceResponseDisplay
-    v-model="showResponse"
-    :response-text="responseText"
-  />
+  <FinanceResponseDisplay v-model="showResponse" :response-text="responseText" />
 </template>
 
 <script setup>
@@ -143,7 +130,6 @@ const submitMessage = async () => {
         showResponse.value = true
       }, 300)
     }
-
   } catch (error) {
     console.error('Finance AI Error:', error)
     responseText.value = '재무 분석 중 오류가 발생했습니다.'
@@ -183,6 +169,15 @@ const closeDialog = () => {
   background-color: #fff8e1;
   font-weight: bold;
   padding: 16px 20px;
+  display: flex;
+  align-items: center;
+}
+
+.header-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .dialog-content {
@@ -192,6 +187,19 @@ const closeDialog = () => {
 
 .greeting-section {
   margin-bottom: 24px;
+}
+
+.avatar-container {
+  display: flex;
+  justify-content: center;
+}
+
+.ai-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #5a152c;
 }
 
 .examples-text {

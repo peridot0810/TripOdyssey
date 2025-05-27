@@ -1,7 +1,5 @@
 <template>
   <div class="master-view">
-    <h1 class="page-title">MASTER DASHBOARD</h1>
-
     <div class="dashboard-container">
       <!-- LEFT COLUMN - GROUP INFO & TRIP PROGRESS -->
       <div class="left-column">

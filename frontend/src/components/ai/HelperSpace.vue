@@ -37,8 +37,8 @@ const isFinancePage = computed(() => {
 <style scoped>
 .helper-space {
   position: fixed;
-  bottom: 24px;
-  left: 24px;
+  bottom: 60px;
+  left: 62px;
   z-index: 1000;
   pointer-events: none;
 }

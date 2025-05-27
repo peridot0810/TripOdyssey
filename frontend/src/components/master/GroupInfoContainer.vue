@@ -2,12 +2,7 @@
   <div class="group-info-container">
     <!-- Toggle Edit Button -->
     <div class="header-actions">
-      <button
-        @click="toggleEdit"
-        class="edit-toggle-btn"
-      >
-        편집
-      </button>
+      <button @click="toggleEdit" class="edit-toggle-btn">편집</button>
     </div>
 
     <!-- Content - Always Display Mode -->
@@ -103,7 +98,7 @@ const closeModal = () => {
   border-radius: 8px;
   width: 90%;
   max-width: 600px;
-  max-height: 80vh;
+  max-height: 90vh; /* Increased from 80vh to 90vh */
   overflow: hidden;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
   display: flex;

@@ -1,8 +1,8 @@
 <template>
-  <div class="member-card">
+  <div class="member-card" :class="`border--${roleKey}`">
     <!-- Left: Avatar Icon -->
     <div class="user-icon">
-      <v-icon size="20" color="white">mdi-account</v-icon>
+      <img :src="profileImageSrc" alt="profile" class="avatar-img" />
     </div>
 
     <!-- Center: Nickname + ID -->
@@ -21,6 +21,12 @@
 <script setup>
 import { computed } from 'vue'
 import { useMemberListStore } from '@/stores/memberList'
+
+const profileImageSrc = computed(() => {
+  const role = roleKey.value?.toLowerCase()
+  const validRoles = ['master', 'finance', 'schedule', 'logistics']
+  return validRoles.includes(role) ? `/img/${role}.PNG` : '/img/normal.PNG'
+})
 
 const props = defineProps({
   member: {
@@ -52,38 +58,15 @@ const roleBadgeClass = computed(() => {
   align-items: center;
   justify-content: space-between;
   padding: 1rem 1.25rem;
-  border-radius: 24px;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 16px;
+  background: #ffffff;
   margin-bottom: 0.75rem;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.1), 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
   font-family: 'Nunito', sans-serif;
-  position: relative;
-  overflow: hidden;
   width: 92%;
   max-width: 600px;
   margin: 0 auto 0.75rem;
-}
-
-/* Role-specific border colors */
-.member-card {
-  border: 3px solid #4a5568; /* Default dark gray for member */
-}
-
-.member-card:has(.role-badge--master) {
-  border: 3px solid #667eea; /* Purple for master */
-}
-
-.member-card:has(.role-badge--finance) {
-  border: 3px solid #ff8c42; /* Orange for finance */
-}
-
-.member-card:has(.role-badge--logistics) {
-  border: 3px solid #4da6ff; /* Blue for logistics */
-}
-
-.member-card:has(.role-badge--schedule) {
-  border: 3px solid #ffb3d9; /* Pink for schedule */
+  border: 2px solid #e2e8f0; /* default border, overridden by role class */
 }
 
 .member-card::before {
@@ -92,7 +75,9 @@ const roleBadgeClass = computed(() => {
 }
 
 .member-card:hover {
-  box-shadow: 0 8px 20px rgba(0, 123, 255, 0.15), 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow:
+    0 8px 20px rgba(0, 123, 255, 0.15),
+    0 4px 8px rgba(0, 0, 0, 0.1);
   /* Hover maintains the same border color - no change */
 }
 
@@ -100,11 +85,11 @@ const roleBadgeClass = computed(() => {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #6c5ce7; /* flat Nintendo-style lavender */
+  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
   margin-right: 0.75rem;
   flex-shrink: 0;
 }
@@ -114,20 +99,18 @@ const roleBadgeClass = computed(() => {
 }
 
 .nickname {
-  font-weight: 700;
+  font-weight: 600;
   color: #2d3748;
-  font-size: 1.1rem;
-  letter-spacing: -0.025em;
+  font-size: 1rem;
 }
 
 .user-id {
-  color: #718096;
-  font-size: 0.9rem;
-  font-weight: 600;
-  background: #edf2f7;
-  padding: 0.25rem 0.5rem;
-  border-radius: 12px;
-  margin-top: 0.25rem;
+  font-size: 0.8rem;
+  background: #f1f5f9;
+  padding: 0.2rem 0.4rem;
+  border-radius: 8px;
+  color: #4a5568;
+  margin-top: 0.2rem;
   display: inline-block;
 }
 
@@ -145,26 +128,20 @@ const roleBadgeClass = computed(() => {
   text-align: center;
 }
 
-/* Role-specific colors matching the master member card */
 .role-badge--master {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  background: #6c5ce7;
 }
 
 .role-badge--finance {
-  background: #ff8c42;
-  box-shadow: 0 2px 8px rgba(255, 140, 66, 0.3);
-}
-
-.role-badge--logistics {
-  background: #4da6ff;
-  box-shadow: 0 2px 8px rgba(77, 166, 255, 0.3);
+  background: #ff6b6b;
 }
 
 .role-badge--schedule {
-  background: #ffb3d9;
-  color: #6b2c5c;
-  box-shadow: 0 2px 8px rgba(255, 179, 217, 0.3);
+  background: #45b7d1;
+}
+
+.role-badge--logistics {
+  background: #f9ca24;
 }
 
 .role-badge--member {
@@ -200,5 +177,12 @@ const roleBadgeClass = computed(() => {
     font-size: 0.8rem;
     padding: 0.4rem 0.6rem;
   }
+}
+
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
 }
 </style>

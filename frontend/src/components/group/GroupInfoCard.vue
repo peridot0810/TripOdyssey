@@ -10,9 +10,7 @@
 
         <!-- 날짜 섹션 -->
         <div class="date-section">
-          <div class="date-display">
-            {{ group.startDate }} ~ {{ group.endDate }}
-          </div>
+          <div class="date-display">{{ group.startDate }} ~ {{ group.endDate }}</div>
         </div>
 
         <!-- 역할 제한 섹션 -->
@@ -67,8 +65,20 @@ const props = defineProps({
 
 const router = useRouter()
 // 그룹 이미지 URL - 실제 이미지로 교체 가능
-const groupImageUrl =
-  'https://fastly.picsum.photos/id/20/3670/2462.jpg?hmac=CmQ0ln-k5ZqkdtLvVO23LjVAEabZQx2wOaT4pyeG10I'
+const groupImageUrl = computed(() => {
+  if (!props.group?.imageUrl) {
+    return 'https://fastly.picsum.photos/id/20/3670/2462.jpg?hmac=CmQ0ln-k5ZqkdtLvVO23LjVAEabZQx2wOaT4pyeG10I' // fallback image
+  }
+
+  // If it's already a full URL, return as is
+  if (props.group.imageUrl.startsWith('http')) {
+    return props.group.imageUrl
+  }
+
+  // If it's a relative path, construct full URL
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
+  return `${API_BASE_URL}${props.group.imageUrl}`
+})
 
 // 상태 텍스트 계산 - 상태에 따라 한글로 표시
 const statusText = computed(() => {
@@ -156,7 +166,7 @@ const goToGroupPage = () => {
   flex-direction: column;
   transition: all 0.3s ease;
   z-index: 2;
-  color: #2C2C2C;
+  color: #2c2c2c;
 }
 
 /* 이미지 영역 스타일 - 피그마 기준으로 수정 */
@@ -165,7 +175,7 @@ const goToGroupPage = () => {
   height: 100%;
   flex-shrink: 0;
   transition: all 0.5s ease;
-  background-color: #D9D9D9;
+  background-color: #d9d9d9;
 }
 
 .image {
@@ -193,7 +203,7 @@ const goToGroupPage = () => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: #2C2C2C;
+  color: #2c2c2c;
 }
 
 /* 날짜 섹션 - 피그마 기준으로 수정 */
@@ -211,7 +221,7 @@ const goToGroupPage = () => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: #2C2C2C;
+  color: #2c2c2c;
 }
 
 /* 역할 제한 섹션 - 피그마 기준으로 수정 */
@@ -237,12 +247,13 @@ const goToGroupPage = () => {
 }
 
 /* 역할 라벨과 값 스타일 - 피그마 기준으로 수정 */
-.limit-label, .limit-value {
+.limit-label,
+.limit-value {
   font-family: 'Inter', sans-serif;
   font-size: 15px;
   font-weight: 400;
   transition: color 0.3s ease;
-  color: #2C2C2C;
+  color: #2c2c2c;
 }
 
 /* 상태 섹션 - 피그마 기준으로 수정 */
@@ -258,7 +269,7 @@ const goToGroupPage = () => {
   font-weight: 400;
   transition: color 0.3s ease;
   display: block;
-  color: #2C2C2C;
+  color: #2c2c2c;
 }
 
 /* === 반응형 디자인 === */

@@ -1,6 +1,6 @@
 <template>
   <div class="home-container">
-    <h1 class="page-title">My Groups</h1>
+    <h1 class="page-title">나의 여행 그룹</h1>
 
     <!-- Loading State -->
     <div v-if="isLoading" class="loading-container">
@@ -67,18 +67,18 @@ const loadGroups = async () => {
   try {
     const response = await apiClient.get('/user/groups')
 
-    console.log("response : ", response)
+    console.log('response : ', response)
     // Transform API response to match expected format
     const transformedGroups = response.data.map((group) => ({
       groupId: group.groupId,
       name: group.name,
-      description: '', // API doesn't provide description, set empty
       status: group.status,
       startDate: group.startDate,
       endDate: group.endDate,
       memberCount: group.memberCount,
       myRole: group.myRole,
       progress: group.progress,
+      imageUrl: group.imageUrl, // Add this line
       roleLimits: {
         finance: 1, // Default values since API doesn't provide these
         schedule: 1,

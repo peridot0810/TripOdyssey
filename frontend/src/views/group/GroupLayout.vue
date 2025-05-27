@@ -7,39 +7,25 @@
 
   <!-- Error State -->
   <div v-else-if="error" class="error-container">
-    <v-alert
-      type="error"
-      variant="tonal"
-      class="mb-4"
-      :text="error"
-    >
+    <v-alert type="error" variant="tonal" class="mb-4" :text="error">
       <template #append>
-        <v-btn
-          variant="text"
-          size="small"
-          @click="loadGroupInfo"
-        >
-          다시 시도
-        </v-btn>
+        <v-btn variant="text" size="small" @click="loadGroupInfo"> 다시 시도 </v-btn>
       </template>
     </v-alert>
 
-    <v-btn
-      to="/"
-      variant="outlined"
-      prepend-icon="mdi-arrow-left"
-    >
-      홈으로 돌아가기
-    </v-btn>
+    <v-btn to="/" variant="outlined" prepend-icon="mdi-arrow-left"> 홈으로 돌아가기 </v-btn>
   </div>
 
   <!-- Main Content -->
   <div v-else-if="groupStore.hasGroup" class="group-layout">
     <!-- Navigation Drawer -->
-    <div class="navigator-container">
+    <div class="navigator-container" :class="currentPageClass">
+      <!-- Radial spread overlay -->
+      <div class="radial-overlay" :class="radialOverlayClass"></div>
+
       <!-- Navigation Links -->
       <div class="navigator">
-                <div
+        <div
           v-for="item in links"
           :key="item.label"
           class="nav-item"
@@ -51,7 +37,10 @@
               <img
                 :src="getIconPath(item.icon)"
                 :alt="item.label"
-                :class="['nav-icon', { 'nav-icon-large': item.path === 'master' || item.path === 'logistics' }]"
+                :class="[
+                  'nav-icon',
+                  { 'nav-icon-large': item.path === 'master' || item.path === 'logistics' },
+                ]"
               />
             </div>
             <span class="nav-label">{{ item.label }}</span>
@@ -64,12 +53,12 @@
     <v-main class="pa-4">
       <RouterView />
     </v-main>
-    <HelperSpace/>
+    <HelperSpace />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, watch, onUnmounted } from 'vue'
+import { ref, onMounted, watch, onUnmounted, computed } from 'vue'
 import { useRoute, useRouter, RouterView } from 'vue-router'
 import { useGroupStore } from '@/stores/group'
 import { apiClient } from '@/utils/apiClient'
@@ -104,12 +93,32 @@ const getIconPath = (iconName) => {
 const isActiveRoute = (itemPath) => {
   // 그룹 홈의 경우 (빈 경로)
   if (itemPath === '') {
-    return route.path === `/group/${groupId}` || route.path === `/group/${groupId}/`;
+    return route.path === `/group/${groupId}` || route.path === `/group/${groupId}/`
   }
 
   // 다른 메뉴 아이템의 경우
-  return route.path === `/group/${groupId}/${itemPath}`;
+  return route.path === `/group/${groupId}/${itemPath}`
 }
+
+// 현재 페이지에 따른 클래스 계산
+const currentPageClass = computed(() => {
+  const path = route.path
+  if (path.includes('/master')) return 'page-master'
+  if (path.includes('/logistics')) return 'page-logistics'
+  if (path.includes('/finance')) return 'page-finance'
+  if (path.includes('/schedule')) return 'page-schedule'
+  return ''
+})
+
+// 라디얼 오버레이 클래스 계산
+const radialOverlayClass = computed(() => {
+  const path = route.path
+  if (path.includes('/master')) return 'radial-master'
+  if (path.includes('/logistics')) return 'radial-logistics'
+  if (path.includes('/finance')) return 'radial-finance'
+  if (path.includes('/schedule')) return 'radial-schedule'
+  return ''
+})
 
 // Load group information and store in pinia
 const loadGroupInfo = async () => {
@@ -149,7 +158,7 @@ watch(
     if (newGroupId && newGroupId !== oldGroupId) {
       loadGroupInfo()
     }
-  }
+  },
 )
 
 onMounted(() => {
@@ -196,17 +205,117 @@ onUnmounted(() => {
 /* 네비게이터 컨테이너 스타일 */
 .navigator-container {
   width: 258px;
-  background-color: #F5F5F5;
+  background-color: #f5f5f5;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding-top: 13px;
-  height: calc(100vh - 100px);
+  height: calc(100vh);
   position: fixed;
   left: 0;
   top: 60px;
   z-index: 100;
+  transition: background-color 0.5s ease;
+  overflow: hidden;
 }
+
+/* 라디얼 오버레이 */
+.radial-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0;
+  transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: scale(0);
+  border-radius: 50%;
+  z-index: 1;
+}
+
+/* 라디얼 스프레드 애니메이션 클래스들 */
+.radial-master {
+  background: radial-gradient(
+    circle,
+    rgba(46, 199, 197, 0.15) 0%,
+    rgba(46, 199, 197, 0.08) 50%,
+    rgba(46, 199, 197, 0.03) 100%
+  );
+  opacity: 1;
+  transform: scale(3);
+  animation: radialSpread 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.radial-logistics {
+  background: radial-gradient(
+    circle,
+    rgba(59, 130, 246, 0.15) 0%,
+    rgba(59, 130, 246, 0.08) 50%,
+    rgba(59, 130, 246, 0.03) 100%
+  );
+  opacity: 1;
+  transform: scale(3);
+  animation: radialSpread 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.radial-finance {
+  background: radial-gradient(
+    circle,
+    rgba(249, 115, 22, 0.15) 0%,
+    rgba(249, 115, 22, 0.08) 50%,
+    rgba(249, 115, 22, 0.03) 100%
+  );
+  opacity: 1;
+  transform: scale(3);
+  animation: radialSpread 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.radial-schedule {
+  background: radial-gradient(
+    circle,
+    rgba(236, 72, 153, 0.15) 0%,
+    rgba(236, 72, 153, 0.08) 50%,
+    rgba(236, 72, 153, 0.03) 100%
+  );
+  opacity: 1;
+  transform: scale(3);
+  animation: radialSpread 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* 라디얼 스프레드 키프레임 애니메이션 */
+@keyframes radialSpread {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(3);
+    opacity: 1;
+  }
+}
+
+/* 페이지별 배경색 변경 */
+.page-master {
+  background: linear-gradient(135deg, #54ebca 0%, rgba(38, 110, 138, 0.05) 100%);
+}
+
+.page-logistics {
+  background-color: #08549b;
+}
+
+.page-finance {
+  background-color: #ff9900;
+}
+
+.page-schedule {
+  background-color: #d13166;
+}
+
+/* background: linear-gradient(135deg, #ff9900 0%, rgba(249, 115, 22, 0.05) 100%); */
 
 /* 네비게이터 스타일 */
 .navigator {
@@ -216,6 +325,8 @@ onUnmounted(() => {
   gap: 18.48px;
   width: 100%;
   margin-top: 30px;
+  position: relative;
+  z-index: 2;
 }
 
 /* 네비게이션 아이템 스타일 */
@@ -223,8 +334,8 @@ onUnmounted(() => {
   width: 100px;
   height: 100px;
   border-radius: 85px;
-  background-color: #FFFEFF;
-  border: 3px solid #DEDEDE;
+  background-color: #fffeff;
+  border: 3px solid #dedede;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -232,6 +343,8 @@ onUnmounted(() => {
   transition: all 0.3s ease;
   padding: 0;
   overflow: hidden;
+  position: relative;
+  z-index: 3;
 }
 
 /* 네비게이션 아이템 내부 컨텐츠 */
@@ -276,7 +389,7 @@ onUnmounted(() => {
 .nav-label {
   display: none;
   white-space: nowrap;
-  color: #2EC7C5;
+  color: #2ec7c5;
   font-size: 19.2px;
   font-weight: 500;
   margin-left: 10px;
@@ -288,7 +401,7 @@ onUnmounted(() => {
 .nav-item-active {
   width: 220px;
   border-radius: 85px;
-  border: 5px solid #55F6D7;
+  border: 2px solid #666666;
   transform: scale(1.1);
   justify-content: center;
   padding: 0;

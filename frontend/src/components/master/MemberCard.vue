@@ -1,7 +1,7 @@
 <template>
   <div class="member-card">
     <div class="member-info">
-      <span class="user-icon">👤</span>
+      <!-- <span class="user-icon">👤</span> -->
       <span class="nickname">{{ member.nickName }}</span>
       <span class="user-id">({{ member.userId }})</span>
     </div>
@@ -76,10 +76,10 @@ const groupId = computed(() => route.params.groupId)
 
 // Role configuration
 const roleOptions = [
-  { key: 'MASTER', name: '마스터', icon: '' },
-  { key: 'FINANCE', name: '회계', icon: '' },
+  { key: 'MASTER', name: '방장', icon: '' },
+  { key: 'FINANCE', name: '재무', icon: '' },
   { key: 'SCHEDULE', name: '일정', icon: '' },
-  { key: 'LOGISTICS', name: '숙박', icon: '' },
+  { key: 'LOGISTICS', name: '교통/숙박', icon: '' },
   { key: 'MEMBER', name: '멤버', icon: '' },
 ]
 
@@ -176,35 +176,22 @@ const kickMember = async () => {
   align-items: center;
   justify-content: space-between;
   padding: 1rem 1.25rem;
-  border: 3px solid transparent;
-  border-radius: 24px;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  margin-bottom: 0.75rem;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow:
-    0 4px 12px rgba(0, 123, 255, 0.1),
-    0 2px 4px rgba(0, 0, 0, 0.05);
+  border-radius: 20px;
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.05);
   font-family: 'Nunito', sans-serif;
-  position: relative;
-  overflow: hidden;
+  margin-bottom: 0.75rem;
+  transition: box-shadow 0.2s ease;
 }
 
+.member-card:hover {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Remove rainbow top bar */
 .member-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(
-    90deg,
-    #ff6b6b 0%,
-    #4ecdc4 25%,
-    #45b7d1 50%,
-    #f9ca24 75%,
-    #6c5ce7 100%
-  );
-  border-radius: 24px 24px 0 0;
+  display: none;
 }
 
 .member-card:hover {
@@ -269,31 +256,25 @@ const kickMember = async () => {
 
 /* Role-specific colors */
 .role-badge--master {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  background: #6c5ce7;
 }
 
 .role-badge--finance {
-  background: #ff8c42;
-  box-shadow: 0 2px 8px rgba(255, 140, 66, 0.3);
+  background: #ffa217;
 }
 
 .role-badge--logistics {
-  background: #4da6ff;
-  box-shadow: 0 2px 8px rgba(77, 166, 255, 0.3);
+  background: #0984e3;
 }
 
 .role-badge--schedule {
-  background: #ffb3d9;
-  color: #6b2c5c;
-  box-shadow: 0 2px 8px rgba(255, 179, 217, 0.3);
+  background: #ff5a7e;
+  color: #2d3436;
 }
 
 .role-badge--member {
-  background: #f1f3f4;
-  color: #5f6368;
-  border: 2px solid #e8eaed;
-  box-shadow: 0 2px 8px rgba(95, 99, 104, 0.2);
+  background: #dfe6e9;
+  color: #2d3436;
 }
 
 .action-buttons {

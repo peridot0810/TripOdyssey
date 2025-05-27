@@ -41,15 +41,29 @@
           <!-- Contact Information -->
           <div v-if="accommodation.accommodationInfo.tel" class="contact-section mb-2">
             <div class="d-flex align-center">
-              <SvgIcon :path="phoneIcon" type="mdi" size="16" color="grey-darken-1" class="mr-2 contact-icon" />
-              <span class="text-body-2 contact-text">{{ accommodation.accommodationInfo.tel }}</span>
+              <SvgIcon
+                :path="phoneIcon"
+                type="mdi"
+                size="16"
+                color="grey-darken-1"
+                class="mr-2 contact-icon"
+              />
+              <span class="text-body-2 contact-text">{{
+                accommodation.accommodationInfo.tel
+              }}</span>
             </div>
           </div>
 
           <!-- Homepage -->
           <div v-if="accommodation.accommodationInfo.homepage" class="homepage-section mb-2">
             <div class="d-flex align-center">
-              <SvgIcon :path="webIcon" type="mdi" size="16" color="grey-darken-1" class="mr-2 contact-icon" />
+              <SvgIcon
+                :path="webIcon"
+                type="mdi"
+                size="16"
+                color="grey-darken-1"
+                class="mr-2 contact-icon"
+              />
               <a
                 :href="extractUrl(accommodation.accommodationInfo.homepage)"
                 target="_blank"
@@ -63,7 +77,13 @@
           <!-- Address -->
           <div class="address-section mb-3">
             <div class="d-flex align-start">
-              <SvgIcon :path="mapMarkerIcon" type="mdi" size="16" color="grey-darken-1" class="mr-2 mt-1 contact-icon" />
+              <SvgIcon
+                :path="mapMarkerIcon"
+                type="mdi"
+                size="16"
+                color="grey-darken-1"
+                class="mr-2 mt-1 contact-icon"
+              />
               <div class="address-text">
                 <div class="text-body-2">{{ accommodation.accommodationInfo.addr1 }}</div>
                 <div
@@ -87,11 +107,7 @@
                   {{ accommodation.accommodationInfo.overview }}
                 </p>
               </div>
-              <div v-else class="description-section">
-                <p class="text-body-2 text-grey-lighten-1 mb-0 font-italic">
-                  숙소 정보가 제공되지 않았습니다.
-                </p>
-              </div>
+              <div v-else class="description-section"></div>
             </div>
 
             <!-- Delete Button -->
@@ -161,19 +177,12 @@
               <strong>체크아웃:</strong> {{ formatTime(accommodation.checkOutTime) }}
             </div>
           </div>
-          <p class="text-caption text-error mt-3 mb-0">
-            ⚠️ 이 작업은 되돌릴 수 없습니다.
-          </p>
+          <p class="text-caption text-error mt-3 mb-0">⚠️ 이 작업은 되돌릴 수 없습니다.</p>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn variant="text" @click="showDeleteDialog = false">취소</v-btn>
-          <v-btn
-            color="error"
-            variant="elevated"
-            @click="confirmDelete"
-            :loading="isDeleting"
-          >
+          <v-btn color="error" variant="elevated" @click="confirmDelete" :loading="isDeleting">
             예약 취소
           </v-btn>
         </v-card-actions>
@@ -195,7 +204,7 @@ import {
   mdiArrowRight,
   mdiDelete,
   mdiAlertCircle,
-  mdiBed
+  mdiBed,
 } from '@mdi/js'
 
 const phoneIcon = mdiPhone
@@ -257,8 +266,8 @@ const confirmDelete = async () => {
     // Call API to delete accommodation
     const response = await apiClient.delete(`/accommodation/${groupId}`, {
       params: {
-        accommodationId: props.accommodation.accommodationId
-      }
+        accommodationId: props.accommodation.accommodationId,
+      },
     })
 
     if (response.data.success) {
@@ -316,7 +325,9 @@ const confirmDelete = async () => {
 .accommodation-card {
   width: 100%;
   border-radius: 12px;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
   border: 1px solid #e0e0e0;
   overflow: hidden;
   position: relative;

@@ -44,7 +44,7 @@
 
       <!-- Category Block -->
       <div class="category-block d-flex align-center justify-center">
-        <v-chip size="small" color="primary" variant="flat" class="text-caption">
+        <v-chip size="small" color="orange" variant="flat" class="text-caption">
           {{ getCategoryDisplayName(expense.categoryId) }}
         </v-chip>
       </div>
@@ -124,9 +124,7 @@
               {{ formatDate(expense.datetime) }} {{ formatTime(expense.datetime) }}
             </div>
           </div>
-          <p class="text-caption text-error mt-2 mb-0">
-            이 작업은 되돌릴 수 없습니다.
-          </p>
+          <p class="text-caption text-error mt-2 mb-0">이 작업은 되돌릴 수 없습니다.</p>
         </v-card-text>
 
         <v-card-actions>
@@ -139,12 +137,7 @@
           >
             취소
           </v-btn>
-          <v-btn
-            color="error"
-            variant="elevated"
-            @click="confirmDelete"
-            :loading="deleteLoading"
-          >
+          <v-btn color="error" variant="elevated" @click="confirmDelete" :loading="deleteLoading">
             삭제
           </v-btn>
         </v-card-actions>
@@ -207,7 +200,7 @@ const categoryDisplayMap = {
   3: '식비',
   4: '레저',
   5: '공용품',
-  6: '기타'
+  6: '기타',
 }
 
 // Get Korean category name
@@ -254,8 +247,8 @@ const confirmDelete = async () => {
     // Make API call to delete expense
     const response = await apiClient.delete(`/financial/expense-tracker/${groupId}`, {
       params: {
-        expenseId: props.expense.expenseId
-      }
+        expenseId: props.expense.expenseId,
+      },
     })
 
     console.log('Delete API response:', response.data)
@@ -271,7 +264,6 @@ const confirmDelete = async () => {
     } else {
       throw new Error(response.data.message || '경비 삭제에 실패했습니다.')
     }
-
   } catch (error) {
     console.error('Error deleting expense:', error)
 
@@ -300,7 +292,6 @@ const confirmDelete = async () => {
 
     // Set error in store
     financeStore.setError(errorMessage)
-
   } finally {
     deleteLoading.value = false
   }
@@ -524,5 +515,4 @@ const confirmDelete = async () => {
   object-fit: cover;
   border-radius: 8px;
 }
-
 </style>

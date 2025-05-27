@@ -3,42 +3,28 @@
     <v-card class="transportation-dialog-card">
       <!-- Header -->
       <v-card-title class="transportation-dialog-header">
-        <v-icon color="info" class="mr-2">mdi-train</v-icon>
-        교통편 티켓 인식
-        <v-spacer></v-spacer>
-        <v-btn icon variant="text" @click="closeDialog">
-          <v-icon>mdi-close</v-icon>
+        <div class="header-content">
+          <v-icon color="white" class="header-icon">mdi-train</v-icon>
+          <h3 class="header-title">교통편 티켓 인식</h3>
+        </div>
+        <v-btn icon variant="text" @click="closeDialog" class="close-button">
+          <v-icon color="white">mdi-close</v-icon>
         </v-btn>
       </v-card-title>
 
-      <v-divider></v-divider>
-
       <!-- Content Area -->
       <v-card-text class="dialog-content">
-        <!-- Instructions -->
-        <div class="instructions-section">
-          <v-alert type="info" variant="tonal" density="comfortable" class="mb-4">
-            <div class="instruction-text">
-              <v-icon start>mdi-camera</v-icon>
-              <strong>티켓 이미지를 업로드하세요</strong><br />
-              기차표, 버스표, 항공권 등의 이미지를 업로드하면<br />
-              자동으로 교통편 정보를 추출해드립니다.
-            </div>
-          </v-alert>
-        </div>
-
         <!-- Image Upload Section -->
         <div class="upload-section">
           <v-file-input
             v-model="selectedImage"
-            label="티켓 이미지 선택"
+            label="티켓 이미지 선택하면 자동으로 분석해줄게!"
             accept="image/*"
             variant="outlined"
-            prepend-icon="mdi-camera"
             show-size
             :disabled="isProcessing"
             @update:model-value="handleImageSelect"
-            class="mb-4"
+            class="upload-input"
           />
 
           <!-- Image Preview -->
@@ -62,9 +48,9 @@
         </div>
 
         <!-- Processing State -->
-        <div v-if="isProcessing" class="processing-section text-center py-4">
+        <div v-if="isProcessing" class="processing-section">
           <v-progress-circular indeterminate color="info" size="48"></v-progress-circular>
-          <p class="text-body-1 mt-3">티켓 정보를 추출하는 중...</p>
+          <p class="processing-text">티켓 정보를 추출하는 중...</p>
         </div>
 
         <!-- Result Display -->
@@ -171,10 +157,6 @@ const isOpen = computed({
 })
 
 const handleImageSelect = (files) => {
-  console.log('🔵 handleImageSelect called with:', files)
-  console.log('🔵 Type of files:', typeof files)
-  console.log('🔵 Is array:', Array.isArray(files))
-
   let fileToProcess = null
 
   if (files) {
@@ -198,9 +180,7 @@ const handleImageSelect = (files) => {
     const reader = new FileReader()
 
     reader.onload = (e) => {
-      console.log('🔵 FileReader loaded successfully')
       imagePreview.value = e.target.result
-      console.log('🔵 Image preview set')
     }
 
     reader.onerror = (e) => {
@@ -209,7 +189,6 @@ const handleImageSelect = (files) => {
 
     reader.readAsDataURL(fileToProcess)
     extractedData.value = null
-    console.log('🔵 Cleared previous results')
   } else {
     console.log('⚠️ No valid file found')
     console.log('selectedImage.value after assignment:', selectedImage.value)
@@ -223,11 +202,6 @@ const clearImage = () => {
 }
 
 const processTicket = async () => {
-  console.log('🔵 processTicket function called')
-  console.log('🔵 selectedImage.value:', selectedImage.value)
-  console.log('🔵 Type of selectedImage.value:', typeof selectedImage.value)
-  console.log('🔵 Is array:', Array.isArray(selectedImage.value))
-
   let fileToUpload = null
 
   if (selectedImage.value) {
@@ -269,11 +243,7 @@ const processTicket = async () => {
       lastModified: fileToUpload.lastModified,
     })
 
-    console.log('🔵 FormData created successfully')
-
     const endpoint = `/transportation/${groupId}/generate`
-    console.log('🔵 API endpoint:', endpoint)
-    console.log('🔵 Making API call...')
 
     const response = await apiClient.post(endpoint, formData, {
       headers: {
@@ -281,13 +251,9 @@ const processTicket = async () => {
       },
     })
 
-    console.log('✅ API call successful!')
-    console.log('✅ Response status:', response.status)
-    console.log('✅ Full response object:', response)
     console.log('✅ Response data:', response.data)
 
     if (response.data && response.data.success) {
-      console.log('✅ Server returned success=true')
       extractedData.value = response.data.data
       console.log('✅ Extracted transportation data:', extractedData.value)
 
@@ -300,11 +266,6 @@ const processTicket = async () => {
     }
   } catch (error) {
     console.error('❌ API call failed!')
-    console.error('❌ Error object:', error)
-    console.error('❌ Error message:', error.message)
-    console.error('❌ Error response:', error.response)
-    console.error('❌ Error response data:', error.response?.data)
-    console.error('❌ Error response status:', error.response?.status)
 
     extractedData.value = {
       error: true,
@@ -431,33 +392,104 @@ const formatDateTime = (dateTimeString) => {
   flex-direction: column;
 }
 
+/* Header Styling - Perfect Centering */
 .transportation-dialog-header {
-  background-color: #f0f8ff;
+  background-color: #378edb;
   font-weight: bold;
   padding: 16px 20px;
+  color: white;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.header-icon {
+  font-size: 20px;
+}
+
+.header-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.close-button {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Content Area - Perfect Centering */
 .dialog-content {
-  padding: 20px;
-  flex: 1;
-  overflow-y: auto;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
+/* Instructions Section - Perfect Centering */
 .instructions-section {
-  margin-bottom: 20px;
+  width: 100%;
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: center;
 }
 
 .instruction-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 16px;
+  gap: 8px;
+}
+
+.instruction-icon {
+  margin-bottom: 8px;
+  color: #1976d2;
+}
+
+.instruction-line {
+  margin: 0;
   line-height: 1.5;
+  color: #1976d2;
 }
 
+/* Upload Section - Perfect Centering */
 .upload-section {
-  margin-bottom: 20px;
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
+.hint {
+  color: rgb(43, 97, 177);
+  font-size: 1rem;
+}
+
+.upload-input {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+/* Image Preview - Perfect Centering */
 .image-preview-container {
   display: flex;
   justify-content: center;
+  width: 100%;
 }
 
 .image-preview-card {
@@ -474,11 +506,26 @@ const formatDateTime = (dateTimeString) => {
   justify-content: flex-end;
 }
 
+/* Processing Section - Perfect Centering */
 .processing-section {
-  margin: 20px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 0;
+  text-align: center;
 }
 
+.processing-text {
+  margin-top: 16px;
+  margin-bottom: 0;
+  color: #666;
+}
+
+/* Result Section */
 .result-section {
+  width: 100%;
+  max-width: 400px;
   margin-top: 20px;
 }
 
@@ -489,18 +536,21 @@ const formatDateTime = (dateTimeString) => {
 .result-content p {
   margin-bottom: 8px;
   line-height: 1.4;
+  text-align: left;
 }
 
 .result-content p:last-child {
   margin-bottom: 0;
 }
 
+/* Action Section */
 .action-section {
   padding: 16px 20px;
   background-color: #f8f9fa;
   gap: 12px;
 }
 
+/* Scrollbar Styling */
 .dialog-content::-webkit-scrollbar {
   width: 6px;
 }
