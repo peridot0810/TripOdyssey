@@ -152,11 +152,11 @@
 ### ✅ 프로젝트 클론
 1. **git clone**
     ```bash
-    git clone https://lab.ssafy.com/ssafy_13th_18class/999_final/ssafy_trip_final_kimjoonhyeok_parkjihun_bonghyenjin
+    git clone https://github.com/peridot0810/TripOdyssey
     ```
 2. **프로젝트 진입**
     ```bash
-    cd ssafy_trip_final_kimjoonhyeok_parkjihun_bonghyenjin/
+    cd TripOdyssey/
     ```
 
 ### ✅ DB(MySQL) 설정
