@@ -179,7 +179,7 @@
 - backend/src/main/resources/sql/schema.sql 실행
 
 4. **데이터 삽입**
-- backend/src/main/resources/sql/attraction_data.sql, dummy_data.sql 실행
+- backend/src/main/resources/sql/attraction_data.sql, category_data.sql 실행
 
 ### ✅ 환경 변수 설정
 1. **Chat GPT API 설정**
