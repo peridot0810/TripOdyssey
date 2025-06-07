@@ -189,6 +189,7 @@
     ``` 
 2. **JWT Secrete Key 설정**
   - backend/.env에 JWT 비밀 키 정보 추가 입력
+  - **JWT 비밀 키는 충분히 길어야함**
     ```bash
     JWT_SECRET_KEY={jwt secret key} 
     ```
